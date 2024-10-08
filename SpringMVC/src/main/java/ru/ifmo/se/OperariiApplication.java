@@ -1,13 +1,13 @@
-package ru.ifmo.se.springmvc;
+package ru.ifmo.se;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SpringMvcApplication {
+public class OperariiApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringMvcApplication.class, args);
+		SpringApplication.run(OperariiApplication.class, args);
 	}
 
 }
