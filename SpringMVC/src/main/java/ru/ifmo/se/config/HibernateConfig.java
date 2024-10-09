@@ -17,7 +17,7 @@ public class HibernateConfig {
     public LocalSessionFactoryBean sessionFactory() {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource();
-        sessionFactory.setPackagesToScan("com.javachinna.model");
+        sessionFactory.setPackagesToScan("");
         sessionFactory.setHibernateProperties(hibernateProperties());
         return sessionFactory;
     }

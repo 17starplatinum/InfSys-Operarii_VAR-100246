@@ -1,6 +1,6 @@
 package ru.ifmo.se.config;
 
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -15,9 +15,13 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
-    private final JWTAuthFilter jwtRequestFilter;
+    private JWTAuthFilter jwtRequestFilter;
+
+    @Autowired
+    public void setJwtRequestFilter(JWTAuthFilter jwtRequestFilter) {
+        this.jwtRequestFilter = jwtRequestFilter;
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -34,7 +38,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        .requestMatchers("/api/**").hasAnyRole("ADMIN", "USER")
+                        .requestMatchers("/api/**").hasAnyRole("USER", "ADMIN")
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session

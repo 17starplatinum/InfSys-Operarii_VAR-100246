@@ -8,6 +8,7 @@ import ru.ifmo.se.entity.UserRole;
 import ru.ifmo.se.entity.Worker;
 import ru.ifmo.se.repository.UserRepository;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -20,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Slf4j
 public class UserService implements UserDetailsService {
     private UserRepository userRepository;
 
@@ -62,14 +64,15 @@ public class UserService implements UserDetailsService {
 
         return userRepository.save(user);
     }
-
-    public String login(UserLoginDTO loginDTO) {
+    @Transactional
+    public User login(UserLoginDTO loginDTO) {
+        log.info("authenticate()");
         authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginDTO.getUsername(), loginDTO.getPassword())
         );
-        UserDetails userDetails = loadUserByUsername(loginDTO.getUsername());
+        log.info("authenticate() ended");
 
-        return jwtService.generateToken(userDetails);
+        return userRepository.findByUsername(loginDTO.getUsername()).orElseThrow();
     }
 
     @Override
@@ -89,7 +92,8 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public User approveAdmin(AdminApprovalDTO approvalDTO) {
-        User user = userRepository.findById(approvalDTO.getUserID()).orElseThrow(() -> new IllegalArgumentException("User not found"));
+        User user = userRepository.findById(approvalDTO.getUserID())
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
         if(!user.isPendingAdminApproval()) {
             throw new IllegalArgumentException("This user has no pending admin approval");
         }
@@ -101,8 +105,14 @@ public class UserService implements UserDetailsService {
     }
 
     public User getCurrentUser() {
-        String username = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        return userRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(principal instanceof UserDetails) {
+            String username = ((UserDetails)principal).getUsername();
+            return userRepository.findByUsername(username)
+                    .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
+        } else {
+            throw new IllegalStateException("Authentication principal is not of type UserDetails");
+        }
     }
 
     public boolean canModifyWorker(Worker worker) {

@@ -21,7 +21,7 @@ import java.util.List;
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotNull
     @Size(min = 2)
@@ -67,4 +67,17 @@ public class User implements UserDetails {
     @OneToOne
     @JoinColumn(name = "update_id", referencedColumnName = "id")
     private UpdateTracker update;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if(o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id != null && id.equals(user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
+    }
 }

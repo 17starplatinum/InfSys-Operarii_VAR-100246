@@ -1,6 +1,6 @@
 package ru.ifmo.se.config;
 
-import ru.ifmo.se.service.UserService;
+import ru.ifmo.se.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -9,23 +9,30 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import ru.ifmo.se.util.MD5PasswordEncoder;
 
 @Configuration
 @RequiredArgsConstructor
 public class ApplicationConfig {
-    private final UserService userService;
+    private final UserRepository userRepository;
+
+    @Bean
+    public UserDetailsService userDetailsService() {
+        return username -> userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+    }
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new MD5PasswordEncoder();
     }
 
     @Bean
     AuthenticationProvider authenticationProvider() {
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
-        authProvider.setUserDetailsService(userService);
+        authProvider.setUserDetailsService(userDetailsService());
         authProvider.setPasswordEncoder(passwordEncoder());
         return authProvider;
     }

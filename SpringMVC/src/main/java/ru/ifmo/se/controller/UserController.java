@@ -1,8 +1,12 @@
 package ru.ifmo.se.controller;
 
+import org.springframework.security.core.Authentication;
 import ru.ifmo.se.dto.AdminApprovalDTO;
+import ru.ifmo.se.dto.AuthLoginResponseDTO;
 import ru.ifmo.se.dto.UserLoginDTO;
 import ru.ifmo.se.dto.UserRegistrationDTO;
+import ru.ifmo.se.entity.User;
+import ru.ifmo.se.service.JWTService;
 import ru.ifmo.se.service.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -13,10 +17,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/auth")
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+
+    private final JWTService jwtService;
 
     @PostMapping("/register")
     public ResponseEntity<String> registerUser(@RequestBody UserRegistrationDTO userRegistrationDTO) {
@@ -25,9 +31,11 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginUser(@RequestBody UserLoginDTO userLoginDTO) {
-        String token = userService.login(userLoginDTO);
-        return ResponseEntity.ok(token);
+    public ResponseEntity<AuthLoginResponseDTO> loginUser(@RequestBody UserLoginDTO userLoginDTO) {
+        User authenticatedUser = userService.login(userLoginDTO);
+        String token = jwtService.generateToken(authenticatedUser);
+        AuthLoginResponseDTO authLoginResponseDTO = AuthLoginResponseDTO.builder().token(token).expiration(jwtService.getExpirationTime()).build();
+        return ResponseEntity.ok(authLoginResponseDTO);
     }
 
     @PostMapping("/request-admin")
