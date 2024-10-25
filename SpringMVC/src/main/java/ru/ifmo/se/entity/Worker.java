@@ -1,14 +1,19 @@
 package ru.ifmo.se.entity;
 
+import ru.ifmo.se.entity.enumerated.Position;
+import ru.ifmo.se.entity.enumerated.Status;
+
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
+import ru.ifmo.se.entity.operation.WorkerOperation;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Table(name = "worker", schema = "s372799")
@@ -21,19 +26,20 @@ public class Worker {
     private long id;
 
     @NotNull
+    @Size(min = 1)
     @Column(name = "name")
     private String name;
 
     @NotNull
-    @OneToOne
-    @JoinColumn(name = "coordinate_id", referencedColumnName = "id")
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "coordinates_id")
     private Coordinates coordinates;
 
-    @NotNull
-    private LocalDateTime creationDate;
+    @Column(nullable = false)
+    private LocalDateTime creationDate = LocalDateTime.now();
 
     @OneToOne
-    @JoinColumn(name = "organization_id", referencedColumnName = "id")
+    @JoinColumn(name = "organization_id")
     private Organization organization;
 
     @Min(1)
@@ -43,6 +49,7 @@ public class Worker {
     private int rating;
 
     @NotNull
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Position position;
 
@@ -50,16 +57,15 @@ public class Worker {
     private Status status;
 
     @NotNull
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "human_id", referencedColumnName = "id")
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "human_id")
     private Person person;
 
     @NotNull
     @ManyToOne
-    @JoinColumn(name = "creator_id", referencedColumnName = "id")
+    @JoinColumn(name = "creator_id")
     private User creator;
 
-    @OneToOne
-    @JoinColumn(name = "update_id", referencedColumnName = "id")
-    private UpdateTracker update;
+    @OneToMany(mappedBy = "worker", cascade = CascadeType.REMOVE)
+    private List<WorkerOperation> operations;
 }

@@ -1,10 +1,14 @@
 package ru.ifmo.se.entity;
 
+import ru.ifmo.se.entity.operation.CoordinatesOperation;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(name = "coordinates", schema = "s372799")
@@ -22,7 +26,9 @@ public class Coordinates {
     @Max(12)
     private int y;
 
-    @OneToOne
-    @JoinColumn(name = "update_id", referencedColumnName = "id")
-    private UpdateTracker update;
+    @OneToMany(mappedBy = "coordinates")
+    private List<Worker> workers;
+
+    @OneToMany(mappedBy = "coordinates", cascade = CascadeType.REMOVE)
+    private List<CoordinatesOperation> operations;
 }

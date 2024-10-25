@@ -1,5 +1,9 @@
 package ru.ifmo.se.entity;
 
+import ru.ifmo.se.entity.enumerated.Color;
+import ru.ifmo.se.entity.enumerated.Country;
+import ru.ifmo.se.entity.operation.PersonOperation;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Min;
@@ -8,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "human", schema = "s372799")
@@ -28,7 +33,7 @@ public class Person {
 
     @NotNull
     @OneToOne
-    @JoinColumn(name = "location_id", referencedColumnName = "id")
+    @JoinColumn(name = "location_id")
     private Location location;
 
     private LocalDate birthday;
@@ -41,7 +46,9 @@ public class Person {
     @Enumerated(EnumType.STRING)
     private Country nationality;
 
-    @OneToOne
-    @JoinColumn(name = "update_id", referencedColumnName = "id")
-    private UpdateTracker update;
+    @OneToOne(mappedBy = "person")
+    private Worker worker;
+
+    @OneToMany(mappedBy = "person", cascade = CascadeType.REMOVE)
+    private List<PersonOperation> operations;
 }

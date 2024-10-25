@@ -4,9 +4,9 @@ import ru.ifmo.se.dto.UserLoginDTO;
 import ru.ifmo.se.dto.UserRegistrationDTO;
 import ru.ifmo.se.dto.AdminApprovalDTO;
 import ru.ifmo.se.entity.User;
-import ru.ifmo.se.entity.UserRole;
+import ru.ifmo.se.entity.enumerated.UserRole;
 import ru.ifmo.se.entity.Worker;
-import ru.ifmo.se.repository.UserRepository;
+import ru.ifmo.se.repository.entity.UserRepository;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

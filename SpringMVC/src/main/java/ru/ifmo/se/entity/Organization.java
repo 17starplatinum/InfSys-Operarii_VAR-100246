@@ -1,5 +1,8 @@
 package ru.ifmo.se.entity;
 
+import ru.ifmo.se.entity.enumerated.OrganizationType;
+import ru.ifmo.se.entity.operation.OrganizationOperation;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
@@ -7,6 +10,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.util.List;
 
 @Entity
 @Table(name = "coordinates", schema = "s372799")
@@ -20,7 +25,7 @@ public class Organization {
 
     @NotNull
     @OneToOne
-    @JoinColumn(name = "legal_id", referencedColumnName = "id")
+    @JoinColumn(name = "legal_id")
     private Address officialAddress;
 
     @NotNull
@@ -38,10 +43,12 @@ public class Organization {
 
     @NotNull
     @OneToOne
-    @JoinColumn(name = "postal_id", referencedColumnName = "id")
+    @JoinColumn(name = "postal_id")
     private Address postalAddress;
 
-    @OneToOne
-    @JoinColumn(name = "update_id", referencedColumnName = "id")
-    private UpdateTracker update;
+    @OneToOne(mappedBy = "organization")
+    private Worker worker;
+
+    @OneToMany(mappedBy = "organization", cascade = CascadeType.REMOVE)
+    private List<OrganizationOperation> operations;
 }

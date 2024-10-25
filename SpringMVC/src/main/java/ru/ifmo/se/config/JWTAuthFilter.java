@@ -4,6 +4,7 @@ import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,27 +21,18 @@ import ru.ifmo.se.service.JWTService;
 import ru.ifmo.se.service.UserService;
 
 @Component
+@RequiredArgsConstructor
 @Log4j2
 public class JWTAuthFilter extends OncePerRequestFilter {
-    private JWTService jwtService;
+    private final JWTService jwtService;
 
-    private UserDetailsService userDetailsService;
-
-    @Autowired
-    public void setJWTUtil(JWTService jwtService) {
-        this.jwtService = jwtService;
-    }
-
-    @Autowired
-    public void setUserDetailsService(UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
+    private final UserDetailsService userDetailsService;
 
     @Override
     @SneakyThrows
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) {
         final String authHeader = request.getHeader("Authorization");
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+        if (authHeader == null && !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }

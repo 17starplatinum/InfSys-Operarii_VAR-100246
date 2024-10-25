@@ -1,13 +1,25 @@
 package ru.ifmo.se.util;
 
 import ru.ifmo.se.dto.WorkerDTO;
-import ru.ifmo.se.entity.Worker;
+import ru.ifmo.se.dto.CoordinatesDTO;
+import ru.ifmo.se.dto.PersonDTO;
+import ru.ifmo.se.dto.OrganizationDTO;
+import ru.ifmo.se.dto.LocationDTO;
+import ru.ifmo.se.dto.AddressDTO;
+import ru.ifmo.se.entity.*;
+import ru.ifmo.se.service.UserService;
 
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Component;
 
-@Component
-public class EntityMapper {
+import java.time.LocalDateTime;
 
+@Component
+@RequiredArgsConstructor
+public class EntityMapper {
+    //TODO: абсолютная хуйня
     public WorkerDTO toWorkerDTO(Worker worker) {
         WorkerDTO workerDTO = new WorkerDTO();
         workerDTO.setName(worker.getName());

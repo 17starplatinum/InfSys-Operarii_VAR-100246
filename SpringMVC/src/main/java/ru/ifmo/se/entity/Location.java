@@ -1,10 +1,14 @@
 package ru.ifmo.se.entity;
 
+import ru.ifmo.se.entity.operation.LocationOperation;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
+
+import java.util.List;
 
 @Entity
 @Table(name = "location", schema = "s372799")
@@ -24,7 +28,12 @@ public class Location {
     @NotNull
     private Long z;
 
-    @OneToOne
-    @JoinColumn(name = "update_id", referencedColumnName = "id")
-    private UpdateTracker update;
+    @OneToOne(mappedBy = "location")
+    private Person person;
+
+    @OneToOne(mappedBy = "town")
+    private Address address;
+
+    @OneToMany(mappedBy = "location", cascade = CascadeType.REMOVE)
+    private List<LocationOperation> operations;
 }

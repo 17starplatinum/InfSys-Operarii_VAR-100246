@@ -1,6 +1,6 @@
 package ru.ifmo.se.config;
 
-import ru.ifmo.se.repository.UserRepository;
+import ru.ifmo.se.repository.entity.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;

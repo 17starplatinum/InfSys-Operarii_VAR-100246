@@ -2,14 +2,13 @@ package ru.ifmo.se.service;
 
 import ru.ifmo.se.dto.WorkerDTO;
 import ru.ifmo.se.entity.Worker;
-import ru.ifmo.se.repository.WorkerRepository;
+import ru.ifmo.se.repository.entity.WorkerRepository;
 import ru.ifmo.se.util.EntityMapper;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;

@@ -1,13 +1,12 @@
 package ru.ifmo.se.controller;
 
+import ru.ifmo.se.dto.PaginationResponseDTO;
 import ru.ifmo.se.dto.WorkerDTO;
 import ru.ifmo.se.service.WorkerService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/workers")
@@ -16,7 +15,7 @@ public class WorkerController {
     private final WorkerService workerService;
 
     @GetMapping
-    public ResponseEntity<List<WorkerDTO>> getAllWorkers() {
+    public ResponseEntity<PaginationResponseDTO<WorkerDTO>> getAllWorkers() {
         return ResponseEntity.ok(workerService.getAllWorkers());
     }
 

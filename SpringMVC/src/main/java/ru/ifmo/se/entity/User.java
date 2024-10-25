@@ -9,6 +9,7 @@ import lombok.Setter;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import ru.ifmo.se.entity.enumerated.UserRole;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,7 +25,7 @@ public class User implements UserDetails {
     private Long id;
 
     @NotNull
-    @Size(min = 2)
+    @Size(min = 1)
     private String username;
 
     @NotNull
@@ -63,10 +64,6 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
-
-    @OneToOne
-    @JoinColumn(name = "update_id", referencedColumnName = "id")
-    private UpdateTracker update;
 
     @Override
     public boolean equals(Object o) {

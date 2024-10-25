@@ -1,6 +1,5 @@
 package ru.ifmo.se.controller;
 
-import org.springframework.security.core.Authentication;
 import ru.ifmo.se.dto.AdminApprovalDTO;
 import ru.ifmo.se.dto.AuthLoginResponseDTO;
 import ru.ifmo.se.dto.UserLoginDTO;
