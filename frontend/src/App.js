@@ -1,25 +1,63 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { useState } from "react";
+import { LoginPage } from "./pages/Login";
+import { RegisterPage } from "./pages/Register";
+import { LayoutPage } from "./pages/Layout";
+import { DashboardComponent } from "./components/Dashboard";
+import { OrganizationsComponent } from "./components/Organizations";
+import { WorkersComponent } from "./components/Workers";
+import { PersonsComponent } from "./components/Persons";
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  const [user, setUser] = useState();
+  const [page, setPage] = useState("");
+
+  if (!user) {
+    switch (page) {
+      case "register":
+        return <RegisterPage setPage={setPage} setUser={setUser} />;
+      default:
+        return <LoginPage setPage={setPage} setUser={setUser} />;
+    }
+  }
+  switch (page) {
+    case "persons":
+      return (
+        <LayoutPage
+          setPage={setPage}
+          user={user}
+          setUser={setUser}
+          content={<PersonsComponent />}
+        />
+      );
+    case "organizations":
+      return (
+        <LayoutPage
+          setPage={setPage}
+          user={user}
+          setUser={setUser}
+          content={<OrganizationsComponent />}
+        />
+      );
+    case "workers":
+      return (
+        <LayoutPage
+          setPage={setPage}
+          user={user}
+          setUser={setUser}
+          content={<WorkersComponent />}
+        />
+      );
+    default:
+      return (
+        <LayoutPage
+          setPage={setPage}
+          user={user}
+          setUser={setUser}
+          content={<DashboardComponent setPage={setPage} />}
+        />
+      );
+  }
 }
 
 export default App;
