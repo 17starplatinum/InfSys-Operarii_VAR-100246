@@ -1,44 +1,61 @@
 package ru.ifmo.se.controller;
 
-import ru.ifmo.se.dto.PaginationResponseDTO;
-import ru.ifmo.se.dto.WorkerDTO;
-import ru.ifmo.se.service.WorkerService;
-
-import lombok.RequiredArgsConstructor;
+import ru.ifmo.se.dto.data.*;
+import ru.ifmo.se.dto.data.response.WorkerDTOResponse;
+import ru.ifmo.se.entity.data.Worker;
+import ru.ifmo.se.entity.data.enumerated.*;
+import ru.ifmo.se.entity.user.User;
+import ru.ifmo.se.service.data.WorkerService;
+import ru.ifmo.se.util.DTOUtil;
+import ru.ifmo.se.websocket.WorkerWebSocketHandler;
+import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
+@AllArgsConstructor
 @RestController
 @RequestMapping("/api/workers")
-@RequiredArgsConstructor
 public class WorkerController {
     private final WorkerService workerService;
 
-    @GetMapping
-    public ResponseEntity<PaginationResponseDTO<WorkerDTO>> getAllWorkers() {
-        return ResponseEntity.ok(workerService.getAllWorkers());
-    }
-
-    @GetMapping("/{id}")
-    public ResponseEntity<WorkerDTO> getWorkerByID(@PathVariable Long id) {
-        return ResponseEntity.ok(workerService.getWorkerByID(id));
-    }
-
     @PostMapping
-    public ResponseEntity<WorkerDTO> createWorker(@RequestBody WorkerDTO workerDTO) {
-        WorkerDTO createdWorker = workerService.createWorker(workerDTO);
-        return ResponseEntity.ok(createdWorker);
+    public ResponseEntity<?> createWorker(@RequestBody @Valid WorkerDTORequest workerDTORequest, BindingResult bindingResult) throws IOException {
+        if(bindingResult.hasErrors()) {
+            Map<String, String> errors = new HashMap<>();
+            bindingResult.getAllErrors().forEach(error -> errors.put(error.getDefaultMessage(), error.getDefaultMessage()));
+            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
+        }
+
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+
+        try {
+            Worker savedWorker = workerService.saveWorker(workerDTORequest, user);
+            return new ResponseEntity<>(DTOUtil.convertToResponse(savedWorker), HttpStatus.CREATED);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity<>("Ошибка при создании работника", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<WorkerDTO> updateWorker(@PathVariable Long id, @RequestBody WorkerDTO workerDTO) {
-        WorkerDTO updatedWorker = workerService.updateWorker(id, workerDTO);
-        return ResponseEntity.ok(updatedWorker);
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<WorkerDTO> deleteWorker(@PathVariable Long id) {
-        workerService.deleteWorker(id);
-        return ResponseEntity.noContent().build();
+    @GetMapping
+    public ResponseEntity<List<WorkerDTOResponse>> getAllWorkers() {
+        List<Worker> workers = workerService.getAllWorkers();
+        List<WorkerDTOResponse> workerDTOResponses = workers.stream()
+                .map(DTOUtil::convertToResponse)
+                .collect(Collectors.toList());
+        return new ResponseEntity.ok(workerDTOResponses);
     }
 }

@@ -1,39 +1,38 @@
 package ru.ifmo.se.config;
 
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.cfg.Configuration;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
-import ru.ifmo.se.entity.*;
+import jakarta.persistence.EntityManagerFactory;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
+import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
+import java.util.Properties;
+import javax.sql.DataSource;
+
+@Configuration
 public class HibernateConfig {
-    private static SessionFactory sessionFactory;
+    @Bean
+    @Primary
+    public LocalSessionFactoryBean sessionFactory(DataSource dataSource) {
+        LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
+        sessionFactory.setDataSource(dataSource);
+        sessionFactory.setPackagesToScan("ru.ifmo.se.entity");
+        sessionFactory.setHibernateProperties(hibernateProperties());
 
-    static {
-        try {
-            Configuration configuration = new Configuration()
-                    .addAnnotatedClass(Worker.class)
-                    .addAnnotatedClass(Address.class)
-                    .addAnnotatedClass(Coordinates.class)
-                    .addAnnotatedClass(Location.class)
-                    .addAnnotatedClass(Organization.class)
-                    .addAnnotatedClass(Person.class)
-                    .addAnnotatedClass(User.class)
-                    .setProperty("hibernate.dialect", "org.hibernate.dialect.PostgreSQL10Dialect")
-                    .setProperty("hibernate.connection.driver_class", "org.postgresql.Driver")
-                    .setProperty("hibernate.connection.url", "jdbc:postgresql://localhost:5432/studs")
-                    .setProperty("hibernate.connection.username", "s372799")
-                    .setProperty("hibernate.connection.password", "xwVxXqHACMOxPOqS")
-                    .setProperty("hibernate.show_sql", "true")
-                    .setProperty("hibernate.format_sql", "true")
-                    .setProperty("hbm2ddl", "update");
-            sessionFactory = configuration.buildSessionFactory(new StandardServiceRegistryBuilder().applySettings(configuration.getProperties()).build());
-        } catch (Throwable ex) {
-            throw new ExceptionInInitializerError(ex);
-        }
+        return sessionFactory;
     }
 
-    public static Session createSession() {
-        return sessionFactory.openSession();
+    private Properties hibernateProperties() {
+        Properties properties = new Properties();
+        properties.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
+        properties.put("hibernate.show_sql", "true");
+        properties.put("hibernate.hbm2ddl.auto", "none");
+
+        return properties;
+    }
+
+    @Bean
+    public EntityManagerFactory entityManagerFactory(LocalSessionFactoryBean sessionFactory) {
+        return sessionFactory.getObject();
     }
 }
