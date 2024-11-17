@@ -1,6 +1,8 @@
+import axios from "axios";
 import { useState } from "react";
+import { V1APIURL } from "../shared/constants";
 
-export const RegisterPage = ({setPage, setUser}) => {
+export const RegisterPage = ({ setPage, setUser }) => {
   const [formData, setFormData] = useState({ username: "", password: "" });
 
   const updateForm = (e) => {
@@ -9,8 +11,19 @@ export const RegisterPage = ({setPage, setUser}) => {
 
   const submitForm = async (e) => {
     e.preventDefault();
-    console.log(formData)
-    setUser({...formData, role: "general"})
+    console.log(formData);
+    try {
+      const res = await axios.post(`${V1APIURL}/auth/register`, formData);
+      if (res.status !== 200) {
+        alert("Failed to register");
+        return false;
+      }
+      setUser({ ...res.data, username: formData.username });
+    } catch (error) {
+      console.log(error);
+      alert("Error, please try again.");
+    }
+    setUser({ ...formData, role: "admin" });
     return false;
   };
 
@@ -24,11 +37,23 @@ export const RegisterPage = ({setPage, setUser}) => {
             </div>
             <div className="mb-4">
               <label htmlFor="username">Username</label>
-              <input className="form-control" name="username" type="text" onChange={updateForm} required={true} />
+              <input
+                className="form-control"
+                name="username"
+                type="text"
+                onChange={updateForm}
+                required={true}
+              />
             </div>
             <div className="mb-4">
               <label htmlFor="password">Password</label>
-              <input className="form-control" name="password" type="password" onChange={updateForm} required={true} />
+              <input
+                className="form-control"
+                name="password"
+                type="password"
+                onChange={updateForm}
+                required={true}
+              />
             </div>
             <div className="mb-4 text-center">
               <button className="btn btn-primary" type="submit">
@@ -36,11 +61,11 @@ export const RegisterPage = ({setPage, setUser}) => {
               </button>
             </div>
           </form>
-            <div className="mb-4 text-center">
-              <button className="btn btn-link" onClick={() => setPage("login")}>
-                <i className="fa fa-user"></i>&nbsp;Login
-              </button>
-            </div>
+          <div className="mb-4 text-center">
+            <button className="btn btn-link" onClick={() => setPage("login")}>
+              <i className="fa fa-user"></i>&nbsp;Login
+            </button>
+          </div>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LoginPage } from "./pages/Login";
 import { RegisterPage } from "./pages/Register";
 import { LayoutPage } from "./pages/Layout";
@@ -11,6 +11,14 @@ import { PersonsComponent } from "./components/Persons";
 function App() {
   const [user, setUser] = useState();
   const [page, setPage] = useState("");
+
+  useEffect(() => {
+    window.localStorage.setItem("token", user.token);
+    window.localStorage.setItem(
+      "axios",
+      JSON.stringify({ headers: { Authorization: `Bearer ${user.token}` } })
+    );
+  }, [user]);
 
   if (!user) {
     switch (page) {

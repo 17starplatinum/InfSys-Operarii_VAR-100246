@@ -1,4 +1,6 @@
+import axios from "axios";
 import { useState } from "react";
+import {V1APIURL} from "../shared/constants"
 
 export const LoginPage = ({setPage, setUser}) => {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -10,6 +12,17 @@ export const LoginPage = ({setPage, setUser}) => {
   const submitForm = async (e) => {
     e.preventDefault();
     console.log(formData)
+    try {
+      const res = await axios.post(`${V1APIURL}/auth/authenticate`, formData)
+      if (res.status !== 200) {
+        alert("Not found")
+        return false
+      }
+      setUser({...res.data, username: formData.username})
+    } catch (error) {
+      console.log(error)
+      alert("Error, please try again.")
+    }
     setUser({...formData, role: "admin"})
     return false;
   };
