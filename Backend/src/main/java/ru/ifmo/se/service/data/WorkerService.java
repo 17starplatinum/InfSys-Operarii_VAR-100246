@@ -1,13 +1,11 @@
 package ru.ifmo.se.service.data;
 
-import ru.ifmo.se.dto.data.PersonDTOwID;
 import ru.ifmo.se.dto.data.WorkerDTORequest;
 import ru.ifmo.se.entity.data.Worker;
 import ru.ifmo.se.entity.data.enumerated.*;
 import ru.ifmo.se.repository.data.*;
 import ru.ifmo.se.entity.user.User;
 import ru.ifmo.se.exception.ResourceNotFoundException;
-import ru.ifmo.se.dto.data.response.WorkerDTOResponse;
 import ru.ifmo.se.entity.data.*;
 import ru.ifmo.se.websocket.WorkerWebSocketHandler;
 import ru.ifmo.se.util.DTOUtil;
@@ -15,7 +13,6 @@ import ru.ifmo.se.util.DTOUtil;
 
 import lombok.RequiredArgsConstructor;
 import org.hibernate.HibernateException;
-import org.hibernate.event.spi.SaveOrUpdateEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
