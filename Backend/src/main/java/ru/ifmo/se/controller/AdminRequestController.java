@@ -4,7 +4,6 @@ import ru.ifmo.se.dto.admin.AdminRequestDTO;
 import ru.ifmo.se.entity.user.AdminRequest;
 import ru.ifmo.se.entity.user.User;
 import ru.ifmo.se.service.user.AdminRequestService;
-import ru.ifmo.se.service.user.AuthenticationService;
 import ru.ifmo.se.util.AdminRequestMapper;
 
 import lombok.AllArgsConstructor;
@@ -22,7 +21,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/admin-request")
 public class AdminRequestController {
     private final AdminRequestService adminRequestService;
-    private final AuthenticationService authenticationService;
     private final AdminRequestMapper adminRequestMapper;
 
     @PostMapping("/request")
@@ -33,10 +31,42 @@ public class AdminRequestController {
         adminRequest.setRequester(currentUser);
         adminRequest.setApprovedByAll(false);
         adminRequest.setApprovedBy(new ArrayList<>());
-        if (adminRequestService.createAdminRequest(adminRequest)) {
-            return ResponseEntity.status(HttpStatus.CREATED).body("Запрос на админку создан.");
+        return (adminRequestService.createAdminRequest(adminRequest)) ?
+                ResponseEntity.status(HttpStatus.CREATED).body("Запрос на админку создан.")
+                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Запрос уже был отправлен.");
+    }
+
+    @GetMapping
+    public ResponseEntity<Map<String, Object>> getAdminRequestStatus() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) authentication.getPrincipal();
+        Optional<AdminRequest> currentRequest = adminRequestService.findByRequester(currentUser);
+        Map<String, Object> response = new HashMap<>();
+        if (currentRequest.isPresent()) {
+            response.put("status", currentRequest.get().isApprovedByAll() ? "approved" : "pending");
+            response.put("message", currentRequest.get().isApprovedByAll() ? "You are now an admin." : "Your request has not yet been processed.");
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Запрос уже был отправлен.");
+            response.put("status", "none");
         }
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<AdminRequestDTO>> getAllAdminRequests() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User currentUser = (User) authentication.getPrincipal();
+        if(currentUser.getAuthorities().stream().anyMatch(grantedAuth -> grantedAuth.getAuthority().equals("ROLE_ADMIN"))) {
+            List<AdminRequest> requests = adminRequestService.getAllAdminRequests();
+            List<AdminRequestDTO> requestDTOs = requests.stream().map(adminRequestMapper::toAdminRequestDTO).toList();
+            return  ResponseEntity.ok(requestDTOs);
+        } else {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+    }
+
+    @PostMapping("/{id}/approve")
+    public ResponseEntity<AdminRequest> approveRequest(@PathVariable Long id) {
+        AdminRequest adminRequest = adminRequestService.getAdminRequestById(id);
+        return (adminRequest != null) ? ResponseEntity.ok(adminRequest) : ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 }

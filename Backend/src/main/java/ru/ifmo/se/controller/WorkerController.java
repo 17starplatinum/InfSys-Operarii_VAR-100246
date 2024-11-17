@@ -56,6 +56,39 @@ public class WorkerController {
         List<WorkerDTOResponse> workerDTOResponses = workers.stream()
                 .map(DTOUtil::convertToResponse)
                 .collect(Collectors.toList());
-        return new ResponseEntity.ok(workerDTOResponses);
+        return ResponseEntity.ok(workerDTOResponses);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<WorkerDTOResponse> getWorkerById(@PathVariable long id) {
+        Worker worker = workerService.getWorkerById(id);
+        return ResponseEntity.ok(DTOUtil.convertToResponse(worker));
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<WorkerDTOResponse> updateWorker(@PathVariable long id, @RequestBody @Valid WorkerDTORequest workerDTORequest) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+
+        Worker currentWorker = workerService.getWorkerById(id);
+        if(!currentWorker.getOwner().getId().equals(user.getId()) && user.getAuthorities().stream().noneMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"))) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        Worker updatedWorker = workerService.updateWorker(currentWorker, workerDTORequest, user);
+        return ResponseEntity.ok(DTOUtil.convertToResponse(updatedWorker));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteWorkerById(@PathVariable long id) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) auth.getPrincipal();
+
+        Worker currentWorker = workerService.getWorkerById(id);
+        if(!currentWorker.getOwner().getId().equals(user.getId()) && user.getAuthorities().stream().noneMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"))) {
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+        workerService.deleteWorkerById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }

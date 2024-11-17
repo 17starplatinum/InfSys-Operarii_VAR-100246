@@ -1,5 +1,6 @@
 package ru.ifmo.se.entity.user;
 
+import jakarta.validation.constraints.Size;
 import ru.ifmo.se.entity.data.*;
 
 import lombok.*;
@@ -24,9 +25,10 @@ public class User implements UserDetails {
     @Column(name = "id", nullable = false, unique = true)
     private Long id;
 
-    @Column(name = "username", nullable = false, length = 100)
+    @Column(name = "username", nullable = false, length = 60)
     private String username;
 
+    @Size(min = 8, message = "Obviously")
     @Column(name = "password", nullable = false, length = 100, unique = true)
     private String password;
 

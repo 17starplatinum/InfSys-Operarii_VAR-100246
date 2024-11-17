@@ -1,7 +1,6 @@
 package ru.ifmo.se.controller;
 
 import ru.ifmo.se.dto.data.AddressDTOwID;
-import ru.ifmo.se.dto.data.AddressDTOwID;
 import ru.ifmo.se.entity.data.Address;
 import ru.ifmo.se.entity.user.User;
 import ru.ifmo.se.service.data.AddressService;
@@ -25,7 +24,7 @@ public class AddressController {
     }
 
     @GetMapping
-    public ResponseEntity<AddressDTOwID> getUserAddress() {
+    public ResponseEntity<AddressDTOwID> getUserAddresses() {
         try {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             User user = (User) auth.getPrincipal();
