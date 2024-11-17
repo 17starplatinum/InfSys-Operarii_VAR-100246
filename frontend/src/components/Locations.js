@@ -4,7 +4,7 @@ import { V1APIURL } from "../shared/constants";
 import axios from "axios";
 import { getAxios } from "../shared/utils";
 
-export const CoordinatesComponent = ({ setPage }) => {
+export const LocationsComponent = ({ setPage }) => {
   const columns = [
     {
       name: "ID",
@@ -17,6 +17,10 @@ export const CoordinatesComponent = ({ setPage }) => {
     {
       name: "Y",
       selector: (item) => item.y,
+    },
+    {
+      name: "Z",
+      selector: (item) => item.z,
     },
     {
       name: "Actions",
@@ -46,7 +50,7 @@ export const CoordinatesComponent = ({ setPage }) => {
 
   const loadItems = async () => {
     try {
-      const res = await axios.get(`${V1APIURL}/coordinates`, getAxios());
+      const res = await axios.get(`${V1APIURL}/locations`, getAxios());
       if (res.status !== 200) {
         alert(`Error: ${res.statusText}`);
         return false;
@@ -72,7 +76,7 @@ export const CoordinatesComponent = ({ setPage }) => {
   const deleteItem = async (item) => {
     try {
       const res = await axios.delete(
-        `${V1APIURL}/coordinates/${item.id}`,
+        `${V1APIURL}/locations/${item.id}`,
         getAxios()
       );
       if (res.status !== 200) {
@@ -92,7 +96,7 @@ export const CoordinatesComponent = ({ setPage }) => {
   };
 
   if (showForm) {
-    return <CoordinatesFormComponent closeForm={closeForm} item={item} />;
+    return <LocationsFormComponent closeForm={closeForm} item={item} />;
   }
 
   return (
@@ -100,7 +104,7 @@ export const CoordinatesComponent = ({ setPage }) => {
       <div className="row">
         <div className="col-12">
           <h2>
-            Coordinates{" "}
+            Locations{" "}
             <button className="btn btn-primary float-end" onClick={addItem}>
               <i className="fa fa-add"></i>&nbsp;Add
             </button>
@@ -110,34 +114,14 @@ export const CoordinatesComponent = ({ setPage }) => {
       <div className="row">
         <div className="col-12">
           <DataTable columns={columns} data={items} pagination />
-          {/* <div className="table-responsive">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>X</th>
-                  <th>Y</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.id}</td>
-                    <td>{item.x}</td>
-                    <td>{item.y}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div> */}
         </div>
       </div>
     </div>
   );
 };
 
-export const CoordinatesFormComponent = ({ closeForm, item }) => {
-  const [formData, setFormData] = useState({ x: "", y: "" });
+export const LocationsFormComponent = ({ closeForm, item }) => {
+  const [formData, setFormData] = useState({ x: "", y: "", z: "" });
 
   useEffect(() => {
     if (item) {
@@ -152,7 +136,7 @@ export const CoordinatesFormComponent = ({ closeForm, item }) => {
   const submitForm = async (e) => {
     try {
       const res = await axios.post(
-        `${V1APIURL}/coordinates${item ? `/${item.id}` : ""}`,
+        `${V1APIURL}/locations${item ? `/${item.id}` : ""}`,
         formData,
         getAxios()
       );
@@ -195,6 +179,16 @@ export const CoordinatesFormComponent = ({ closeForm, item }) => {
                 type="text"
                 onChange={updateForm}
                 value={formData.y}
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="password">Z</label>
+              <input
+                className="form-control"
+                name="z"
+                type="text"
+                onChange={updateForm}
+                value={formData.z}
               />
             </div>
             <div className="mb-4">

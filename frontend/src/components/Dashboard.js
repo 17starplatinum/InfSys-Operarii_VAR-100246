@@ -18,6 +18,21 @@ export const DashboardComponent = ({ setPage }) => {
             title: "Persons",
             icon: "fa fa-people-group",
           },
+          {
+            page: "addresses",
+            title: "Addresses",
+            icon: "fa-solid fa-map",
+          },
+          {
+            page: "coordinates",
+            title: "Coordinates",
+            icon: "fa-solid fa-location-dot",
+          },
+          {
+            page: "location",
+            title: "Locations",
+            icon: "fa-solid fa-location-pin",
+          },
         //   {
         //     page: "organizations",
         //     title: "Organizations",

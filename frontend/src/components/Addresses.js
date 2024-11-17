@@ -4,19 +4,19 @@ import { V1APIURL } from "../shared/constants";
 import axios from "axios";
 import { getAxios } from "../shared/utils";
 
-export const CoordinatesComponent = ({ setPage }) => {
+export const AddressesComponent = ({ setPage }) => {
   const columns = [
     {
       name: "ID",
       selector: (item) => item.id,
     },
     {
-      name: "X",
-      selector: (item) => item.x,
+      name: "ZIP Code",
+      selector: (item) => item.zipCode,
     },
     {
-      name: "Y",
-      selector: (item) => item.y,
+      name: "Location",
+      selector: (item) => item.locationWrapper?.locationId,
     },
     {
       name: "Actions",
@@ -46,7 +46,7 @@ export const CoordinatesComponent = ({ setPage }) => {
 
   const loadItems = async () => {
     try {
-      const res = await axios.get(`${V1APIURL}/coordinates`, getAxios());
+      const res = await axios.get(`${V1APIURL}/addresses`, getAxios());
       if (res.status !== 200) {
         alert(`Error: ${res.statusText}`);
         return false;
@@ -72,7 +72,7 @@ export const CoordinatesComponent = ({ setPage }) => {
   const deleteItem = async (item) => {
     try {
       const res = await axios.delete(
-        `${V1APIURL}/coordinates/${item.id}`,
+        `${V1APIURL}/addresses/${item.id}`,
         getAxios()
       );
       if (res.status !== 200) {
@@ -92,7 +92,7 @@ export const CoordinatesComponent = ({ setPage }) => {
   };
 
   if (showForm) {
-    return <CoordinatesFormComponent closeForm={closeForm} item={item} />;
+    return <AddressesFormComponent closeForm={closeForm} item={item} />;
   }
 
   return (
@@ -100,7 +100,7 @@ export const CoordinatesComponent = ({ setPage }) => {
       <div className="row">
         <div className="col-12">
           <h2>
-            Coordinates{" "}
+            Addresses{" "}
             <button className="btn btn-primary float-end" onClick={addItem}>
               <i className="fa fa-add"></i>&nbsp;Add
             </button>
@@ -110,38 +110,18 @@ export const CoordinatesComponent = ({ setPage }) => {
       <div className="row">
         <div className="col-12">
           <DataTable columns={columns} data={items} pagination />
-          {/* <div className="table-responsive">
-            <table className="table">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>X</th>
-                  <th>Y</th>
-                </tr>
-              </thead>
-              <tbody>
-                {items.map((item, index) => (
-                  <tr key={index}>
-                    <td>{item.id}</td>
-                    <td>{item.x}</td>
-                    <td>{item.y}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div> */}
         </div>
       </div>
     </div>
   );
 };
 
-export const CoordinatesFormComponent = ({ closeForm, item }) => {
-  const [formData, setFormData] = useState({ x: "", y: "" });
+export const AddressesFormComponent = ({ closeForm, item }) => {
+  const [formData, setFormData] = useState({ zipCode: "", locationId: "", locationWrapper: null });
 
   useEffect(() => {
     if (item) {
-      setFormData({ ...item });
+      setFormData({ ...item, locationId: item?.locationWrapper?.locationId });
     }
   }, [item]);
 
@@ -152,7 +132,7 @@ export const CoordinatesFormComponent = ({ closeForm, item }) => {
   const submitForm = async (e) => {
     try {
       const res = await axios.post(
-        `${V1APIURL}/coordinates${item ? `/${item.id}` : ""}`,
+        `${V1APIURL}/addresses${item ? `/${item.id}` : ""}`,
         formData,
         getAxios()
       );
@@ -178,24 +158,28 @@ export const CoordinatesFormComponent = ({ closeForm, item }) => {
         <div className="col-12">
           <form onSubmit={submitForm}>
             <div className="mb-4">
-              <label htmlFor="name">X</label>
+              <label htmlFor="name">ZIP Code</label>
               <input
                 className="form-control"
-                name="x"
+                name="zipCode"
                 type="text"
                 onChange={updateForm}
-                value={formData.x}
+                value={formData.zipCode}
               />
             </div>
             <div className="mb-4">
               <label htmlFor="password">Y</label>
-              <input
+              <select
                 className="form-control"
-                name="y"
+                name="locationId"
                 type="text"
                 onChange={updateForm}
                 value={formData.y}
-              />
+              >
+                {
+                  [].map((v, i) => <option value={v} key={i}>{v}</option>)
+                }
+              </select>
             </div>
             <div className="mb-4">
               <button className="btn btn-primary" type="submit">
