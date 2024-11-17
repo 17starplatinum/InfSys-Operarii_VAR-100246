@@ -53,4 +53,8 @@ public class Organization {
     @JoinColumn(name = "owner_id")
     @JsonBackReference
     private User owner;
+
+    public void setEmployeesCountwNull(Integer employeesCount) {
+        this.employeesCount = employeesCount;
+    }
 }

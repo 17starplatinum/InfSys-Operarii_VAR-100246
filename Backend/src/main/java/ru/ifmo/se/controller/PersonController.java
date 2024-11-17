@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/people")
+@RequestMapping("/api/v1/people")
 public class PersonController {
     private final PersonService personService;
     public PersonController(PersonService personService) {
@@ -30,7 +30,7 @@ public class PersonController {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             User user = (User) auth.getPrincipal();
 
-            List<Person> people = personService.getPeopleByUser(user);
+            List<Person> people = personService.getAllPeopleByUser(user);
             List<PersonDTOwID> response = people.stream().map(DTOUtil::convertToPersonDTOwIDResponse).collect(Collectors.toList());
 
             return ResponseEntity.ok(response);

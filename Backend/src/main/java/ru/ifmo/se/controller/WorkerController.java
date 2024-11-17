@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/api/workers")
+@RequestMapping("/api/v1/workers")
 public class WorkerController {
     private final WorkerService workerService;
 

@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/addresses")
+@RequestMapping("/api/v1/addresses")
 public class AddressController {
     private final AddressService addressService;
     public AddressController(AddressService addressService) {

@@ -32,25 +32,25 @@ public class SecurityConfig {
                         .requestMatchers("/", "/static/**", "/index.html").permitAll()
 
 
-                        .requestMatchers("/api/address/**").authenticated()
-                        .requestMatchers("/api/coordinates/**").authenticated()
-                        .requestMatchers("/api/locations/**").authenticated()
-                        .requestMatchers("/api/organizations/**").authenticated()
-                        .requestMatchers("/api/people/**").authenticated()
+                        .requestMatchers("/api/v1/addresses/**").authenticated()
+                        .requestMatchers("/api/v1/coordinates/**").authenticated()
+                        .requestMatchers("/api/v1/locations/**").authenticated()
+                        .requestMatchers("/api/v1/orgs/**").authenticated()
+                        .requestMatchers("/api/v1/people/**").authenticated()
 
                         .requestMatchers("/api/v1/auth/**").permitAll()
                         .requestMatchers("/ws/worker/**").permitAll()
                         .requestMatchers("/ws/admin/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/worker").permitAll()
-                        .requestMatchers("/api/worker/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/workers").permitAll()
+                        .requestMatchers("/api/v1/workers/**").authenticated()
 
                         .requestMatchers("/api/v1/special/**").permitAll()
                         .requestMatchers("/api/v1/special/transfer-worker").authenticated()
                         .requestMatchers("/api/v1/special/remove-worker").authenticated()
 
                         .requestMatchers("/api/v1/auth/verify-token").authenticated()
-                        .requestMatchers("/api/admin-requests/**").hasRole("ADMIN")
-                        .requestMatchers("/api/admin-requests/request").hasAuthority("ROLE_USER")
+                        .requestMatchers("/api/v1/admin-requests/**").hasRole("ADMIN")
+                        .requestMatchers("/api/v1/admin-requests/request").hasAuthority("ROLE_USER")
 
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/orgs")
+@RequestMapping("/api/v1/orgs")
 public class OrganizationController {
     private final OrganizationService organizationService;
     public OrganizationController(OrganizationService organizationService) {
@@ -30,7 +30,7 @@ public class OrganizationController {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             User user = (User) auth.getPrincipal();
 
-            List<Organization> organizations = organizationService.getOrganizationsByUser(user);
+            List<Organization> organizations = organizationService.getAllOrganizationsByUser(user);
             List<OrganizationDTOwID> response = organizations.stream().map(DTOUtil::convertToOrganizationDTOwIDResponse).collect(Collectors.toList());
 
             return ResponseEntity.ok(response);

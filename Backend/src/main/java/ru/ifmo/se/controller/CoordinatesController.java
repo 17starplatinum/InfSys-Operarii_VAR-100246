@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/coordinates")
+@RequestMapping("/api/v1/coordinates")
 public class CoordinatesController {
     private final CoordinatesService coordinatesService;
     public CoordinatesController(CoordinatesService coordinatesService) {

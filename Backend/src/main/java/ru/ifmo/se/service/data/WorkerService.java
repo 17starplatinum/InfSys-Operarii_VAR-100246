@@ -1,5 +1,6 @@
 package ru.ifmo.se.service.data;
 
+import ru.ifmo.se.dto.data.PersonDTOwID;
 import ru.ifmo.se.dto.data.WorkerDTORequest;
 import ru.ifmo.se.entity.data.Worker;
 import ru.ifmo.se.entity.data.enumerated.*;
@@ -183,6 +184,5 @@ public class WorkerService {
             throw new RuntimeException(e);
         }
     }
-
 
 }

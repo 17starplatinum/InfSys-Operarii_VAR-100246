@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/api/admin-request")
+@RequestMapping("/api/v1/admin-requests")
 public class AdminRequestController {
     private final AdminRequestService adminRequestService;
     private final AdminRequestMapper adminRequestMapper;
