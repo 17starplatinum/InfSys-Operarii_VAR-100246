@@ -17,26 +17,26 @@ export const RegisterPage = ({setPage, setUser}) => {
   return (
     <div className="container-fluid">
       <div className="row">
-        <div className="col-md-6 offset-md-3 py-5">
+        <div className="col-md-6 col-lg-4 offset-lg-4 offset-md-3 py-5">
           <form onSubmit={submitForm}>
             <div className="mb-4">
               <h2>Register</h2>
             </div>
             <div className="mb-4">
               <label htmlFor="username">Username</label>
-              <input className="form-control" name="username" type="text" onChange={updateForm} />
+              <input className="form-control" name="username" type="text" onChange={updateForm} required={true} />
             </div>
             <div className="mb-4">
               <label htmlFor="password">Password</label>
-              <input className="form-control" name="password" type="password" onChange={updateForm} />
+              <input className="form-control" name="password" type="password" onChange={updateForm} required={true} />
             </div>
-            <div className="mb-4">
+            <div className="mb-4 text-center">
               <button className="btn btn-primary" type="submit">
                 <i className="fa fa-sign-in"></i>&nbsp;Register
               </button>
             </div>
           </form>
-            <div className="mb-4">
+            <div className="mb-4 text-center">
               <button className="btn btn-link" onClick={() => setPage("login")}>
                 <i className="fa fa-user"></i>&nbsp;Login
               </button>
