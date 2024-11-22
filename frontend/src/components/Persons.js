@@ -48,17 +48,7 @@ export const PersonsComponent = ({ setPage }) => {
       ),
     },
   ];
-  const [items, setItems] = useState(
-    Array.from({ length: 100 }, (_, i) => ({
-      id: i,
-      eyeColor: "blue",
-      hairColor: "blonde",
-      birthday: "12-10-2002",
-      weight: 65,
-      nationality: "Belarussian",
-      location: { x: i, y: i, z: i },
-    }))
-  );
+  const [items, setItems] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [item, setItem] = useState();
 
