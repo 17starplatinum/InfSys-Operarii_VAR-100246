@@ -174,6 +174,7 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
     } catch (error) {
       alert(`Error!`);
     }
+    return false;
   };
 
   return (
