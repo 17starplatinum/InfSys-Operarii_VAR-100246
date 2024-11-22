@@ -27,11 +27,11 @@ public class Worker {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotNull(message = "Name CANNOT be null")
+    @NotNull
     @Size(min = 1, message = "Name CANNOT be blank")
     private String name;
 
-    @NotNull(message = "Coordinates CANNOT be null")
+    @NotNull
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "coordinates_id", nullable = false)
     private Coordinates coordinates;
@@ -49,14 +49,14 @@ public class Worker {
     @Min(value = 1, message = "Rating must be a natural value")
     private int rating;
 
-    @NotNull(message = "Position cannot be null")
+    @NotNull
     @Enumerated(EnumType.STRING)
     private Position position;
 
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @NotNull(message = "Person CANNOT be null")
+    @NotNull
     @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "person_id", referencedColumnName = "id")
     private Person person;

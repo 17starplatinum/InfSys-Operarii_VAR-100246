@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Entity
-@Table(name = "users", schema = "s372799")
+@Table(name = "user", schema = "s372799")
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -36,6 +36,8 @@ public class User implements UserDetails {
     private UserRole role;
 
     @Enumerated(EnumType.STRING)
+    @Builder.Default
+    @Column(name="admin_request_status", nullable = false, length = 20)
     private AdminRequestStatus adminRequestStatus = AdminRequestStatus.NONE;
 
     @Override

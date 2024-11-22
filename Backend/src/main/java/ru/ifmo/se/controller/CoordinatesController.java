@@ -34,7 +34,11 @@ public class CoordinatesController {
 
     @GetMapping("/{id}")
     public ResponseEntity<CoordinatesDTO> getCoordinatesById(@PathVariable Long id) {
-        return ResponseEntity.ok(coordinatesService.getCoordinatesById(id));
+        try {
+            return ResponseEntity.ok(coordinatesService.getCoordinatesById(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @PostMapping

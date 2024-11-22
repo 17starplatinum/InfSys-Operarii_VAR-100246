@@ -11,7 +11,6 @@ import ru.ifmo.se.dto.data.filter.AddressFilterCriteria;
 import ru.ifmo.se.entity.data.Address;
 import ru.ifmo.se.entity.data.Location;
 import ru.ifmo.se.entity.data.audit.AuditOperation;
-import ru.ifmo.se.entity.user.User;
 import ru.ifmo.se.repository.data.AddressRepository;
 import ru.ifmo.se.service.data.audit.AuditService;
 import ru.ifmo.se.service.user.UserService;
@@ -57,9 +56,9 @@ public class AddressService {
         this.paginationHandler = paginationHandler;
     }
 
-
-    public List<Address> getAllAddressesByUser(User user) {
-        return addressRepository.findAddressByOwner(user);
+    @Autowired
+    public void setLocationService(LocationService locationService) {
+        this.locationService = locationService;
     }
 
     @Transactional(readOnly = true)

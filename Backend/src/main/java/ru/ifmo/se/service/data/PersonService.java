@@ -66,12 +66,13 @@ public class PersonService {
 
     @Transactional
     public Person createOrUpdatePersonForWorker(PersonDTO personDTO) {
+        Location location = locationService.createOrUpdateLocationForObjects(personDTO.getLocation());
         if(personDTO.getId() != null) {
             Person person = personRepository.findById(personDTO.getId()).orElseThrow(() -> new IllegalArgumentException("Person not found."));
             person.setEyeColor(personDTO.getEyeColor());
             person.setHairColor(personDTO.getHairColor());
             person.setBirthday(personDTO.getBirthday());
-            person.setLocation(locationService.createOrUpdateLocationForObjects(personDTO.getLocation()));
+            person.setLocation(location);
             person.setWeight(personDTO.getWeight());
             person.setNationality(personDTO.getNationality());
 
@@ -79,7 +80,7 @@ public class PersonService {
             auditService.auditPerson(savedPerson, AuditOperation.UPDATE);
             return savedPerson;
         } else {
-            Person person = new Person();
+            Person person = entityMapper.toPersonEntity(personDTO, location);
             person.setCreatedBy(userService.getCurrentUser());
             Person savedPerson = personRepository.save(person);
             auditService.auditPerson(savedPerson, AuditOperation.CREATE);

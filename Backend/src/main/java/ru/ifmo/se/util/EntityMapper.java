@@ -137,7 +137,7 @@ public class EntityMapper {
         worker.setOrganization(organization);
         worker.setRating(workerDTO.getRating());
         worker.setSalary(workerDTO.getSalary());
-        worker.setPosition(worker.getPosition());
+        worker.setPosition(workerDTO.getPosition());
         worker.setStatus(workerDTO.getStatus());
         worker.setPerson(person);
         return worker;

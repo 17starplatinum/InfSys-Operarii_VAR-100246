@@ -11,8 +11,6 @@ import java.util.List;
 @Repository
 public interface LocationRepository extends CrudRepository<Location, Long>, PagingAndSortingRepository<Location, Long> {
 
-    List<Location> findByOwner(User user);
-
     Location findById(long id);
 
 }

@@ -26,3 +26,16 @@ SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
 CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
 OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+"Validation failed for classes [ru.ifmo.se.entity.data.Worker]
+during persist time for groups [jakarta.validation.groups.Default, ]\n
+List of constraint violations:
+[\n\tConstraintViolationImpl{interpolatedMessage='Name CANNOT be null', propertyPath=name, rootBeanClass=class ru.ifmo.se.entity.data.Worker,
+messageTemplate='Name CANNOT be null'}
+\n\tConstraintViolationImpl{interpolatedMessage='Person CANNOT be null', propertyPath=person, rootBeanClass=class ru.ifmo.se.entity.data.Worker,
+messageTemplate='Person CANNOT be null'}
+\n\tConstraintViolationImpl{interpolatedMessage='Coordinates CANNOT be null', propertyPath=coordinates, rootBeanClass=class ru.ifmo.se.entity.data.Worker,
+messageTemplate='Coordinates CANNOT be null'}
+\n\tConstraintViolationImpl{interpolatedMessage='Rating must be a natural value', propertyPath=rating, rootBeanClass=class ru.ifmo.se.entity.data.Worker,
+messageTemplate='Rating must be a natural value'}
+\n\tConstraintViolationImpl{interpolatedMessage='Position cannot be null', propertyPath=position, rootBeanClass=class ru.ifmo.se.entity.data.Worker, messageTemplate='Position cannot be null'}\n]"

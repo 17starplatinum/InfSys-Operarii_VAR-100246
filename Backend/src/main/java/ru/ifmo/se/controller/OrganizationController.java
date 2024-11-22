@@ -34,7 +34,11 @@ public class OrganizationController {
 
     @GetMapping("/{id}")
     public ResponseEntity<OrganizationDTO> getOrganizationById(@PathVariable Long id) {
-        return ResponseEntity.ok(organizationService.getOrganizationById(id));
+        try {
+            return ResponseEntity.ok(organizationService.getOrganizationById(id));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
     }
 
     @PostMapping

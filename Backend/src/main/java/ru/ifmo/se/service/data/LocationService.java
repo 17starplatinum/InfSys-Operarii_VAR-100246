@@ -7,6 +7,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.ifmo.se.dto.data.LocationDTO;
+import ru.ifmo.se.entity.data.Coordinates;
 import ru.ifmo.se.entity.data.Location;
 import ru.ifmo.se.entity.data.audit.AuditOperation;
 import ru.ifmo.se.exception.EntityDeletionException;
@@ -63,12 +64,8 @@ public class LocationService {
 
     @Transactional
     public LocationDTO createLocation(LocationDTO locationDTO) {
-        Location location = locationRepository.findById(locationDTO.getId()).orElseThrow(() -> new IllegalArgumentException("Location not found."));
-
-        location.setX(locationDTO.getX());
-        location.setY(locationDTO.getY());
-        location.setZ(locationDTO.getZ());
-
+        Location location = entityMapper.toLocationEntity(locationDTO);
+        location.setCreatedBy(userService.getCurrentUser());
         Location savedLocation = locationRepository.save(location);
         auditService.auditLocation(savedLocation, AuditOperation.CREATE);
         return entityMapper.toLocationDTO(savedLocation);
