@@ -31,12 +31,7 @@ import java.time.LocalDateTime;
 public class WorkerService {
 
     private final WorkerRepository workerRepository;
-    private final CoordinatesRepository coordinatesRepository;
-    private final OrganizationRepository organizationRepository;
-    private final PersonRepository personRepository;
-    private final AddressService addressService;
     private final CoordinatesService coordinatesService;
-    private final LocationService locationService;
     private final OrganizationService organizationService;
     private final PersonService personService;
     private final UserService userService;
@@ -65,7 +60,10 @@ public class WorkerService {
 
     @Transactional
     public WorkerDTO createWorker(WorkerDTO workerDTO) {
-        Worker worker = new Worker();
+        Coordinates coordinates = coordinatesService.createOrUpdateCoordinatesForWorker(workerDTO.getCoordinates());
+        Organization organization = organizationService.createOrUpdateOrganizationForWorker(workerDTO.getOrganization());
+        Person person = personService.createOrUpdatePersonForWorker(workerDTO.getPerson());
+        Worker worker = entityMapper.toWorkerEntity(workerDTO, coordinates, organization, person);
         worker.setCreatedBy(userService.getCurrentUser());
         worker.setCreationDate(LocalDateTime.now());
 
@@ -78,8 +76,6 @@ public class WorkerService {
         }
         return entityMapper.toWorkerDTO(savedWorker);
     }
-
-
 
     @Transactional
     public WorkerDTO updateWorker(Long id, WorkerDTO workerDTO) {
@@ -125,8 +121,8 @@ public class WorkerService {
     }
 
     @Transactional
-    public void deleteWorkerByPerson(Person person) {
-        Worker worker = workerRepository.findWorkerByPerson(person).orElseThrow(() -> new IllegalArgumentException("Worker not found."));
+    public void deleteWorkerByPerson(Long personId) {
+        Worker worker = workerRepository.findWorkerByPersonId(personId).orElseThrow(() -> new IllegalArgumentException("Worker not found."));
         if(!userService.canModifyWorker(worker)) {
             throw new IllegalArgumentException("You are not allowed to delete this Worker.");
         }
@@ -135,8 +131,8 @@ public class WorkerService {
     }
 
     @Transactional(readOnly = true)
-    public Long countWorkersByPerson(Person person) {
-        return workerRepository.countWorkersByPerson(person.getId());
+    public Long countWorkersByPerson(Long personId) {
+        return workerRepository.countWorkersByPerson(personId);
     }
 
     @Transactional(readOnly = true)
@@ -145,12 +141,12 @@ public class WorkerService {
     }
 
     @Transactional
-    public void fireWorkerFromOrganization(Worker worker) {
-        workerRepository.fireWorkerFromOrganization(worker.getId());
+    public void fireWorkerFromOrganization(Long workerId) {
+        workerRepository.fireWorkerFromOrganization(workerId);
     }
 
     @Transactional
-    public void transferWorkerToAnotherOrganization(Organization organization, Worker worker) {
-        workerRepository.transferWorkerToAnotherOrganization(organization.getId(), worker.getId());
+    public void transferWorkerToAnotherOrganization(Long organizationId, Long workerId) {
+        workerRepository.transferWorkerToAnotherOrganization(organizationId, workerId);
     }
 }

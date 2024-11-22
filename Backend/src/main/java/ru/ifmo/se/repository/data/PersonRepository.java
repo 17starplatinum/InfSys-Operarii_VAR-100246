@@ -13,9 +13,5 @@ import java.util.List;
 @Repository
 public interface PersonRepository extends CrudRepository<Person, Long>, PagingAndSortingRepository<Person, Long> {
 
-    List<Person> findByOwner(User user);
-
     Person findById(long id);
-
-    Page<Person> findByFilters(Pageable pageable);
 }

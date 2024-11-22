@@ -58,14 +58,14 @@ public class WorkerController {
         return ResponseEntity.noContent().build();
     }
     @DeleteMapping("/delete-by-person")
-    public ResponseEntity<WorkerDTO> deleteWorkerByPerson(@RequestParam Person person) {
-        workerService.deleteWorkerByPerson(person);
+    public ResponseEntity<WorkerDTO> deleteWorkerByPerson(@RequestParam Long personId) {
+        workerService.deleteWorkerByPerson(personId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/count-by-people")
-    public ResponseEntity<Long> countByPeople(@RequestParam Person person) {
-        Long count = workerService.countWorkersByPerson(person);
+    public ResponseEntity<Long> countByPeople(@RequestParam Long personId) {
+        Long count = workerService.countWorkersByPerson(personId);
         return ResponseEntity.ok(count);
     }
 
@@ -76,14 +76,14 @@ public class WorkerController {
     }
 
     @PutMapping("/fire-worker-from-org")
-    public ResponseEntity<WorkerDTO> fireWorkerFromOrg(@RequestParam Worker worker) {
-        workerService.fireWorkerFromOrganization(worker);
+    public ResponseEntity<WorkerDTO> fireWorkerFromOrg(@RequestParam Long workerId) {
+        workerService.fireWorkerFromOrganization(workerId);
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/transfer-worker-to-another-organization")
-    public ResponseEntity<WorkerDTO> transferWorkerToAnotherOrganization(@RequestParam Organization organization, Worker worker) {
-        workerService.transferWorkerToAnotherOrganization(organization, worker);
+    public ResponseEntity<WorkerDTO> transferWorkerToAnotherOrganization(@RequestParam Long organizationId, @RequestParam Long workerId) {
+        workerService.transferWorkerToAnotherOrganization(organizationId, workerId);
         return ResponseEntity.noContent().build();
     }
 }

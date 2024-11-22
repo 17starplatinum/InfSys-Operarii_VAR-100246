@@ -25,17 +25,17 @@ public class Organization {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotNull(message = "Official address CANNOT be null")
+    @NotNull
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "legal_id", referencedColumnName = "id", nullable = false)
     private Address officialAddress;
 
-    @NotNull(message = "Annual turnover CANNOT be null")
+    @NotNull
     @Min(value = 1, message = "Annual turnover must be a natural value")
     @Column(name = "annual_turnover", nullable = false)
     private Float annualTurnover;
 
-    @Min(value = 1, message = "A company must have at least 1 employee")
+    @Min(value = 1)
     @Column(name = "employees_count")
     private int employeesCount;
 
@@ -46,7 +46,7 @@ public class Organization {
     @Enumerated(EnumType.STRING)
     private OrganizationType type;
 
-    @NotNull(message = "Postal address CANNOT be null")
+    @NotNull
     @OneToOne(cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})
     @JoinColumn(name = "postal_id", nullable = false)
     private Address postalAddress;
@@ -61,8 +61,4 @@ public class Organization {
     @OneToMany(mappedBy = "organization")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<OrganizationAudit> audits;
-
-    public void setEmployeesCountwNull(Integer employeesCount) {
-        this.employeesCount = employeesCount;
-    }
 }

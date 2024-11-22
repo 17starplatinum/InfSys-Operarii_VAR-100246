@@ -17,14 +17,8 @@ public interface OrganizationRepository extends CrudRepository<Organization, Lon
     @Override
     Optional<Organization> findById(Long aLong);
 
-    void update(Organization organization);
-
     @Override
     void delete(Organization organization);
 
-    Organization findOrganizationByFullName(String name);
-
     Page<Organization> findByFullNameContaining(String name, Pageable pageable);
-
-    List<Organization> findOrganizationByOwner(User user);
 }

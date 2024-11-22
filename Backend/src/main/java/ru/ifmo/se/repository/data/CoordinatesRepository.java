@@ -11,8 +11,6 @@ import java.util.List;
 @Repository
 public interface CoordinatesRepository extends CrudRepository<Coordinates, Long>, PagingAndSortingRepository<Coordinates, Long> {
 
-    List<Coordinates> findByOwner(User user);
-
     Coordinates findById(long id);
 
 }

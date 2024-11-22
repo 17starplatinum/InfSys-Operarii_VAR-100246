@@ -8,11 +8,8 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import ru.ifmo.se.entity.data.Person;
 import ru.ifmo.se.entity.data.Worker;
-import ru.ifmo.se.entity.user.User;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -23,9 +20,9 @@ public interface WorkerRepository extends CrudRepository<Worker, Long>, PagingAn
     @Query("SELECT w FROM Worker w LEFT JOIN w.organization o WHERE (:name IS NULL OR w.name LIKE %:name%) AND (:fullName IS NULL OR o.fullName LIKE %:fullName%)")
     Page<Worker> findByFilters(@Param("name") String name, @Param("fullName") String fullName, Pageable pageable);
 
-    Optional<Worker> findWorkerByPerson(Person person);
+    Optional<Worker> findWorkerByPersonId(Long personId);
 
-    @Query("SELECT COUNT(*) FROM Worker w JOIN Person p ON w.person.id = p.id WHERE p.id == :person_id")
+    @Query("SELECT COUNT(*) FROM Worker w JOIN Person p ON w.person.id = p.id WHERE p.id = :person_id")
     Long countWorkersByPerson(@Param("person_id") Long personId);
 
     @Query("SELECT w from Worker w WHERE w.rating < :rating")

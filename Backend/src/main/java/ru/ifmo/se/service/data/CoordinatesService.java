@@ -63,11 +63,8 @@ public class CoordinatesService {
 
     @Transactional
     public CoordinatesDTO createCoordinates(CoordinatesDTO coordinatesDTO) {
-        Coordinates coordinates = coordinatesRepository.findById(coordinatesDTO.getId()).orElseThrow(() -> new IllegalArgumentException("Coordinates not found."));
-
-        coordinates.setX(coordinatesDTO.getX());
-        coordinates.setY(coordinatesDTO.getY());
-
+        Coordinates coordinates = entityMapper.toCoordinatesEntity(coordinatesDTO);
+        coordinates.setCreatedBy(userService.getCurrentUser());
         Coordinates savedCoordinates = coordinatesRepository.save(coordinates);
         auditService.auditCoordinates(savedCoordinates, AuditOperation.CREATE);
         return entityMapper.toCoordinatesDTO(savedCoordinates);

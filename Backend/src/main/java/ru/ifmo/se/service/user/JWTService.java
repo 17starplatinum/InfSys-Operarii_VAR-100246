@@ -102,7 +102,6 @@ public class JWTService {
         }
     }
 
-
     private SecretKey getSignInKey() {
         log.info("getSignInKey()");
 

@@ -46,7 +46,9 @@ public class OrganizationService {
 
     @Transactional
     public OrganizationDTO createOrganization(OrganizationDTO organizationDTO) {
-        Organization organization = new Organization();
+        Address officialAddress = addressService.createOrUpdateAddressForOrganization(organizationDTO.getOfficialAddress());
+        Address postalAddress = addressService.createOrUpdateAddressForOrganization(organizationDTO.getPostalAddress());
+        Organization organization = entityMapper.toOrganizationEntity(organizationDTO, officialAddress, postalAddress);
         organization.setCreatedBy(userService.getCurrentUser());
         Organization savedOrganization = organizationRepository.save(organization);
         auditService.auditOrganization(savedOrganization, AuditOperation.CREATE);
@@ -87,7 +89,7 @@ public class OrganizationService {
             auditService.auditOrganization(savedOrganization, AuditOperation.UPDATE);
             return savedOrganization;
         } else {
-            Organization organization = new Organization();
+            Organization organization = entityMapper.toOrganizationEntity(organizationDTO, officialAddress, postalAddress);
             organization.setCreatedBy(userService.getCurrentUser());
             Organization savedOrganization = organizationRepository.save(organization);
             auditService.auditOrganization(savedOrganization, AuditOperation.CREATE);

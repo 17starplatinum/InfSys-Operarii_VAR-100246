@@ -16,7 +16,7 @@ public class HibernateConfig {
     public LocalSessionFactoryBean sessionFactory(DataSource dataSource) {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource);
-        sessionFactory.setPackagesToScan("ru.ifmo.se.entity");
+        sessionFactory.setPackagesToScan("ru.ifmo.se.entity.data", "ru.ifmo.se.entity.data.audit", "ru.ifmo.se.entity.user");
         sessionFactory.setHibernateProperties(hibernateProperties());
 
         return sessionFactory;
@@ -26,7 +26,7 @@ public class HibernateConfig {
         Properties properties = new Properties();
         properties.put("hibernate.dialect", "org.hibernate.dialect.PostgreSQLDialect");
         properties.put("hibernate.show_sql", "true");
-        properties.put("hibernate.hbm2ddl.auto", "none");
+        properties.put("hibernate.hbm2ddl.auto", "create-drop");
 
         return properties;
     }

@@ -14,12 +14,5 @@ import java.util.Optional;
 
 @Repository
 public interface AddressRepository extends CrudRepository<Address, Long>, PagingAndSortingRepository<Address, Long> {
-
-    List<Address> findAddressByOwner(@Param("owner") User user);
-
-    Optional<Address> findAddressById(Long id);
-
     Page<Address> findByZipCodeContaining(String zipCode, Pageable pageable);
-
-    void updateAddressById(Long id, Address address);
 }
