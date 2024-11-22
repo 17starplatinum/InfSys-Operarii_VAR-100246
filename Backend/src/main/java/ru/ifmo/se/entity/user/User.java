@@ -1,13 +1,13 @@
 package ru.ifmo.se.entity.user;
 
-import jakarta.validation.constraints.Size;
-import ru.ifmo.se.entity.data.*;
-
-import lombok.*;
 import jakarta.persistence.*;
-import org.springframework.security.core.userdetails.UserDetails;
+import jakarta.validation.constraints.Size;
+import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import ru.ifmo.se.entity.data.enumerated.AdminRequestStatus;
+import ru.ifmo.se.entity.data.enumerated.UserRole;
 
 import java.util.Collection;
 import java.util.List;
@@ -22,7 +22,6 @@ import java.util.List;
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true)
     private Long id;
 
     @Column(name = "username", nullable = false, length = 60)
@@ -36,8 +35,8 @@ public class User implements UserDetails {
     @Column(name = "role", nullable = false, length = 20)
     private UserRole role;
 
-    @OneToMany(mappedBy = "owner", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Worker> workers;
+    @Enumerated(EnumType.STRING)
+    private AdminRequestStatus adminRequestStatus = AdminRequestStatus.NONE;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -62,5 +61,18 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        User user = (User) o;
+        return id != null && id.equals(user.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 }

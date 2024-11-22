@@ -1,150 +1,108 @@
 package ru.ifmo.se.service.data;
 
-import ru.ifmo.se.entity.data.enumerated.OrganizationType;
-import ru.ifmo.se.entity.user.User;
-import ru.ifmo.se.entity.data.Organization;
-import ru.ifmo.se.entity.data.Address;
-import ru.ifmo.se.dto.data.OrganizationDTOwID;
-import ru.ifmo.se.exception.ResourceNotFoundException;
-import ru.ifmo.se.repository.data.OrganizationRepository;
-import ru.ifmo.se.repository.data.AddressRepository;
-
-import org.hibernate.HibernateException;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
+import ru.ifmo.se.dto.data.OrganizationDTO;
+import ru.ifmo.se.dto.data.filter.OrganizationFilterCriteria;
+import ru.ifmo.se.entity.data.Address;
+import ru.ifmo.se.entity.data.Organization;
+import ru.ifmo.se.entity.data.audit.AuditOperation;
+import ru.ifmo.se.exception.EntityDeletionException;
+import ru.ifmo.se.repository.data.OrganizationRepository;
+import ru.ifmo.se.service.data.audit.AuditService;
+import ru.ifmo.se.service.user.UserService;
+import ru.ifmo.se.util.EntityMapper;
+import ru.ifmo.se.util.filter.FilterProcessor;
+import ru.ifmo.se.util.pagination.PaginationHandler;
 
 @Service
-@AllArgsConstructor
-@Transactional
+@RequiredArgsConstructor
 public class OrganizationService {
     private final OrganizationRepository organizationRepository;
-    private final AddressRepository addressRepository;
+    private final AuditService auditService;
+    private final UserService userService;
+    private final EntityMapper entityMapper;
+    private final FilterProcessor<OrganizationDTO, OrganizationFilterCriteria> organizationFilterProcessor;
+    private final PaginationHandler paginationHandler;
+    private final AddressService addressService;
+
+    @Transactional(readOnly = true)
+    public Page<OrganizationDTO> getAllOrganizations(String fullName, int page, int size, String sortBy, String sortDirection) {
+        OrganizationFilterCriteria organizationFilterCriteria = new OrganizationFilterCriteria();
+        organizationFilterCriteria.setFullName(fullName);
+
+        Pageable pageable = paginationHandler.createPageable(page, size, sortBy, sortDirection);
+        return organizationFilterProcessor.filter(organizationFilterCriteria, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public OrganizationDTO getOrganizationById(Long id) {
+        Organization organization = organizationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Organization not found."));
+        return entityMapper.toOrganizationDTO(organization);
+    }
 
     @Transactional
-    public Organization saveOrganization(OrganizationDTOwID organizationDTOwID, User user) {
-        try {
+    public OrganizationDTO createOrganization(OrganizationDTO organizationDTO) {
+        Organization organization = new Organization();
+        organization.setCreatedBy(userService.getCurrentUser());
+        Organization savedOrganization = organizationRepository.save(organization);
+        auditService.auditOrganization(savedOrganization, AuditOperation.CREATE);
+        return entityMapper.toOrganizationDTO(savedOrganization);
+    }
+
+    @Transactional
+    public OrganizationDTO updateOrganization(OrganizationDTO organizationDTO) {
+        Organization organization = organizationRepository.findById(organizationDTO.getId()).orElseThrow(() -> new IllegalArgumentException("Organization not found."));
+        Address officialAddress = addressService.createOrUpdateAddressForOrganization(organizationDTO.getOfficialAddress());
+        Address postalAddress = addressService.createOrUpdateAddressForOrganization(organizationDTO.getPostalAddress());
+        organization.setOfficialAddress(officialAddress);
+        organization.setAnnualTurnover(organizationDTO.getAnnualTurnover());
+        organization.setEmployeesCount(organizationDTO.getEmployeesCount());
+        organization.setFullName(organizationDTO.getFullName());
+        organization.setType(organizationDTO.getType());
+        organization.setPostalAddress(postalAddress);
+
+        Organization savedOrganization = organizationRepository.save(organization);
+        auditService.auditOrganization(savedOrganization, AuditOperation.UPDATE);
+        return entityMapper.toOrganizationDTO(savedOrganization);
+    }
+
+    @Transactional
+    public Organization createOrUpdateOrganizationForWorker(OrganizationDTO organizationDTO) {
+        Address officialAddress = addressService.createOrUpdateAddressForOrganization(organizationDTO.getOfficialAddress());
+        Address postalAddress = addressService.createOrUpdateAddressForOrganization(organizationDTO.getPostalAddress());
+        if(organizationDTO.getId() != null) {
+            Organization organization = organizationRepository.findById(organizationDTO.getId()).orElseThrow(() -> new IllegalArgumentException("Organization not found."));
+            organization.setOfficialAddress(officialAddress);
+            organization.setAnnualTurnover(organizationDTO.getAnnualTurnover());
+            organization.setEmployeesCount(organizationDTO.getEmployeesCount());
+            organization.setFullName(organizationDTO.getFullName());
+            organization.setType(organizationDTO.getType());
+            organization.setPostalAddress(postalAddress);
+
+            Organization savedOrganization = organizationRepository.save(organization);
+            auditService.auditOrganization(savedOrganization, AuditOperation.UPDATE);
+            return savedOrganization;
+        } else {
             Organization organization = new Organization();
-            if (organizationDTOwID.getOfficialAddressWrapper().getAddressId() != null) {
-                Address existingAddress = organizationDTOwID.getOfficialAddressWrapper().getAddress();
-                organization.setOfficialAddress(existingAddress);
-            } else if (organizationDTOwID.getOfficialAddressWrapper().getAddress() != null) {
-                Address newAddress = organizationDTOwID.getOfficialAddressWrapper().getAddress();
-                newAddress.setOwner(user);
-                organizationRepository.save(organization);
-                organization.setOfficialAddress(newAddress);
-            }
-            organization.setAnnualTurnover(organizationDTOwID.getAnnualTurnover());
-            try {
-                organization.setEmployeesCount(organizationDTOwID.getEmployeesCount());
-            } catch (Exception e) {
-                organization.setEmployeesCountwNull(null);
-            }
-            try {
-                organization.setFullName(organizationDTOwID.getFullName());
-            } catch (Exception e) {
-                organization.setFullName(null);
-            }
-            try {
-                organization.setType(OrganizationType.valueOf(organizationDTOwID.getType()));
-            } catch (Exception e) {
-                organization.setType(null);
-            }
-            if (organizationDTOwID.getPostalAddressWrapper().getAddressId() != null) {
-                Address existingAddress = organizationDTOwID.getPostalAddressWrapper().getAddress();
-                organization.setPostalAddress(existingAddress);
-            } else if (organizationDTOwID.getPostalAddressWrapper().getAddress() != null) {
-                Address newAddress = organizationDTOwID.getPostalAddressWrapper().getAddress();
-                newAddress.setOwner(user);
-                organizationRepository.save(organization);
-                organization.setPostalAddress(newAddress);
-            }
-            organizationRepository.save(organization);
-            return organization;
-        } catch (HibernateException e) {
-            throw new RuntimeException("Error while saving organization", e);
-        }
-    }
-    public List<Organization> getAllOrganizations() {
-        try {
-            return organizationRepository.findAll();
-        } catch (HibernateException e) {
-            throw new RuntimeException("Error while getting all organizations", e);
-        }
-    }
-
-    public Organization getOrganizationById(long id) {
-        try {
-            Organization organization = organizationRepository.findById(id);
-
-            if (organization == null) {
-                throw new ResourceNotFoundException("Organization with id " + id + " not found");
-            }
-            return organization;
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("There's no such organization with id = " + id);
+            organization.setCreatedBy(userService.getCurrentUser());
+            Organization savedOrganization = organizationRepository.save(organization);
+            auditService.auditOrganization(savedOrganization, AuditOperation.CREATE);
+            return savedOrganization;
         }
     }
 
     @Transactional
-    public Organization updateOrganization(Organization organization, OrganizationDTOwID organizationDTOwID, User user) {
-        try {
-            if(organization == null) {
-                throw new IllegalArgumentException("Address with this id not found");
-            }
+    public void deleteOrganization(Long id) {
+        Organization organization = organizationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Organization not found."));
 
-            Address officialAddress = organizationDTOwID.getOfficialAddressWrapper().getAddress();
-            if(officialAddress != null) {
-
-                addressRepository.update(officialAddress);
-                organization.setOfficialAddress(officialAddress);
-            }
-            organization.setAnnualTurnover(organizationDTOwID.getAnnualTurnover());
-            organization.setEmployeesCount(organizationDTOwID.getEmployeesCount());
-            if(organizationDTOwID.getFullName() == null || organizationDTOwID.getFullName().isEmpty()) {
-                organization.setFullName(null);
-            } else {
-                organization.setFullName(organizationDTOwID.getFullName());
-            }
-            if(organizationDTOwID.getType() == null || organizationDTOwID.getType().isEmpty()) {
-                organization.setType(null);
-            } else {
-                organization.setType(OrganizationType.valueOf(organizationDTOwID.getType()));
-            }
-            Address postalAddress = organizationDTOwID.getPostalAddressWrapper().getAddress();
-            if(postalAddress != null) {
-
-                addressRepository.update(officialAddress);
-                organization.setOfficialAddress(officialAddress);
-            }
-            organizationRepository.update(organization);
-            return organization;
-        } catch (HibernateException e) {
-            throw new RuntimeException("Error while updating organization", e);
+        if(!organization.getWorkers().isEmpty()) {
+            throw new EntityDeletionException("Cannot delete this Organization since it is linked to one or more Workers.");
         }
-    }
-
-    public List<Organization> getAllOrganizationByUser(User user) {
-        return organizationRepository.findByOwner(user);
-    }
-
-    @Transactional
-    public void deleteOrganizationById(Long id) {
-        Organization organization = organizationRepository.findById(id);
-
-        if(organization.getOfficialAddress() != null) {
-            Address officialAddress = organization.getOfficialAddress();
-            organization.setOfficialAddress(null);
-            addressRepository.delete(officialAddress);
-        }
-
-        if (organization.getPostalAddress() != null) {
-            Address postalAddress = organization.getPostalAddress();
-            organization.setPostalAddress(null);
-            addressRepository.delete(postalAddress);
-        }
+        auditService.deleteLocationAudits(id);
 
         organizationRepository.delete(organization);
     }

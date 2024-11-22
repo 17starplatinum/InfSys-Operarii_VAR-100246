@@ -1,25 +1,32 @@
 package ru.ifmo.se.service.user;
 
-import ru.ifmo.se.entity.user.User;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import ru.ifmo.se.entity.user.User;
 
-import java.security.Key;
+import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
+@Slf4j
 @Service
 public class JWTService {
 
-    private final String SECRET = "1ed542f1df01e67031c88a20643ecbc0bb5e10712ebe48756f286a30b51e7091";
+    @Value("${security.jwt.secret-key}")
+    private String secretKey;
+
+    @Value("${security.jwt.expiration-time}")
+    private long jwtExpiration;
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -30,30 +37,45 @@ public class JWTService {
         return claimsResolver.apply(claims);
     }
 
+    public String generateToken(User userDetails) {
+        log.info("generateToken() for user: {}", userDetails.getUsername());
+        return generateToken(Map.of(
+                "role", userDetails.getRole(),
+                "userId", userDetails.getId()
+        ), userDetails);
+    }
+
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
-        return Jwts.builder()
-                .setClaims(extraClaims)
-                .setSubject(userDetails.getUsername())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 36000))
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
-                .compact();
+        return buildToken(extraClaims, userDetails, jwtExpiration);
     }
 
-    public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        if(userDetails instanceof User) {
-            claims.put("role", "ROLE_" + ((User) userDetails).getRole().name());
+    public long getExpirationTime() {
+        return jwtExpiration;
+    }
+
+    private String buildToken(Map<String, Object> claims, UserDetails userDetails, long expiration) {
+        log.info("buildToken()");
+
+        try {
+            return Jwts.builder()
+                    .setClaims(claims)
+                    .setSubject(userDetails.getUsername())
+                    .setIssuedAt(new Date(System.currentTimeMillis()))
+                    .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                    .signWith(getSignInKey(), SignatureAlgorithm.HS256)
+                    .compact();
+        } catch (JwtException e) {
+            log.error("Error build JWT: " + e.getMessage(), e);
+            throw e;
         }
-        return generateToken(claims, userDetails);
     }
 
-    public boolean isTokenValid(String token, UserDetails userDetails) {
+    public boolean validateToken(String token, UserDetails userDetails) {
         final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !username.equals(token));
+        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
-    public boolean isTokenExpired(String token) {
+    private Boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
@@ -61,18 +83,35 @@ public class JWTService {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET);
-        return Keys.hmacShaKeyFor(keyBytes);
+
+    private Claims extractAllClaims(final String token) {
+        log.info("extractAllClaims()");
+        try {
+            Claims claims = Jwts
+                    .parserBuilder()
+                    .setSigningKey(getSignInKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            log.info("Extracted claims: {}", claims);
+            return claims;
+        } catch (JwtException e) {
+            log.error("Error parsing JWT: " + e.getMessage(), e);
+            throw e;
+        }
     }
 
-    public Claims extractAllClaims(String token) {
-        return Jwts
-                .parserBuilder()
-                .setSigningKey(getSigningKey())
-                .setAllowedClockSkewSeconds(60)
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+
+    private SecretKey getSignInKey() {
+        log.info("getSignInKey()");
+
+        try {
+            byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+            return Keys.hmacShaKeyFor(keyBytes);
+        } catch (JwtException e) {
+            log.error("Error decode JWT: " + e.getMessage(), e);
+            throw e;
+        }
     }
 }

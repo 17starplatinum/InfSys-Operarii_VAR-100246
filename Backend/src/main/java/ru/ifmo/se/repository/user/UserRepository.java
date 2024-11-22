@@ -1,87 +1,29 @@
 package ru.ifmo.se.repository.user;
 
-import ru.ifmo.se.entity.user.User;
-
-import lombok.AllArgsConstructor;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
+import ru.ifmo.se.entity.data.enumerated.AdminRequestStatus;
+import ru.ifmo.se.entity.data.enumerated.UserRole;
+import ru.ifmo.se.entity.user.User;
 
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-@AllArgsConstructor
-public class UserRepository {
-    private final SessionFactory sessionFactory;
+public interface UserRepository extends CrudRepository<User, Long> {
 
-    public void save(User user) {
-        Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            session.save(user);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
-    }
+    Optional<User> findById(Long id);
 
-    public Optional<User> findById(Long id) {
-        try (Session session = sessionFactory.openSession()) {
-            return Optional.ofNullable(session.get(User.class, id));
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Optional.empty();
-        }
-    }
+    Optional<User> findByUsername(String username);
 
-    public Optional<User> findByUsername(String username) {
-        try (Session session = sessionFactory.openSession()) {
-            var query = session.createQuery("from User where username = :username", User.class)
-                    .setParameter("username", username);
-            return query.uniqueResultOptional();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return Optional.empty();
-        }
-    }
+    void deleteById(Long id);
 
-    public void update(User user) {
-        Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            session.update(user);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
-    }
-
-    public void deleteById(Long id) {
-        Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            User user = session.get(User.class, id);
-            if(user != null) session.delete(user);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
-    }
     @SuppressWarnings("unchecked")
-    public List<User> findAllAdmins() {
-        try (Session session = sessionFactory.openSession()) {
-            return session.createQuery("from User where role = 'ADMIN'").list();
-        }
-    }
+    @Query("from User where role = 'ADMIN'")
+    List<User> findAllAdmin();
+
+    boolean existsByRole(UserRole role);
+
+    List<User> findAllByAdminRequestStatus(AdminRequestStatus adminRequestStatus);
 }

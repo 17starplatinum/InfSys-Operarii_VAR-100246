@@ -1,42 +1,55 @@
 package ru.ifmo.se.controller;
 
-import ru.ifmo.se.dto.data.OrganizationDTOwID;
-import ru.ifmo.se.entity.user.User;
-import ru.ifmo.se.entity.data.Organization;
-import ru.ifmo.se.service.data.OrganizationService;
-import ru.ifmo.se.util.DTOUtil;
-
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.*;
+import ru.ifmo.se.dto.PaginationResponseDTO;
+import ru.ifmo.se.dto.data.OrganizationDTO;
+import ru.ifmo.se.service.data.OrganizationService;
 
 @RestController
-@RequestMapping("/api/v1/orgs")
+@RequestMapping("/api/orgs")
+@RequiredArgsConstructor
 public class OrganizationController {
     private final OrganizationService organizationService;
-    public OrganizationController(OrganizationService organizationService) {
-        this.organizationService = organizationService;
+    @GetMapping
+    public ResponseEntity<PaginationResponseDTO<OrganizationDTO>> getAllOrganizations(
+            @RequestParam(required = false) String fullName,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDirection
+    ) {
+        Page<OrganizationDTO> peoplePage = organizationService.getAllOrganizations(fullName, page, size, sortBy, sortDirection);
+        PaginationResponseDTO<OrganizationDTO> responseDTO = new PaginationResponseDTO<>(
+                peoplePage.getContent(),
+                peoplePage.getNumber(),
+                peoplePage.getTotalElements(),
+                peoplePage.getTotalPages()
+        );
+        return ResponseEntity.ok(responseDTO);
     }
 
-    @GetMapping
-    public ResponseEntity<List<OrganizationDTOwID>> getUserOrganizations() {
-        try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            User user = (User) auth.getPrincipal();
+    @GetMapping("/{id}")
+    public ResponseEntity<OrganizationDTO> getOrganizationById(@PathVariable Long id) {
+        return ResponseEntity.ok(organizationService.getOrganizationById(id));
+    }
 
-            List<Organization> organizations = organizationService.getAllOrganizationsByUser(user);
-            List<OrganizationDTOwID> response = organizations.stream().map(DTOUtil::convertToOrganizationDTOwIDResponse).collect(Collectors.toList());
+    @PostMapping
+    public ResponseEntity<OrganizationDTO> createOrganization(@RequestBody OrganizationDTO organizationDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(organizationService.createOrganization(organizationDTO));
+    }
 
-            return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-        }
-        return null;
+    @PutMapping
+    public ResponseEntity<OrganizationDTO> updateOrganization(@RequestBody OrganizationDTO organizationDTO) {
+        return ResponseEntity.ok(organizationService.updateOrganization(organizationDTO));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<OrganizationDTO> deleteOrganization(@PathVariable Long id) {
+        organizationService.deleteOrganization(id);
+        return ResponseEntity.noContent().build();
     }
 }

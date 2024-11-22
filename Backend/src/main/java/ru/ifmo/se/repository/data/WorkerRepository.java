@@ -1,95 +1,41 @@
 package ru.ifmo.se.repository.data;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+import ru.ifmo.se.entity.data.Person;
 import ru.ifmo.se.entity.data.Worker;
 import ru.ifmo.se.entity.user.User;
-import jakarta.persistence.ParameterMode;
-import jakarta.persistence.StoredProcedureQuery;
-import jakarta.validation.ConstraintViolation;
-import jakarta.validation.ConstraintViolationException;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Optional;
 
 @Repository
-public class WorkerRepository {
+public interface WorkerRepository extends CrudRepository<Worker, Long>, PagingAndSortingRepository<Worker, Long> {
 
-    @Autowired
-    private SessionFactory sessionFactory;
+    Optional<Worker> findById(long id);
 
-    public void save(Worker worker) {
-        Transaction transaction = null;
-        try(Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            session.save(worker);
-            transaction.commit();
-        } catch (ConstraintViolationException e) {
-            e.printStackTrace();
-            Set<ConstraintViolation<?>> violations = e.getConstraintViolations();
-            throw e;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to save worker", e);
-        }
-    }
+    @Query("SELECT w FROM Worker w LEFT JOIN w.organization o WHERE (:name IS NULL OR w.name LIKE %:name%) AND (:fullName IS NULL OR o.fullName LIKE %:fullName%)")
+    Page<Worker> findByFilters(@Param("name") String name, @Param("fullName") String fullName, Pageable pageable);
 
-    public void update(Worker worker) {
-        Transaction transaction = null;
-        try(Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            session.merge(worker);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
-    }
+    Optional<Worker> findWorkerByPerson(Person person);
 
-    public void delete(Worker worker) {
-        Transaction transaction = null;
-        try(Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            session.remove(worker);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
-    }
+    @Query("SELECT COUNT(*) FROM Worker w JOIN Person p ON w.person.id = p.id WHERE p.id == :person_id")
+    Long countWorkersByPerson(@Param("person_id") Long personId);
 
-    public List<Worker> findByOwner(User user) {
-        try (Session session = sessionFactory.openSession()) {
-            return session.createQuery("from Worker where owner = :owner", Worker.class)
-                    .setParameter("owner", user).list();
-        }
-    }
+    @Query("SELECT w from Worker w WHERE w.rating < :rating")
+    Long countWorkersWithLessRating(@Param("rating") Integer rating);
 
-    public Worker findById(long id) {
-        try(Session session = sessionFactory.openSession()) {
-            return session.get(Worker.class, id);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
+    @Modifying
+    @Query("UPDATE Worker AS w SET w.status = 'FIRED', w.organization.employeesCount = w.organization.employeesCount - 1, w.salary = 0, w.organization = null WHERE w.id = :worker_id")
+    void fireWorkerFromOrganization(@Param("worker") Long workerId);
 
-    @SuppressWarnings("unchecked")
-    public List<Worker> findAll() {
-        try(Session session = sessionFactory.openSession()) {
-            return session.createQuery("from Worker").list();
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-
+    @Modifying
+    @Query("UPDATE Worker AS w SET w.organization.employeesCount = w.organization.employeesCount - 1, w.organization.id = :org_id, w.organization.employeesCount = w.organization.employeesCount + 1 WHERE w.id = :worker_id")
+    void transferWorkerToAnotherOrganization(@Param("org_id") Long organizationId, @Param("worker_id") Long workerId);
 }

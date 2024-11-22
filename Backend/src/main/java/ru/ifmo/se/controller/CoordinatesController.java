@@ -1,43 +1,55 @@
 package ru.ifmo.se.controller;
 
-import ru.ifmo.se.dto.data.CoordinatesDTOwID;
-import ru.ifmo.se.entity.user.User;
-import ru.ifmo.se.entity.data.Coordinates;
-import ru.ifmo.se.service.data.CoordinatesService;
-import ru.ifmo.se.util.DTOUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.*;
+import ru.ifmo.se.dto.PaginationResponseDTO;
+import ru.ifmo.se.dto.data.CoordinatesDTO;
+import ru.ifmo.se.service.data.CoordinatesService;
 
 @RestController
-@RequestMapping("/api/v1/coordinates")
+@RequestMapping("/api/coordinates")
+@RequiredArgsConstructor
 public class CoordinatesController {
     private final CoordinatesService coordinatesService;
-    public CoordinatesController(CoordinatesService coordinatesService) {
-        this.coordinatesService = coordinatesService;
-    }
 
     @GetMapping
-    public ResponseEntity<CoordinatesDTOwID> getUserCoordinates() {
-        try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            User user = (User) auth.getPrincipal();
+    public ResponseEntity<PaginationResponseDTO<CoordinatesDTO>> getAllCoordinates(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDirection
+    ) {
+        Page<CoordinatesDTO> peoplePage = coordinatesService.getAllCoordinates(page, size, sortBy, sortDirection);
+        PaginationResponseDTO<CoordinatesDTO> responseDTO = new PaginationResponseDTO<>(
+                peoplePage.getContent(),
+                peoplePage.getNumber(),
+                peoplePage.getTotalElements(),
+                peoplePage.getTotalPages()
+        );
+        return ResponseEntity.ok(responseDTO);
+    }
 
-            List<Coordinates> coordinates = coordinatesService.getAllCoordinatesByUser(user);
+    @GetMapping("/{id}")
+    public ResponseEntity<CoordinatesDTO> getCoordinatesById(@PathVariable Long id) {
+        return ResponseEntity.ok(coordinatesService.getCoordinatesById(id));
+    }
 
-            List<CoordinatesDTOwID> response = coordinates.stream()
-                    .map(DTOUtil::convertToCoordinatesDTOwIDResponse)
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok((CoordinatesDTOwID) response);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    @PostMapping
+    public ResponseEntity<CoordinatesDTO> createCoordinates(@RequestBody CoordinatesDTO coordinatesDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(coordinatesService.createCoordinates(coordinatesDTO));
+    }
+
+    @PutMapping
+    public ResponseEntity<CoordinatesDTO> updateCoordinates(@RequestBody CoordinatesDTO coordinatesDTO) {
+        return ResponseEntity.ok(coordinatesService.updateCoordinates(coordinatesDTO));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<CoordinatesDTO> deleteCoordinates(@PathVariable Long id) {
+        coordinatesService.deleteCoordinates(id);
+        return ResponseEntity.noContent().build();
     }
 }

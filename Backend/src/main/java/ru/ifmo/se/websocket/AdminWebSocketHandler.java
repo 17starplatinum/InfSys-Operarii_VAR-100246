@@ -1,16 +1,18 @@
 package ru.ifmo.se.websocket;
 
-import ru.ifmo.se.service.user.JWTService;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
+import org.springframework.web.socket.CloseStatus;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.web.socket.CloseStatus;
+import ru.ifmo.se.service.user.JWTService;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -33,7 +35,7 @@ public class AdminWebSocketHandler extends TextWebSocketHandler {
             try {
                 String username = jwtService.extractUsername(token);
                 UserDetails userDetails = userDetailsService.loadUserByUsername(username);
-                if(jwtService.isTokenValid(token, userDetails)) {
+                if(jwtService.validateToken(token, userDetails)) {
                     activeSessions.put(username, session);
                 } else {
                     session.close(CloseStatus.POLICY_VIOLATION);
@@ -64,8 +66,6 @@ public class AdminWebSocketHandler extends TextWebSocketHandler {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        } else {
-
         }
     }
 }

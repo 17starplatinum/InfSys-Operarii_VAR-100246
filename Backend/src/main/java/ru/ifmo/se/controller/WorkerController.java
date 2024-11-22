@@ -1,94 +1,89 @@
 package ru.ifmo.se.controller;
 
-import ru.ifmo.se.dto.data.*;
-import ru.ifmo.se.dto.data.response.WorkerDTOResponse;
-import ru.ifmo.se.entity.data.Worker;
-import ru.ifmo.se.entity.data.enumerated.*;
-import ru.ifmo.se.entity.user.User;
-import ru.ifmo.se.service.data.WorkerService;
-import ru.ifmo.se.util.DTOUtil;
-import ru.ifmo.se.websocket.WorkerWebSocketHandler;
-import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.time.ZonedDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
+import ru.ifmo.se.dto.PaginationResponseDTO;
+import ru.ifmo.se.dto.data.WorkerDTO;
+import ru.ifmo.se.entity.data.Organization;
+import ru.ifmo.se.entity.data.Person;
+import ru.ifmo.se.entity.data.Worker;
+import ru.ifmo.se.service.data.WorkerService;
 
 @AllArgsConstructor
 @RestController
-@RequestMapping("/api/v1/workers")
+@RequestMapping("/api/workers")
 public class WorkerController {
     private final WorkerService workerService;
 
-    @PostMapping
-    public ResponseEntity<?> createWorker(@RequestBody @Valid WorkerDTORequest workerDTORequest, BindingResult bindingResult) throws IOException {
-        if(bindingResult.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            bindingResult.getAllErrors().forEach(error -> errors.put(error.getDefaultMessage(), error.getDefaultMessage()));
-            return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
-        }
-
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) auth.getPrincipal();
-
-        try {
-            Worker savedWorker = workerService.saveWorker(workerDTORequest, user);
-            return new ResponseEntity<>(DTOUtil.convertToResponse(savedWorker), HttpStatus.CREATED);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return new ResponseEntity<>("Ошибка при создании работника", HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @GetMapping
-    public ResponseEntity<List<WorkerDTOResponse>> getAllWorkers() {
-        List<Worker> workers = workerService.getAllWorkers();
-        List<WorkerDTOResponse> workerDTOResponses = workers.stream()
-                .map(DTOUtil::convertToResponse)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(workerDTOResponses);
+    public ResponseEntity<PaginationResponseDTO<WorkerDTO>> getAllWorkers(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String organizationName,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDirection
+    ) {
+        Page<WorkerDTO> peoplePage = workerService.getAllWorkers(name, organizationName, page, size, sortBy, sortDirection);
+        PaginationResponseDTO<WorkerDTO> responseDTO = new PaginationResponseDTO<>(
+                peoplePage.getContent(),
+                peoplePage.getNumber(),
+                peoplePage.getTotalElements(),
+                peoplePage.getTotalPages()
+        );
+        return ResponseEntity.ok(responseDTO);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<WorkerDTOResponse> getWorkerById(@PathVariable long id) {
-        Worker worker = workerService.getWorkerById(id);
-        return ResponseEntity.ok(DTOUtil.convertToResponse(worker));
+    public ResponseEntity<WorkerDTO> getWorkerById(@PathVariable Long id) {
+        return ResponseEntity.ok(workerService.getWorkerById(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<WorkerDTO> createWorker(@RequestBody WorkerDTO workerDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(workerService.createWorker(workerDTO));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<WorkerDTOResponse> updateWorker(@PathVariable long id, @RequestBody @Valid WorkerDTORequest workerDTORequest) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) auth.getPrincipal();
-
-        Worker currentWorker = workerService.getWorkerById(id);
-        if(!currentWorker.getOwner().getId().equals(user.getId()) && user.getAuthorities().stream().noneMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"))) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-
-        Worker updatedWorker = workerService.updateWorker(currentWorker, workerDTORequest, user);
-        return ResponseEntity.ok(DTOUtil.convertToResponse(updatedWorker));
+    public ResponseEntity<WorkerDTO> updateWorker(@PathVariable Long id, @RequestBody WorkerDTO workerDTO) {
+        return ResponseEntity.ok(workerService.updateWorker(id, workerDTO));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteWorkerById(@PathVariable long id) {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        User user = (User) auth.getPrincipal();
+    public ResponseEntity<WorkerDTO> deleteWorker(@PathVariable Long id) {
+        workerService.deleteWorker(id);
+        return ResponseEntity.noContent().build();
+    }
+    @DeleteMapping("/delete-by-person")
+    public ResponseEntity<WorkerDTO> deleteWorkerByPerson(@RequestParam Person person) {
+        workerService.deleteWorkerByPerson(person);
+        return ResponseEntity.noContent().build();
+    }
 
-        Worker currentWorker = workerService.getWorkerById(id);
-        if(!currentWorker.getOwner().getId().equals(user.getId()) && user.getAuthorities().stream().noneMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"))) {
-            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
-        }
-        workerService.deleteWorkerById(id);
-        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    @GetMapping("/count-by-people")
+    public ResponseEntity<Long> countByPeople(@RequestParam Person person) {
+        Long count = workerService.countWorkersByPerson(person);
+        return ResponseEntity.ok(count);
+    }
+
+    @GetMapping("/count-by-less-than-rating")
+    public ResponseEntity<Long> countByLessThanRating(@RequestParam int rating) {
+        Long count = workerService.countWorkersWithLessRating(rating);
+        return ResponseEntity.ok(count);
+    }
+
+    @PutMapping("/fire-worker-from-org")
+    public ResponseEntity<WorkerDTO> fireWorkerFromOrg(@RequestParam Worker worker) {
+        workerService.fireWorkerFromOrganization(worker);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PutMapping("/transfer-worker-to-another-organization")
+    public ResponseEntity<WorkerDTO> transferWorkerToAnotherOrganization(@RequestParam Organization organization, Worker worker) {
+        workerService.transferWorkerToAnotherOrganization(organization, worker);
+        return ResponseEntity.noContent().build();
     }
 }
