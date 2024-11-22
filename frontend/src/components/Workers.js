@@ -362,7 +362,7 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                     },
                   })
                 }
-                value={formData.postalAddress.zipCode}
+                value={formData.organization.postalAddress.zipCode}
               />
             </div>
             <div className="mb-4">
@@ -455,12 +455,12 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                   setFormData({
                     ...formData,
                     postalAddress: {
-                      ...formData.postalAddress,
+                      ...formData.organization.postalAddress,
                       zipCode: e.target.value,
                     },
                   })
                 }
-                value={formData.postalAddress.zipCode}
+                value={formData.organization.postalAddress.zipCode}
               />
             </div>
             <div className="mb-4">
@@ -473,15 +473,15 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                   setFormData({
                     ...formData,
                     postalAddress: {
-                      ...formData.postalAddress,
+                      ...formData.organization.postalAddress,
                       location: {
-                        ...formData.postalAddress.location,
+                        ...formData.organization.postalAddress.location,
                         x: e.target.value,
                       },
                     },
                   })
                 }
-                value={formData.postalAddress.location.x}
+                value={formData.organization.postalAddress.location.x}
               />
             </div>
             <div className="mb-4">
@@ -494,15 +494,15 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                   setFormData({
                     ...formData,
                     postalAddress: {
-                      ...formData.postalAddress,
+                      ...formData.organization.postalAddress,
                       location: {
-                        ...formData.postalAddress.location,
+                        ...formData.organization.postalAddress.location,
                         y: e.target.value,
                       },
                     },
                   })
                 }
-                value={formData.postalAddress.location.y}
+                value={formData.organization.postalAddress.location.y}
               />
             </div>
             <div className="mb-4">
@@ -515,15 +515,15 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                   setFormData({
                     ...formData,
                     postalAddress: {
-                      ...formData.postalAddress,
+                      ...formData.organization.postalAddress,
                       location: {
-                        ...formData.postalAddress.location,
+                        ...formData.organization.postalAddress.location,
                         z: e.target.value,
                       },
                     },
                   })
                 }
-                value={formData.postalAddress.location.z}
+                value={formData.organization.postalAddress.location.z}
               />
             </div>
             <hr></hr>
@@ -537,12 +537,12 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                   setFormData({
                     ...formData,
                     officialAddress: {
-                      ...formData.officialAddress,
+                      ...formData.organization.officialAddress,
                       zipCode: e.target.value,
                     },
                   })
                 }
-                value={formData.officialAddress.zipCode}
+                value={formData.organization.officialAddress.zipCode}
               />
             </div>
             <div className="mb-4">
@@ -555,15 +555,15 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                   setFormData({
                     ...formData,
                     officialAddress: {
-                      ...formData.officialAddress,
+                      ...formData.organization.officialAddress,
                       location: {
-                        ...formData.officialAddress.location,
+                        ...formData.organization.officialAddress.location,
                         x: e.target.value,
                       },
                     },
                   })
                 }
-                value={formData.officialAddress.location.x}
+                value={formData.organization.officialAddress.location.x}
               />
             </div>
             <div className="mb-4">
@@ -576,15 +576,15 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                   setFormData({
                     ...formData,
                     officialAddress: {
-                      ...formData.officialAddress,
+                      ...formData.organization.officialAddress,
                       location: {
-                        ...formData.officialAddress.location,
+                        ...formData.organization.officialAddress.location,
                         y: e.target.value,
                       },
                     },
                   })
                 }
-                value={formData.officialAddress.location.y}
+                value={formData.organization.officialAddress.location.y}
               />
             </div>
             <div className="mb-4">
@@ -597,15 +597,180 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                   setFormData({
                     ...formData,
                     officialAddress: {
-                      ...formData.officialAddress,
+                      ...formData.organization.officialAddress,
                       location: {
-                        ...formData.officialAddress.location,
+                        ...formData.organization.officialAddress.location,
                         z: e.target.value,
                       },
                     },
                   })
                 }
-                value={formData.officialAddress.location.z}
+                value={formData.organization.officialAddress.location.z}
+              />
+            </div>
+            <hr></hr>
+            <div className="mb-4">
+              <h3>Person Data</h3>
+            </div>
+            <div className="mb-4">
+              <label htmlFor="person_eyeColor">eyeColor</label>
+              <input
+                className="form-control"
+                name="person_eyeColor"
+                type="text"
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    person: {
+                      ...formData.person,
+                      eyeColor: e.target.value,
+                    },
+                  })
+                }
+                value={formData.person.eyeColor}
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="person_hairColor">hairColor</label>
+              <input
+                className="form-control"
+                name="person_hairColor"
+                type="text"
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    person: {
+                      ...formData.person,
+                      hairColor: e.target.value,
+                    },
+                  })
+                }
+                value={formData.person.hairColor}
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="person_birthday">birthday</label>
+              <input
+                className="form-control"
+                name="person_birthday"
+                type="date"
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    person: {
+                      ...formData.person,
+                      birthday: e.target.value,
+                    },
+                  })
+                }
+                value={formData.person.birthday}
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="person_nationality">nationality</label>
+              <input
+                className="form-control"
+                name="person_nationality"
+                type="text"
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    person: {
+                      ...formData.person,
+                      nationality: e.target.value,
+                    },
+                  })
+                }
+                value={formData.person.nationality}
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="person_weight">weight</label>
+              <input
+                className="form-control"
+                name="person_weight"
+                type="text"
+                step={0.01}
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    person: {
+                      ...formData.person,
+                      weight: e.target.value,
+                    },
+                  })
+                }
+                value={formData.person.weight}
+              />
+            </div>
+            <hr></hr>
+            <div className="mb-4">
+              <label htmlFor="person_location_x">
+                Person Location X
+              </label>
+              <input
+                className="form-control"
+                name="person_postalAddress_x"
+                type="number"
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    person: {
+                      ...formData.person,
+                      location: {
+                        ...formData.person.location,
+                        x: e.target.value,
+                      },
+                    },
+                  })
+                }
+                value={formData.person.location.x}
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="person_location_y">
+                Person Location Y
+              </label>
+              <input
+                className="form-control"
+                name="person_postalAddress_y"
+                type="number"
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    person: {
+                      ...formData.person,
+                      location: {
+                        ...formData.person.location,
+                        y: e.target.value,
+                      },
+                    },
+                  })
+                }
+                value={formData.person.location.y}
+              />
+            </div>
+            <div className="mb-4">
+              <label htmlFor="person_location_z">
+                Person Location Z
+              </label>
+              <input
+                className="form-control"
+                name="person_postalAddress_z"
+                type="number"
+                onChange={(e) =>
+                  setFormData({
+                    ...formData,
+                    person: {
+                      ...formData.person,
+                      location: {
+                        ...formData.person.location,
+                        z: e.target.value,
+                      },
+                    },
+                  })
+                }
+                value={formData.person.location.z}
               />
             </div>
             <div className="mb-4">
