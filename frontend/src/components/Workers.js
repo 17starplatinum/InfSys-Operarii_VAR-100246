@@ -59,7 +59,7 @@ export const WorkersComponent = ({ setPage }) => {
         alert(`Error: ${res.statusText}`);
         return false;
       }
-      setItems(res.data);
+      setItems((res.data?.content || []));
     } catch (error) {
       alert(`Error!`);
     }
