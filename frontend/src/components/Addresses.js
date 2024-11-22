@@ -4,31 +4,15 @@ import { V1APIURL } from "../shared/constants";
 import axios from "axios";
 import { getAxios } from "../shared/utils";
 
-export const PersonsComponent = ({ setPage }) => {
+export const AddressesComponent = ({ setPage }) => {
   const columns = [
     {
-      name: "id",
+      name: "ID",
       selector: (item) => item.id,
     },
     {
-      name: "eyeColor",
-      selector: (item) => item.eyeColor,
-    },
-    {
-      name: "hairColor",
-      selector: (item) => item.hairColor,
-    },
-    {
-      name: "birthday",
-      selector: (item) => item.birthday,
-    },
-    {
-      name: "weight",
-      selector: (item) => item.weight,
-    },
-    {
-      name: "nationality",
-      selector: (item) => item.nationality,
+      name: "ZIP Code",
+      selector: (item) => item.zipCode,
     },
     {
       name: "Actions",
@@ -48,7 +32,7 @@ export const PersonsComponent = ({ setPage }) => {
       ),
     },
   ];
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState(Array.from({length: 100}, (_, i) => ({zipCode: i, y: i, id: i})));
   const [showForm, setShowForm] = useState(false);
   const [item, setItem] = useState();
 
@@ -58,7 +42,7 @@ export const PersonsComponent = ({ setPage }) => {
 
   const loadItems = async () => {
     try {
-      const res = await axios.get(`${V1APIURL}/people`, getAxios());
+      const res = await axios.get(`${V1APIURL}/addresses`, getAxios());
       if (res.status !== 200) {
         alert(`Error: ${res.statusText}`);
         return false;
@@ -84,7 +68,7 @@ export const PersonsComponent = ({ setPage }) => {
   const deleteItem = async (item) => {
     try {
       const res = await axios.delete(
-        `${V1APIURL}/people/${item.id}`,
+        `${V1APIURL}/addresses/${item.id}`,
         getAxios()
       );
       if (res.status !== 200) {
@@ -104,7 +88,7 @@ export const PersonsComponent = ({ setPage }) => {
   };
 
   if (showForm) {
-    return <PersonsFormComponent closeForm={closeForm} item={item} />;
+    return <AddressesFormComponent closeForm={closeForm} item={item} />;
   }
 
   return (
@@ -112,7 +96,7 @@ export const PersonsComponent = ({ setPage }) => {
       <div className="row">
         <div className="col-12">
           <h2>
-            Persons{" "}
+            Addresses{" "}
             <button className="btn btn-primary float-end" onClick={addItem}>
               <i className="fa fa-add"></i>&nbsp;Add
             </button>
@@ -128,14 +112,11 @@ export const PersonsComponent = ({ setPage }) => {
   );
 };
 
-export const PersonsFormComponent = ({ closeForm, item }) => {
+export const AddressesFormComponent = ({ closeForm, item }) => {
   const [formData, setFormData] = useState({
-    eyeColor: "",
-    hairColor: "",
-    birthday: "",
-    weight: "",
-    nationality: "",
-    location: { x: 0, y: 0, z: 0 },
+    zipCode: "",
+    town: { x: 0, y: 0, z: 0 },
+    locationWrapper: null,
   });
 
   useEffect(() => {}, []);
@@ -153,7 +134,7 @@ export const PersonsFormComponent = ({ closeForm, item }) => {
   const submitForm = async (e) => {
     try {
       const res = await axios.post(
-        `${V1APIURL}/people${item ? `/${item.id}` : ""}`,
+        `${V1APIURL}/addresses${item ? `/${item.id}` : ""}`,
         formData,
         getAxios()
       );
@@ -180,54 +161,13 @@ export const PersonsFormComponent = ({ closeForm, item }) => {
         <div className="col-12">
           <form onSubmit={submitForm}>
             <div className="mb-4">
-              <label htmlFor="eyeColor">eyeColor</label>
+              <label htmlFor="zipCode">ZIP Code</label>
               <input
                 className="form-control"
-                name="eyeColor"
+                name="zipCode"
                 type="text"
                 onChange={updateForm}
-                value={formData.eyeColor}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="hairColor">hairColor</label>
-              <input
-                className="form-control"
-                name="hairColor"
-                type="text"
-                onChange={updateForm}
-                value={formData.hairColor}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="birthday">birthday</label>
-              <input
-                className="form-control"
-                name="birthday"
-                type="date"
-                onChange={updateForm}
-                value={formData.birthday}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="weight">weight</label>
-              <input
-                className="form-control"
-                name="weight"
-                type="number"
-                step={0.01}
-                onChange={updateForm}
-                value={formData.weight}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="nationality">nationality</label>
-              <input
-                className="form-control"
-                name="nationality"
-                type="text"
-                onChange={updateForm}
-                value={formData.nationality}
+                value={formData.zipCode}
               />
             </div>
             <div className="mb-4">
@@ -239,10 +179,10 @@ export const PersonsFormComponent = ({ closeForm, item }) => {
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    location: { ...formData.location, x: e.target.value },
+                    town: { ...formData.town, x: e.target.value },
                   })
                 }
-                value={formData.location.x}
+                value={formData.town.x}
               />
             </div>
             <div className="mb-4">
@@ -254,10 +194,10 @@ export const PersonsFormComponent = ({ closeForm, item }) => {
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    location: { ...formData.location, y: e.target.value },
+                    town: { ...formData.town, y: e.target.value },
                   })
                 }
-                value={formData.location.y}
+                value={formData.town.y}
               />
             </div>
             <div className="mb-4">
@@ -269,10 +209,10 @@ export const PersonsFormComponent = ({ closeForm, item }) => {
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    location: { ...formData.location, z: e.target.value },
+                    town: { ...formData.town, z: e.target.value },
                   })
                 }
-                value={formData.location.z}
+                value={formData.town.z}
               />
             </div>
             <div className="mb-4">

@@ -4,31 +4,23 @@ import { V1APIURL } from "../shared/constants";
 import axios from "axios";
 import { getAxios } from "../shared/utils";
 
-export const PersonsComponent = ({ setPage }) => {
+export const LocationsComponent = ({ setPage }) => {
   const columns = [
     {
-      name: "id",
+      name: "ID",
       selector: (item) => item.id,
     },
     {
-      name: "eyeColor",
-      selector: (item) => item.eyeColor,
+      name: "X",
+      selector: (item) => item.x,
     },
     {
-      name: "hairColor",
-      selector: (item) => item.hairColor,
+      name: "Y",
+      selector: (item) => item.y,
     },
     {
-      name: "birthday",
-      selector: (item) => item.birthday,
-    },
-    {
-      name: "weight",
-      selector: (item) => item.weight,
-    },
-    {
-      name: "nationality",
-      selector: (item) => item.nationality,
+      name: "Z",
+      selector: (item) => item.z,
     },
     {
       name: "Actions",
@@ -58,7 +50,7 @@ export const PersonsComponent = ({ setPage }) => {
 
   const loadItems = async () => {
     try {
-      const res = await axios.get(`${V1APIURL}/people`, getAxios());
+      const res = await axios.get(`${V1APIURL}/locations`, getAxios());
       if (res.status !== 200) {
         alert(`Error: ${res.statusText}`);
         return false;
@@ -84,7 +76,7 @@ export const PersonsComponent = ({ setPage }) => {
   const deleteItem = async (item) => {
     try {
       const res = await axios.delete(
-        `${V1APIURL}/people/${item.id}`,
+        `${V1APIURL}/locations/${item.id}`,
         getAxios()
       );
       if (res.status !== 200) {
@@ -104,7 +96,7 @@ export const PersonsComponent = ({ setPage }) => {
   };
 
   if (showForm) {
-    return <PersonsFormComponent closeForm={closeForm} item={item} />;
+    return <LocationsFormComponent closeForm={closeForm} item={item} />;
   }
 
   return (
@@ -112,7 +104,7 @@ export const PersonsComponent = ({ setPage }) => {
       <div className="row">
         <div className="col-12">
           <h2>
-            Persons{" "}
+            Locations{" "}
             <button className="btn btn-primary float-end" onClick={addItem}>
               <i className="fa fa-add"></i>&nbsp;Add
             </button>
@@ -128,17 +120,8 @@ export const PersonsComponent = ({ setPage }) => {
   );
 };
 
-export const PersonsFormComponent = ({ closeForm, item }) => {
-  const [formData, setFormData] = useState({
-    eyeColor: "",
-    hairColor: "",
-    birthday: "",
-    weight: "",
-    nationality: "",
-    location: { x: 0, y: 0, z: 0 },
-  });
-
-  useEffect(() => {}, []);
+export const LocationsFormComponent = ({ closeForm, item }) => {
+  const [formData, setFormData] = useState({ x: "", y: "", z: "" });
 
   useEffect(() => {
     if (item) {
@@ -153,7 +136,7 @@ export const PersonsFormComponent = ({ closeForm, item }) => {
   const submitForm = async (e) => {
     try {
       const res = await axios.post(
-        `${V1APIURL}/people${item ? `/${item.id}` : ""}`,
+        `${V1APIURL}/locations${item ? `/${item.id}` : ""}`,
         formData,
         getAxios()
       );
@@ -180,99 +163,33 @@ export const PersonsFormComponent = ({ closeForm, item }) => {
         <div className="col-12">
           <form onSubmit={submitForm}>
             <div className="mb-4">
-              <label htmlFor="eyeColor">eyeColor</label>
-              <input
-                className="form-control"
-                name="eyeColor"
-                type="text"
-                onChange={updateForm}
-                value={formData.eyeColor}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="hairColor">hairColor</label>
-              <input
-                className="form-control"
-                name="hairColor"
-                type="text"
-                onChange={updateForm}
-                value={formData.hairColor}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="birthday">birthday</label>
-              <input
-                className="form-control"
-                name="birthday"
-                type="date"
-                onChange={updateForm}
-                value={formData.birthday}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="weight">weight</label>
-              <input
-                className="form-control"
-                name="weight"
-                type="number"
-                step={0.01}
-                onChange={updateForm}
-                value={formData.weight}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="nationality">nationality</label>
-              <input
-                className="form-control"
-                name="nationality"
-                type="text"
-                onChange={updateForm}
-                value={formData.nationality}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="x">Location ID (X)</label>
+              <label htmlFor="name">X</label>
               <input
                 className="form-control"
                 name="x"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    location: { ...formData.location, x: e.target.value },
-                  })
-                }
-                value={formData.location.x}
+                type="text"
+                onChange={updateForm}
+                value={formData.x}
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="y">Location ID (Y)</label>
+              <label htmlFor="password">Y</label>
               <input
                 className="form-control"
                 name="y"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    location: { ...formData.location, y: e.target.value },
-                  })
-                }
-                value={formData.location.y}
+                type="text"
+                onChange={updateForm}
+                value={formData.y}
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="z">Location ID (Z)</label>
+              <label htmlFor="password">Z</label>
               <input
                 className="form-control"
                 name="z"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    location: { ...formData.location, z: e.target.value },
-                  })
-                }
-                value={formData.location.z}
+                type="text"
+                onChange={updateForm}
+                value={formData.z}
               />
             </div>
             <div className="mb-4">
