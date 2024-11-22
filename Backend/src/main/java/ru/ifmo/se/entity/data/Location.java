@@ -1,21 +1,26 @@
 package ru.ifmo.se.entity.data;
 
-import ru.ifmo.se.entity.user.User;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import ru.ifmo.se.entity.data.audit.LocationAudit;
+import ru.ifmo.se.entity.user.User;
+
+import java.util.List;
 
 @Entity
 @Table(name = "location", schema = "s372799")
 @Getter
 @Setter
+@NoArgsConstructor
 public class Location {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true)
     private long id;
 
     @NotNull(message = "This abscissa CANNOT be null")
@@ -29,8 +34,14 @@ public class Location {
     @Column(name = "z", nullable = false)
     private Long z;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "owner_id")
-    @JsonBackReference
-    private User owner;
+    @OneToOne(mappedBy = "location")
+    private Person person;
+
+    @ManyToOne
+    @JoinColumn(name = "created_by")
+    private User createdBy;
+
+    @OneToMany(mappedBy = "location")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private List<LocationAudit> audits;
 }

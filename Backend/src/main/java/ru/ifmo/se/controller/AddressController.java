@@ -1,43 +1,55 @@
 package ru.ifmo.se.controller;
 
-import ru.ifmo.se.dto.data.AddressDTOwID;
-import ru.ifmo.se.entity.data.Address;
-import ru.ifmo.se.entity.user.User;
-import ru.ifmo.se.service.data.AddressService;
-import ru.ifmo.se.util.DTOUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.*;
+import ru.ifmo.se.dto.PaginationResponseDTO;
+import ru.ifmo.se.dto.data.AddressDTO;
+import ru.ifmo.se.service.data.AddressService;
 
 @RestController
-@RequestMapping("/api/v1/addresses")
+@RequestMapping("/api/addresses")
+@RequiredArgsConstructor
 public class AddressController {
     private final AddressService addressService;
-    public AddressController(AddressService addressService) {
-        this.addressService = addressService;
+    @GetMapping
+    public ResponseEntity<PaginationResponseDTO<AddressDTO>> getAllAddresses(
+            @RequestParam(required = false) String zipCode,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDirection
+    ) {
+        Page<AddressDTO> peoplePage = addressService.getAllAddresses(zipCode, page, size, sortBy, sortDirection);
+        PaginationResponseDTO<AddressDTO> responseDTO = new PaginationResponseDTO<>(
+                peoplePage.getContent(),
+                peoplePage.getNumber(),
+                peoplePage.getTotalElements(),
+                peoplePage.getTotalPages()
+        );
+        return ResponseEntity.ok(responseDTO);
     }
 
-    @GetMapping
-    public ResponseEntity<AddressDTOwID> getUserAddresses() {
-        try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            User user = (User) auth.getPrincipal();
+    @GetMapping("/{id}")
+    public ResponseEntity<AddressDTO> getAddressById(@PathVariable Long id) {
+        return ResponseEntity.ok(addressService.getAddressById(id));
+    }
 
-            List<Address> addresses = addressService.getAllAddressesByUser(user);
+    @PostMapping
+    public ResponseEntity<AddressDTO> createAddress(@RequestBody AddressDTO addressDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(addressService.createAddress(addressDTO));
+    }
 
-            List<AddressDTOwID> response = addresses.stream()
-                    .map(DTOUtil::convertToAddressDTOwIDResponse)
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok((AddressDTOwID) response);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    @PutMapping
+    public ResponseEntity<AddressDTO> updateAddress(@RequestBody AddressDTO addressDTO) {
+        return ResponseEntity.ok(addressService.updateAddress(addressDTO));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<AddressDTO> deleteAddress(@PathVariable Long id) {
+        addressService.deleteAddress(id);
+        return ResponseEntity.noContent().build();
     }
 }

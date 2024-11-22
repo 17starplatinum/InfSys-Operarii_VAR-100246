@@ -1,127 +1,101 @@
 package ru.ifmo.se.service.data;
 
-import ru.ifmo.se.dto.data.PersonDTOwID;
-import ru.ifmo.se.entity.data.*;
-import ru.ifmo.se.entity.data.enumerated.Color;
-import ru.ifmo.se.entity.data.enumerated.Country;
-import ru.ifmo.se.entity.user.User;
-import ru.ifmo.se.entity.data.Person;
-import ru.ifmo.se.dto.data.PersonDTOwID;
-import ru.ifmo.se.exception.ResourceNotFoundException;
-import ru.ifmo.se.repository.data.PersonRepository;
-import ru.ifmo.se.repository.data.LocationRepository;
-
-import org.hibernate.HibernateException;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.ifmo.se.util.DateFormatConverter;
-
-import java.time.LocalDate;
-import java.util.List;
+import ru.ifmo.se.dto.data.PersonDTO;
+import ru.ifmo.se.entity.data.Location;
+import ru.ifmo.se.entity.data.Person;
+import ru.ifmo.se.entity.data.audit.AuditOperation;
+import ru.ifmo.se.exception.EntityDeletionException;
+import ru.ifmo.se.repository.data.PersonRepository;
+import ru.ifmo.se.service.data.audit.AuditService;
+import ru.ifmo.se.service.user.UserService;
+import ru.ifmo.se.util.EntityMapper;
+import ru.ifmo.se.util.pagination.PaginationHandler;
 
 @Service
-@AllArgsConstructor
-@Transactional
+@RequiredArgsConstructor
 public class PersonService {
 
     private final PersonRepository personRepository;
-    private final LocationRepository locationRepository;
+    private final AuditService auditService;
+    private final UserService userService;
+    private final EntityMapper entityMapper;
+    private final PaginationHandler paginationHandler;
+    private final LocationService locationService;
+
+    @Transactional(readOnly = true)
+    public Page<PersonDTO> getAllPeople(int page, int size, String sortBy, String sortDirection) {
+        Pageable pageable = paginationHandler.createPageable(page, size, sortBy, sortDirection);
+        return personRepository.findAll(pageable).map(entityMapper::toPersonDTO);
+    }
+
+    @Transactional(readOnly = true)
+    public PersonDTO getPersonById(Long id) {
+        Person person = personRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Person not found."));
+        return entityMapper.toPersonDTO(person);
+    }
 
     @Transactional
-    public Person savePerson(PersonDTOwID personDTOwID, User user) {
-        try {
+    public PersonDTO createPerson(PersonDTO personDTO) {
+        Location location = locationService.createOrUpdateLocationForObjects(personDTO.getLocation());
+        Person person = entityMapper.toPersonEntity(personDTO, location);
+        person.setCreatedBy(userService.getCurrentUser());
+        Person savedPerson = personRepository.save(person);
+        auditService.auditPerson(savedPerson, AuditOperation.CREATE);
+        return entityMapper.toPersonDTO(savedPerson);
+    }
+
+    @Transactional
+    public PersonDTO updatePerson(PersonDTO personDTO) {
+        Person person = personRepository.findById(personDTO.getId()).orElseThrow(() -> new IllegalArgumentException("Person not found."));
+        person.setEyeColor(personDTO.getEyeColor());
+        person.setHairColor(personDTO.getHairColor());
+        person.setBirthday(personDTO.getBirthday());
+        person.setLocation(locationService.createOrUpdateLocationForObjects(personDTO.getLocation()));
+        person.setWeight(personDTO.getWeight());
+        person.setNationality(personDTO.getNationality());
+
+        Person savedPerson = personRepository.save(person);
+        auditService.auditPerson(savedPerson, AuditOperation.UPDATE);
+        return entityMapper.toPersonDTO(savedPerson);
+    }
+
+    @Transactional
+    public Person createOrUpdatePersonForWorker(PersonDTO personDTO) {
+        if(personDTO.getId() != null) {
+            Person person = personRepository.findById(personDTO.getId()).orElseThrow(() -> new IllegalArgumentException("Person not found."));
+            person.setEyeColor(personDTO.getEyeColor());
+            person.setHairColor(personDTO.getHairColor());
+            person.setBirthday(personDTO.getBirthday());
+            person.setLocation(locationService.createOrUpdateLocationForObjects(personDTO.getLocation()));
+            person.setWeight(personDTO.getWeight());
+            person.setNationality(personDTO.getNationality());
+
+            Person savedPerson = personRepository.save(person);
+            auditService.auditPerson(savedPerson, AuditOperation.UPDATE);
+            return savedPerson;
+        } else {
             Person person = new Person();
-            person.setEyeColor(Color.valueOf(personDTOwID.getEyeColor()));
-
-            try {
-                person.setHairColor(Color.valueOf(personDTOwID.getHairColor()));
-            } catch (Exception e) {
-                person.setHairColor(null);
-            }
-
-            if (personDTOwID.getLocationWrapper().getLocationId() != null) {
-                Location existingLocation = personDTOwID.getLocationWrapper().getLocation();
-                person.setLocation(existingLocation);
-            } else if (personDTOwID.getLocationWrapper().getLocation() != null) {
-                Location newLocation = personDTOwID.getLocationWrapper().getLocation();
-                newLocation.setOwner(user);
-                personRepository.save(person);
-                person.setLocation(newLocation);
-            }
-
-            try {
-                person.setBirthday(LocalDate.parse(personDTOwID.getBirthday()));
-            } catch (Exception e) {
-                person.setBirthday(null);
-            }
-
-            person.setWeight(personDTOwID.getWeight());
-            person.setNationality(Country.valueOf(personDTOwID.getNationality()));
-            personRepository.save(person);
-            return person;
-        } catch (HibernateException e) {
-            throw new RuntimeException("Error while saving person", e);
-        }
-    }
-
-    public List<Person> getAllPeopleByUser(User user) {
-        return personRepository.findByOwner(user);
-    }
-
-    public Person getPersonById(Long id) {
-        try {
-            Person person = personRepository.findById(id);
-
-            if (person == null) {
-                throw new ResourceNotFoundException("Person with id " + id + " not found");
-            }
-            return person;
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("There's no such person with id = " + id);
+            person.setCreatedBy(userService.getCurrentUser());
+            Person savedPerson = personRepository.save(person);
+            auditService.auditPerson(savedPerson, AuditOperation.CREATE);
+            return savedPerson;
         }
     }
 
     @Transactional
-    public Person updatePerson(Person person, PersonDTOwID personDTOwID, User user) {
-        try {
-            if(person == null) {
-                throw new IllegalArgumentException("Person with this id not found");
-            }
-            person.setEyeColor(Color.valueOf(personDTOwID.getEyeColor()));
-            if(personDTOwID.getHairColor() == null || personDTOwID.getHairColor().isEmpty()) {
-                person.setHairColor(null);
-            } else {
-                person.setHairColor(Color.valueOf(personDTOwID.getHairColor()));
-            }
+    public void deletePerson(Long id) {
+        Person person = personRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Person not found."));
 
-            Location location = personDTOwID.getLocationWrapper().getLocation();
-            if(location != null) {
-                locationRepository.update(location);
-                person.setLocation(location);
-            }
-
-            try {
-                String formattedBirthday = DateFormatConverter.convertDate(personDTOwID.getBirthday());
-                person.setBirthday(LocalDate.parse(formattedBirthday));
-            } catch (Exception ignored) {}
-            person.setWeight(personDTOwID.getWeight());
-            person.setNationality(Country.valueOf(personDTOwID.getNationality()));
-            personRepository.update(person);
-            return person;
-        } catch (HibernateException e) {
-            throw new RuntimeException("Error while updating person", e);
+        if(person.getWorker() != null) {
+            throw new EntityDeletionException("Cannot delete this Person since it is linked to a Worker.");
         }
-    }
 
-    @Transactional
-    public void deletePersonById(Long id) {
-        Person person = personRepository.findById(id);
-        if(person.getLocation() != null) {
-            Location location = person.getLocation();
-            person.setLocation(null);
-            locationRepository.delete(location);
-        }
+        auditService.deletePersonAudits(id);
         personRepository.delete(person);
     }
 }

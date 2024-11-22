@@ -1,28 +1,32 @@
 package ru.ifmo.se.entity.data;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import ru.ifmo.se.entity.user.User;
-import ru.ifmo.se.entity.data.enumerated.OrganizationType;
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.Size;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+import ru.ifmo.se.entity.data.audit.OrganizationAudit;
+import ru.ifmo.se.entity.data.enumerated.OrganizationType;
+import ru.ifmo.se.entity.user.User;
+
+import java.util.List;
 
 @Entity
-@Table(name = "coordinates", schema = "s372799")
+@Table(name = "organization", schema = "s372799")
 @Getter
 @Setter
+@NoArgsConstructor
 public class Organization {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true)
     private long id;
 
     @NotNull(message = "Official address CANNOT be null")
-    @OneToOne(cascade = {CascadeType.DETACH, CascadeType.MERGE, CascadeType.PERSIST, CascadeType.REFRESH})
+    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "legal_id", referencedColumnName = "id", nullable = false)
     private Address officialAddress;
 
@@ -30,7 +34,6 @@ public class Organization {
     @Min(value = 1, message = "Annual turnover must be a natural value")
     @Column(name = "annual_turnover", nullable = false)
     private Float annualTurnover;
-
 
     @Min(value = 1, message = "A company must have at least 1 employee")
     @Column(name = "employees_count")
@@ -41,7 +44,6 @@ public class Organization {
     private String fullName;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "type")
     private OrganizationType type;
 
     @NotNull(message = "Postal address CANNOT be null")
@@ -49,10 +51,16 @@ public class Organization {
     @JoinColumn(name = "postal_id", nullable = false)
     private Address postalAddress;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "owner_id")
-    @JsonBackReference
-    private User owner;
+    @OneToMany(mappedBy = "organization")
+    private List<Worker> workers;
+
+    @ManyToOne
+    @JoinColumn(name = "created_by")
+    private User createdBy;
+
+    @OneToMany(mappedBy = "organization")
+    @OnDelete(action = OnDeleteAction.CASCADE)
+    private List<OrganizationAudit> audits;
 
     public void setEmployeesCountwNull(Integer employeesCount) {
         this.employeesCount = employeesCount;

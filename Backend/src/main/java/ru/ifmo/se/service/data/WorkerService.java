@@ -1,23 +1,30 @@
 package ru.ifmo.se.service.data;
 
-import ru.ifmo.se.dto.data.WorkerDTORequest;
-import ru.ifmo.se.entity.data.Worker;
-import ru.ifmo.se.entity.data.enumerated.*;
-import ru.ifmo.se.repository.data.*;
-import ru.ifmo.se.entity.user.User;
-import ru.ifmo.se.exception.ResourceNotFoundException;
-import ru.ifmo.se.entity.data.*;
-import ru.ifmo.se.websocket.WorkerWebSocketHandler;
-import ru.ifmo.se.util.DTOUtil;
-
-
 import lombok.RequiredArgsConstructor;
-import org.hibernate.HibernateException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import ru.ifmo.se.dto.data.WorkerDTO;
+import ru.ifmo.se.dto.data.filter.WorkerFilterCriteria;
+import ru.ifmo.se.entity.data.Coordinates;
+import ru.ifmo.se.entity.data.Organization;
+import ru.ifmo.se.entity.data.Person;
+import ru.ifmo.se.entity.data.Worker;
+import ru.ifmo.se.entity.data.audit.AuditOperation;
+import ru.ifmo.se.repository.data.CoordinatesRepository;
+import ru.ifmo.se.repository.data.OrganizationRepository;
+import ru.ifmo.se.repository.data.PersonRepository;
+import ru.ifmo.se.repository.data.WorkerRepository;
+import ru.ifmo.se.service.data.audit.AuditService;
+import ru.ifmo.se.service.user.UserService;
+import ru.ifmo.se.util.EntityMapper;
+import ru.ifmo.se.util.filter.FilterProcessor;
+import ru.ifmo.se.util.pagination.PaginationHandler;
+import ru.ifmo.se.websocket.WorkerWebSocketHandler;
 
 import java.io.IOException;
-import java.util.List;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -27,159 +34,123 @@ public class WorkerService {
     private final CoordinatesRepository coordinatesRepository;
     private final OrganizationRepository organizationRepository;
     private final PersonRepository personRepository;
+    private final AddressService addressService;
+    private final CoordinatesService coordinatesService;
+    private final LocationService locationService;
+    private final OrganizationService organizationService;
+    private final PersonService personService;
+    private final UserService userService;
+    private final AuditService auditService;
+    private final EntityMapper entityMapper;
+    private final FilterProcessor<WorkerDTO, WorkerFilterCriteria> workerFilterProcessor;
+    private final PaginationHandler paginationHandler;
     private final WorkerWebSocketHandler workerWebSocketHandler;
 
+    @Transactional(readOnly = true)
+    public Page<WorkerDTO> getAllWorkers(String name, String organizationName,
+                                         int page, int size, String sortBy, String sortDirection) {
+        WorkerFilterCriteria workerFilterCriteria = new WorkerFilterCriteria();
+        workerFilterCriteria.setName(name);
+        workerFilterCriteria.setOrganizationName(organizationName);
+
+        Pageable pageable = paginationHandler.createPageable(page, size, sortBy, sortDirection);
+        return workerFilterProcessor.filter(workerFilterCriteria, pageable);
+    }
+
+    @Transactional(readOnly = true)
+    public WorkerDTO getWorkerById(long id) {
+        Worker worker = workerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Worker not found."));
+        return entityMapper.toWorkerDTO(worker);
+    }
+
     @Transactional
-    public Worker saveWorker(WorkerDTORequest workerDTORequest, User user) {
+    public WorkerDTO createWorker(WorkerDTO workerDTO) {
+        Worker worker = new Worker();
+        worker.setCreatedBy(userService.getCurrentUser());
+        worker.setCreationDate(LocalDateTime.now());
+
+        Worker savedWorker = workerRepository.save(worker);
+        auditService.auditWorker(savedWorker, AuditOperation.CREATE);
         try {
-            Worker worker = new Worker();
-            worker.setName(workerDTORequest.getName());
-
-            if(workerDTORequest.getCoordinatesWrapper().getCoordinatesId() != null) {
-                Coordinates existingCoordinates = coordinatesRepository.findById(workerDTORequest.getCoordinatesWrapper().getCoordinatesId());
-                worker.setCoordinates(existingCoordinates);
-            } else if (workerDTORequest.getCoordinatesWrapper().getCoordinates() != null) {
-                Coordinates newCoordinates = workerDTORequest.getCoordinatesWrapper().getCoordinates();
-                newCoordinates.setOwner(user);
-                coordinatesRepository.save(newCoordinates);
-                worker.setCoordinates(newCoordinates);
-            }
-
-            if(workerDTORequest.getOrganizationWrapper() != null && workerDTORequest.getOrganizationWrapper().getOrganizationId() != null) {
-                Organization existingOrganization = organizationRepository.findById(workerDTORequest.getOrganizationWrapper().getOrganizationId());
-                worker.setOrganization(existingOrganization);
-            } else if (workerDTORequest.getOrganizationWrapper() != null && workerDTORequest.getOrganizationWrapper().getOrganization() != null) {
-                Organization newOrganization = workerDTORequest.getOrganizationWrapper().getOrganization();
-                newOrganization.setOwner(user);
-                organizationRepository.save(newOrganization);
-                worker.setOrganization(newOrganization);
-            }
-
-            if(workerDTORequest.getPersonWrapper() != null && workerDTORequest.getPersonWrapper().getPersonId() != null) {
-                Person existingPerson = personRepository.findById(workerDTORequest.getPersonWrapper().getPersonId());
-                worker.setPerson(existingPerson);
-            } else if (workerDTORequest.getPersonWrapper() != null && workerDTORequest.getPersonWrapper().getPerson() != null) {
-                Person newPerson = workerDTORequest.getPersonWrapper().getPerson();
-                newPerson.setOwner(user);
-                personRepository.save(newPerson);
-                worker.setPerson(newPerson);
-            }
-
-            worker.setSalary(workerDTORequest.getSalary());
-            worker.setRating(workerDTORequest.getRating());
-            worker.setPosition(Position.valueOf(workerDTORequest.getPosition()));
-            try {
-                worker.setStatus(Status.valueOf(workerDTORequest.getStatus()));
-            } catch (Exception e) {
-                worker.setStatus(null);
-            }
-            workerRepository.save(worker);
-            workerWebSocketHandler.sendUpdate("create", DTOUtil.convertToResponse(worker));
-            return worker;
-        } catch (HibernateException e) {
-            throw new RuntimeException("Не удалось сохранить рабочего", e);
+            workerWebSocketHandler.sendUpdate("create", entityMapper.toWorkerDTO(savedWorker));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
+        return entityMapper.toWorkerDTO(savedWorker);
     }
 
-    public List<Worker> getAllWorkers() {
-        try {
-            return workerRepository.findAll();
-        } catch (HibernateException e) {
-            throw new RuntimeException("Не удалось получить всех рабочих", e);
-        }
-    }
 
-    public Worker getWorkerById(long id) {
-        try {
-            Worker worker = workerRepository.findById(id);
-
-            if(worker == null) {
-                throw new IllegalArgumentException("Работник с id " + id + " не найден");
-            }
-            return worker;
-        } catch (Exception e) {
-            throw new ResourceNotFoundException("Нет такого работника");
-        }
-    }
 
     @Transactional
-    public Worker updateWorker(Worker worker, WorkerDTORequest workerDTORequest, User user) {
+    public WorkerDTO updateWorker(Long id, WorkerDTO workerDTO) {
+        Worker worker = workerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Worker not found."));
+        if(!userService.canModifyWorker(worker)) {
+            throw new IllegalArgumentException("You are not allowed to modify this Worker.");
+        }
+
+        Coordinates coordinates = coordinatesService.createOrUpdateCoordinatesForWorker(workerDTO.getCoordinates());
+        Organization organization = organizationService.createOrUpdateOrganizationForWorker(workerDTO.getOrganization());
+        Person person = personService.createOrUpdatePersonForWorker(workerDTO.getPerson());
+        Worker updatedWorker = entityMapper.toWorkerEntity(workerDTO, coordinates, organization, person);
+
+        updatedWorker.setId(workerDTO.getId());
+        updatedWorker.setCreatedBy(workerDTO.getCreatedBy());
+        updatedWorker.setCreationDate(workerDTO.getCreationDate());
+
+        Worker savedWorker = workerRepository.save(updatedWorker);
+        auditService.auditWorker(savedWorker, AuditOperation.UPDATE);
         try {
-            if(worker == null) {
-                throw new IllegalArgumentException("Работник с таким id не найден");
-            }
-            worker.setName(workerDTORequest.getName());
-            worker.setSalary(workerDTORequest.getSalary());
-            worker.setRating(workerDTORequest.getRating());
-            worker.setPosition(Position.valueOf(workerDTORequest.getPosition()));
-
-            if(workerDTORequest.getStatus() == null || workerDTORequest.getStatus().isEmpty()) {
-                worker.setStatus(null);
-            } else {
-                worker.setStatus(Status.valueOf(workerDTORequest.getStatus()));
-            }
-
-            Coordinates coordinates = workerDTORequest.getCoordinatesWrapper().getCoordinates();
-            if(coordinates != null) {
-                coordinatesRepository.update(coordinates);
-                worker.setCoordinates(coordinates);
-            }
-
-            Organization organization = workerDTORequest.getOrganizationWrapper().getOrganization();
-            if(organization != null) {
-                organizationRepository.update(organization);
-                worker.setOrganization(organization);
-            }
-            Person person = workerDTORequest.getPersonWrapper().getPerson();
-            if(person != null) {
-                personRepository.update(person);
-                worker.setPerson(person);
-            }
-
-            worker.setUpdatedBy(user);
-
-            workerRepository.update(worker);
-            workerWebSocketHandler.sendUpdate("update", DTOUtil.convertToResponse(worker));
-            return worker;
-        } catch (HibernateException e) {
-            throw new RuntimeException("Не удалось обновить рабочего", e);
+            workerWebSocketHandler.sendUpdate("update", entityMapper.toWorkerDTO(savedWorker));
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
+
+        return entityMapper.toWorkerDTO(worker);
     }
 
     @Transactional
-    public void deleteWorkerById(long id) {
-        Worker worker = workerRepository.findById(id);
-
-        if(worker.getCoordinates() != null) {
-            Coordinates coordinates = worker.getCoordinates();
-            worker.setCoordinates(null);
-            coordinatesRepository.delete(coordinates);
+    public void deleteWorker(Long id) {
+        Worker worker = workerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Worker not found."));
+        if(!userService.canModifyWorker(worker)) {
+            throw new IllegalArgumentException("You are not allowed to delete this Worker.");
         }
-
-        if(worker.getOrganization() != null) {
-            Organization organization = worker.getOrganization();
-            worker.setOrganization(null);
-            organizationRepository.delete(organization);
-        }
-
-        if(worker.getPerson() != null) {
-            Person person = worker.getPerson();
-            worker.setPerson(null);
-            personRepository.delete(person);
-        }
-
-        workerRepository.delete(worker);
-
+        auditService.deleteWorkerAudits(worker.getId());
         try {
             workerWebSocketHandler.sendUpdate("delete", id);
         } catch (IOException e) {
             e.printStackTrace();
             throw new RuntimeException(e);
         }
+        workerRepository.delete(worker);
     }
 
+    @Transactional
+    public void deleteWorkerByPerson(Person person) {
+        Worker worker = workerRepository.findWorkerByPerson(person).orElseThrow(() -> new IllegalArgumentException("Worker not found."));
+        if(!userService.canModifyWorker(worker)) {
+            throw new IllegalArgumentException("You are not allowed to delete this Worker.");
+        }
+        auditService.deleteWorkerAudits(worker.getId());
+        workerRepository.delete(worker);
+    }
+
+    @Transactional(readOnly = true)
+    public Long countWorkersByPerson(Person person) {
+        return workerRepository.countWorkersByPerson(person.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public Long countWorkersWithLessRating(Integer rating) {
+        return workerRepository.countWorkersWithLessRating(rating);
+    }
+
+    @Transactional
+    public void fireWorkerFromOrganization(Worker worker) {
+        workerRepository.fireWorkerFromOrganization(worker.getId());
+    }
+
+    @Transactional
+    public void transferWorkerToAnotherOrganization(Organization organization, Worker worker) {
+        workerRepository.transferWorkerToAnotherOrganization(organization.getId(), worker.getId());
+    }
 }

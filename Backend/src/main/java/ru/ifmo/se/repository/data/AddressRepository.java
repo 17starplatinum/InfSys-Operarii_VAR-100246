@@ -1,65 +1,25 @@
 package ru.ifmo.se.repository.data;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
 import ru.ifmo.se.entity.data.Address;
 import ru.ifmo.se.entity.user.User;
 
-import lombok.AllArgsConstructor;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
-import org.springframework.stereotype.Repository;
-
 import java.util.List;
+import java.util.Optional;
 
 @Repository
-@AllArgsConstructor
-public class AddressRepository {
-    private final SessionFactory sessionFactory;
+public interface AddressRepository extends CrudRepository<Address, Long>, PagingAndSortingRepository<Address, Long> {
 
-    public List<Address> findByOwner(User user) {
-        try (Session session = sessionFactory.openSession()) {
-            return session.createQuery("from Address where owner = :owner", Address.class)
-                    .setParameter("owner", user).list();
-        }
-    }
+    List<Address> findAddressByOwner(@Param("owner") User user);
 
-    public Address findById(long id) {
-        try (Session session = sessionFactory.openSession()) {
-            return session.get(Address.class, id);
-        }
-    }
+    Optional<Address> findAddressById(Long id);
 
-    public void delete(Address address) {
-        Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            session.merge(address);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
-    }
+    Page<Address> findByZipCodeContaining(String zipCode, Pageable pageable);
 
-    public void save(Address address) {
-        Transaction transaction = null;
-        try (Session session = sessionFactory.openSession()) {
-            transaction = session.beginTransaction();
-            session.save(address);
-            transaction.commit();
-        } catch (Exception e) {
-            if (transaction != null) {
-                transaction.rollback();
-            }
-            e.printStackTrace();
-        }
-    }
-
-    public void update(Address address) {
-        try (Session session = sessionFactory.openSession()) {
-            session.update(address);
-        }
-    }
+    void updateAddressById(Long id, Address address);
 }

@@ -6,8 +6,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.orm.hibernate5.LocalSessionFactoryBean;
 
-import java.util.Properties;
 import javax.sql.DataSource;
+import java.util.Properties;
 
 @Configuration
 public class HibernateConfig {

@@ -1,45 +1,55 @@
 package ru.ifmo.se.controller;
 
 
-import ru.ifmo.se.dto.data.LocationDTOwID;
-import ru.ifmo.se.entity.data.Location;
-import ru.ifmo.se.entity.user.User;
-import ru.ifmo.se.service.data.LocationService;
-import ru.ifmo.se.util.DTOUtil;
+import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.*;
+import ru.ifmo.se.dto.PaginationResponseDTO;
+import ru.ifmo.se.dto.data.LocationDTO;
+import ru.ifmo.se.service.data.LocationService;
 
 @RestController
-@RequestMapping("/api/v1/locations")
+@RequestMapping("/api/locations")
+@RequiredArgsConstructor
 public class LocationController {
     private final LocationService locationService;
-
-    public LocationController(LocationService locationService) {
-        this.locationService = locationService;
+    @GetMapping
+    public ResponseEntity<PaginationResponseDTO<LocationDTO>> getAllLocations(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "8") int size,
+            @RequestParam(defaultValue = "id") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDirection
+    ) {
+        Page<LocationDTO> peoplePage = locationService.getAllLocations(page, size, sortBy, sortDirection);
+        PaginationResponseDTO<LocationDTO> responseDTO = new PaginationResponseDTO<>(
+                peoplePage.getContent(),
+                peoplePage.getNumber(),
+                peoplePage.getTotalElements(),
+                peoplePage.getTotalPages()
+        );
+        return ResponseEntity.ok(responseDTO);
     }
 
-    @GetMapping
-    public ResponseEntity<LocationDTOwID> getUserLocations() {
-        try {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            User user = (User) auth.getPrincipal();
+    @GetMapping("/{id}")
+    public ResponseEntity<LocationDTO> getLocationById(@PathVariable Long id) {
+        return ResponseEntity.ok(locationService.getLocationById(id));
+    }
 
-            List<Location> location = locationService.getAllLocationsByUser(user);
+    @PostMapping
+    public ResponseEntity<LocationDTO> createLocation(@RequestBody LocationDTO locationDTO) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(locationService.createLocation(locationDTO));
+    }
 
-            List<LocationDTOwID> response = location.stream()
-                    .map(DTOUtil::convertToLocationDTOwIDResponse)
-                    .collect(Collectors.toList());
-            return ResponseEntity.ok((LocationDTOwID) response);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
+    @PutMapping
+    public ResponseEntity<LocationDTO> updateLocation(@RequestBody LocationDTO locationDTO) {
+        return ResponseEntity.ok(locationService.updateLocation(locationDTO));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<LocationDTO> deleteLocation(@PathVariable Long id) {
+        locationService.deleteLocation(id);
+        return ResponseEntity.noContent().build();
     }
 }
