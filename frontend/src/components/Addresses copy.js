@@ -15,6 +15,10 @@ export const AddressesComponent = ({ setPage }) => {
       selector: (item) => item.zipCode,
     },
     {
+      name: "Location",
+      selector: (item) => item.locationWrapper?.locationId,
+    },
+    {
       name: "Actions",
       grow: 1,
       cell: (item) => (
@@ -32,7 +36,7 @@ export const AddressesComponent = ({ setPage }) => {
       ),
     },
   ];
-  const [items, setItems] = useState(Array.from({length: 100}, (_, i) => ({zipCode: i, y: i, id: i})));
+  const [items, setItems] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [item, setItem] = useState();
 
@@ -115,15 +119,30 @@ export const AddressesComponent = ({ setPage }) => {
 export const AddressesFormComponent = ({ closeForm, item }) => {
   const [formData, setFormData] = useState({
     zipCode: "",
-    town: { x: 0, y: 0, z: 0 },
+    locationId: "",
     locationWrapper: null,
   });
+  const [locations, setLocations] = useState([]);
+  const [showSelectLocation, setShowSelectLocation] = useState(false);
 
-  useEffect(() => {}, []);
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await axios.get(`${V1APIURL}/locations`, getAxios());
+        if (res.status !== 200) {
+          alert(`Error: ${res.statusText}`);
+          return false;
+        }
+        setLocations(res.data);
+      } catch (error) {
+        alert(`Error!`);
+      }
+    })();
+  }, []);
 
   useEffect(() => {
     if (item) {
-      setFormData({ ...item });
+      setFormData({ ...item, locationId: item?.locationWrapper?.locationId });
     }
   }, [item]);
 
@@ -170,50 +189,82 @@ export const AddressesFormComponent = ({ closeForm, item }) => {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="x">Location ID (X)</label>
+              <label htmlFor="toggleUseExistingLocation">
+                Toggle use existing location
+              </label>
               <input
                 className="form-control"
-                name="x"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    town: { ...formData.town, x: e.target.value },
-                  })
-                }
-                value={formData.zipCode}
+                type="text"
+                name="toggleUseExistingLocation"
+                onChange={() => setShowSelectLocation(!showSelectLocation)}
               />
             </div>
-            <div className="mb-4">
-              <label htmlFor="y">Location ID (Y)</label>
-              <input
-                className="form-control"
-                name="y"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    town: { ...formData.town, y: e.target.value },
-                  })
-                }
-                value={formData.zipCode}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="z">Location ID (Z)</label>
-              <input
-                className="form-control"
-                name="z"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    town: { ...formData.town, z: e.target.value },
-                  })
-                }
-                value={formData.zipCode}
-              />
-            </div>
+            {showSelectLocation ? (
+              <div className="mb-4">
+                <label htmlFor="password">Location ID</label>
+                <select
+                  className="form-control"
+                  name="locationId"
+                  type="text"
+                  onChange={updateForm}
+                  value={formData.y}
+                >
+                  {locations.map((v, i) => (
+                    <option value={v} key={i}>
+                      {v}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            ) : (
+              <>
+                <div className="mb-4">
+                  <label htmlFor="x">Location ID (X)</label>
+                  <input
+                    className="form-control"
+                    name="x"
+                    type="number"
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        locationId: { ...formData, x: e.target.value },
+                      })
+                    }
+                    value={formData.zipCode}
+                  />
+                </div>
+                <div className="mb-4">
+                  <label htmlFor="y">Location ID (Y)</label>
+                  <input
+                    className="form-control"
+                    name="y"
+                    type="number"
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        locationId: { ...formData, y: e.target.value },
+                      })
+                    }
+                    value={formData.zipCode}
+                  />
+                </div>
+                <div className="mb-4">
+                  <label htmlFor="z">Location ID (Z)</label>
+                  <input
+                    className="form-control"
+                    name="z"
+                    type="number"
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        locationId: { ...formData, z: e.target.value },
+                      })
+                    }
+                    value={formData.zipCode}
+                  />
+                </div>
+              </>
+            )}
             <div className="mb-4">
               <button className="btn btn-primary" type="submit">
                 <i className="fa fa-send"></i>&nbsp;Submit

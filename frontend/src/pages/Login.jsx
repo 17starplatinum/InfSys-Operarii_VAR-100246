@@ -13,7 +13,7 @@ export const LoginPage = ({setPage, setUser}) => {
     e.preventDefault();
     console.log(formData)
     try {
-      const res = await axios.post(`${V1APIURL}/auth/authenticate`, formData)
+      const res = await axios.post(`${V1APIURL}/auth/login`, formData)
       if (res.status !== 200) {
         alert("Not found")
         return false
@@ -23,7 +23,6 @@ export const LoginPage = ({setPage, setUser}) => {
       console.log(error)
       alert("Error, please try again.")
     }
-    setUser({...formData, role: "admin"})
     return false;
   };
 

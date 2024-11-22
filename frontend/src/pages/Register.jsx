@@ -22,8 +22,11 @@ export const RegisterPage = ({ setPage, setUser }) => {
     } catch (error) {
       console.log(error);
       alert("Error, please try again.");
+      alert(
+        "Your registration failed, you will be redirected to the dashboard, this is a development mode feature since we assume the backend is down or not ready."
+      );
+      setUser({ token: "###", expiration: 7000, username: formData.username });
     }
-    setUser({ ...formData, role: "admin" });
     return false;
   };
 

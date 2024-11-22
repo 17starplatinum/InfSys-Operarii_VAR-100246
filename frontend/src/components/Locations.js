@@ -24,7 +24,7 @@ export const LocationsComponent = ({ setPage }) => {
     },
     {
       name: "Actions",
-      grow: 0,
+      grow: 1,
       cell: (item) => (
         <>
           <button

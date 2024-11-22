@@ -20,9 +20,9 @@ export const CoordinatesComponent = ({ setPage }) => {
     },
     {
       name: "Actions",
-      grow: 0,
+      grow: 1,
       cell: (item) => (
-        <>
+        <div className="">
           <button
             className="btn btn-primary mx-2"
             onClick={() => editItem(item)}
@@ -32,11 +32,11 @@ export const CoordinatesComponent = ({ setPage }) => {
           <button className="btn btn-danger" onClick={() => deleteItem(item)}>
             <i className="fa fa-trash"></i>
           </button>
-        </>
+        </div>
       ),
     },
   ];
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState(Array.from({length: 100}, (_, i) => ({x: i, y: i, id: i})));
   const [showForm, setShowForm] = useState(false);
   const [item, setItem] = useState();
 
