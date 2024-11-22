@@ -420,12 +420,12 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="organization_postalAddress_location_y">
-                Location ID (Y)
+              <label htmlFor="organization_postalAddress_location_z">
+                Location ID (Z)
               </label>
               <input
                 className="form-control"
-                name="organization_postalAddress_location_y"
+                name="organization_postalAddress_location_z"
                 type="number"
                 onChange={(e) =>
                   setFormData({
@@ -436,91 +436,8 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                         ...formData.organization.postalAddress,
                         location: {
                           ...formData.organization.postalAddress.location,
-                          y: e.target.value,
+                          z: e.target.value,
                         },
-                      },
-                    },
-                  })
-                }
-                value={formData.organization.postalAddress.location.y}
-              />
-            </div>
-            <hr></hr>
-
-            <div className="mb-4">
-              <label htmlFor="postalAddress_zipCode">Postal Address Zip Code</label>
-              <input
-                className="form-control"
-                name="postalAddress_zipCode"
-                type="text"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    postalAddress: {
-                      ...formData.organization.postalAddress,
-                      zipCode: e.target.value,
-                    },
-                  })
-                }
-                value={formData.organization.postalAddress.zipCode}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="postalAddress_x">Location ID (X)</label>
-              <input
-                className="form-control"
-                name="postalAddress_x"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    postalAddress: {
-                      ...formData.organization.postalAddress,
-                      location: {
-                        ...formData.organization.postalAddress.location,
-                        x: e.target.value,
-                      },
-                    },
-                  })
-                }
-                value={formData.organization.postalAddress.location.x}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="postalAddress_y">Location ID (Y)</label>
-              <input
-                className="form-control"
-                name="postalAddress_y"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    postalAddress: {
-                      ...formData.organization.postalAddress,
-                      location: {
-                        ...formData.organization.postalAddress.location,
-                        y: e.target.value,
-                      },
-                    },
-                  })
-                }
-                value={formData.organization.postalAddress.location.y}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="postalAddress_z">Location ID (Z)</label>
-              <input
-                className="form-control"
-                name="postalAddress_z"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    postalAddress: {
-                      ...formData.organization.postalAddress,
-                      location: {
-                        ...formData.organization.postalAddress.location,
-                        z: e.target.value,
                       },
                     },
                   })
@@ -530,17 +447,22 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
             </div>
             <hr></hr>
             <div className="mb-4">
-              <label htmlFor="officialAddress_zipCode">Official Address Zip Code</label>
+              <label htmlFor="organization_officialAddress_zipCode">
+                Organization Official Address Zip Code
+              </label>
               <input
                 className="form-control"
-                name="officialAddress_zipCode"
+                name="organization_officialAddress_zipCode"
                 type="text"
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    officialAddress: {
-                      ...formData.organization.officialAddress,
-                      zipCode: e.target.value,
+                    organization: {
+                      ...formData.organization,
+                      officialAddress: {
+                        ...formData.organization.officialAddress,
+                        zipCode: e.target.value,
+                      },
                     },
                   })
                 }
@@ -548,19 +470,24 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="officialAddress_x">Location ID (X)</label>
+              <label htmlFor="organization_officialAddress_location_x">
+                Location ID (X)
+              </label>
               <input
                 className="form-control"
-                name="officialAddress_x"
+                name="organization_officialAddress_location_x"
                 type="number"
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    officialAddress: {
-                      ...formData.organization.officialAddress,
-                      location: {
-                        ...formData.organization.officialAddress.location,
-                        x: e.target.value,
+                    organization: {
+                      ...formData.organization,
+                      officialAddress: {
+                        ...formData.organization.officialAddress,
+                        location: {
+                          ...formData.organization.officialAddress.location,
+                          x: e.target.value,
+                        },
                       },
                     },
                   })
@@ -569,19 +496,24 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="officialAddress_y">Location ID (Y)</label>
+              <label htmlFor="organization_officialAddress_location_y">
+                Location ID (Y)
+              </label>
               <input
                 className="form-control"
-                name="officialAddress_y"
+                name="organization_officialAddress_location_y"
                 type="number"
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    officialAddress: {
-                      ...formData.organization.officialAddress,
-                      location: {
-                        ...formData.organization.officialAddress.location,
-                        y: e.target.value,
+                    organization: {
+                      ...formData.organization,
+                      officialAddress: {
+                        ...formData.organization.officialAddress,
+                        location: {
+                          ...formData.organization.officialAddress.location,
+                          y: e.target.value,
+                        },
                       },
                     },
                   })
@@ -590,19 +522,24 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="officialAddress_z">Location ID (Z)</label>
+              <label htmlFor="organization_officialAddress_location_z">
+                Location ID (Z)
+              </label>
               <input
                 className="form-control"
-                name="officialAddress_z"
+                name="organization_officialAddress_location_z"
                 type="number"
                 onChange={(e) =>
                   setFormData({
                     ...formData,
-                    officialAddress: {
-                      ...formData.organization.officialAddress,
-                      location: {
-                        ...formData.organization.officialAddress.location,
-                        z: e.target.value,
+                    organization: {
+                      ...formData.organization,
+                      officialAddress: {
+                        ...formData.organization.officialAddress,
+                        location: {
+                          ...formData.organization.officialAddress.location,
+                          z: e.target.value,
+                        },
                       },
                     },
                   })
