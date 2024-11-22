@@ -134,6 +134,7 @@ export const LocationsFormComponent = ({ closeForm, item }) => {
   };
 
   const submitForm = async (e) => {
+    e.preventDefault();
     try {
       const res = await axios.post(
         `${V1APIURL}/locations${item ? `/${item.id}` : ""}`,

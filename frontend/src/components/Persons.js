@@ -151,6 +151,7 @@ export const PersonsFormComponent = ({ closeForm, item }) => {
   };
 
   const submitForm = async (e) => {
+    e.preventDefault();
     try {
       const res = await axios.post(
         `${V1APIURL}/people${item ? `/${item.id}` : ""}`,
