@@ -150,6 +150,7 @@ export const CoordinatesFormComponent = ({ closeForm, item }) => {
   };
 
   const submitForm = async (e) => {
+    e.preventDefault();
     try {
       const res = await axios.post(
         `${V1APIURL}/coordinates${item ? `/${item.id}` : ""}`,
