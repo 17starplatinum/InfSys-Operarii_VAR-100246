@@ -18,14 +18,17 @@ export const RegisterPage = ({ setPage, setUser }) => {
         alert("Failed to register");
         return false;
       }
-      setUser({ ...res.data, username: formData.username });
+      alert("Registration successful")
+      setPage("login")
+
+      // setUser({ ...res.data, username: formData.username });
     } catch (error) {
       console.log(error);
       alert("Error, please try again.");
-      alert(
-        "Your registration failed, you will be redirected to the dashboard, this is a development mode feature since we assume the backend is down or not ready."
-      );
-      setUser({ token: "###", expiration: 7000, username: formData.username });
+      // alert(
+      //   "Your registration failed, you will be redirected to the dashboard, this is a development mode feature since we assume the backend is down or not ready."
+      // );
+      // setUser({ token: "###", expiration: 7000, username: formData.username });
     }
     return false;
   };
