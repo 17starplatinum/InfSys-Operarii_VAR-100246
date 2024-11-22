@@ -151,6 +151,7 @@ export const AddressesFormComponent = ({ closeForm, item }) => {
   };
 
   const submitForm = async (e) => {
+    e.preventDefault();
     try {
       const res = await axios.post(
         `${V1APIURL}/addresses${item ? `/${item.id}` : ""}`,
