@@ -229,7 +229,7 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
             </div>
             <hr></hr>
             <div className="mb-4">
-              <h3>Organization Data</h3>
+              <h3>Coordinates</h3>
             </div>
             <div className="mb-4">
               <label htmlFor="x">Coordinates ID (X)</label>
