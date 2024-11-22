@@ -7,7 +7,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.ifmo.se.dto.data.LocationDTO;
-import ru.ifmo.se.entity.data.Coordinates;
 import ru.ifmo.se.entity.data.Location;
 import ru.ifmo.se.entity.data.audit.AuditOperation;
 import ru.ifmo.se.exception.EntityDeletionException;
@@ -25,6 +24,7 @@ public class LocationService {
     private AuditService auditService;
     private UserService userService;
     private PaginationHandler paginationHandler;
+
     @Autowired
     public void setLocationRepository(LocationRepository locationRepository) {
         this.locationRepository = locationRepository;
@@ -86,7 +86,7 @@ public class LocationService {
 
     @Transactional
     public Location createOrUpdateLocationForObjects(LocationDTO locationDTO) {
-        if(locationDTO.getId() != null) {
+        if (locationDTO.getId() != null) {
             Location location = locationRepository.findById(locationDTO.getId()).orElseThrow(() -> new IllegalArgumentException("Location not found."));
 
             location.setX(locationDTO.getX());
@@ -107,7 +107,7 @@ public class LocationService {
     @Transactional
     public void deleteLocation(Long id) {
         Location location = locationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Location not found."));
-        if(location.getPerson() != null) {
+        if (location.getPerson() != null) {
             throw new EntityDeletionException("Cannot delete this Location since it is linked to a Person.");
         }
         auditService.deleteLocationAudits(location.getId());

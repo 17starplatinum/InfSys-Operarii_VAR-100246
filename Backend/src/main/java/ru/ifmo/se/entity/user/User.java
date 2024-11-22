@@ -37,7 +37,7 @@ public class User implements UserDetails {
 
     @Enumerated(EnumType.STRING)
     @Builder.Default
-    @Column(name="admin_request_status", nullable = false, length = 20)
+    @Column(name = "admin_request_status", nullable = false, length = 20)
     private AdminRequestStatus adminRequestStatus = AdminRequestStatus.NONE;
 
     @Override

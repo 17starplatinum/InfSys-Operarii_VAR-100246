@@ -15,6 +15,7 @@ import ru.ifmo.se.service.data.LocationService;
 @RequiredArgsConstructor
 public class LocationController {
     private final LocationService locationService;
+
     @GetMapping
     public ResponseEntity<PaginationResponseDTO<LocationDTO>> getAllLocations(
             @RequestParam(defaultValue = "0") int page,

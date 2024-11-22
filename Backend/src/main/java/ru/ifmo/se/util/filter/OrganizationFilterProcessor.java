@@ -17,7 +17,7 @@ public class OrganizationFilterProcessor implements FilterProcessor<Organization
 
     @Override
     public Page<OrganizationDTO> filter(OrganizationFilterCriteria criteria, Pageable pageable) {
-        if(criteria.getFullName() == null || criteria.getFullName().isEmpty()) {
+        if (criteria.getFullName() == null || criteria.getFullName().isEmpty()) {
             return organizationRepository.findAll(pageable).map(entityMapper::toOrganizationDTO);
         } else {
             return organizationRepository.findByFullNameContaining(criteria.getFullName(), pageable).map(entityMapper::toOrganizationDTO);

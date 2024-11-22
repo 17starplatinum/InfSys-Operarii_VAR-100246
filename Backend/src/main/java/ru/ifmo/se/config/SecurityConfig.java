@@ -44,6 +44,8 @@ public class SecurityConfig {
                                 "/api/auth/login",
                                 "/api/auth/admin-exists")
                         .permitAll()
+                        .requestMatchers("/ws/workers/**").permitAll()
+                        .requestMatchers("/ws/auth/admin/**").permitAll()
                         .requestMatchers("/api/auth/admin-requests/status")
                         .hasAnyRole("USER", "ADMIN")
                         .requestMatchers("/api/auth/approve-admin",

@@ -12,18 +12,13 @@ import ru.ifmo.se.entity.data.Organization;
 import ru.ifmo.se.entity.data.Person;
 import ru.ifmo.se.entity.data.Worker;
 import ru.ifmo.se.entity.data.audit.AuditOperation;
-import ru.ifmo.se.repository.data.CoordinatesRepository;
-import ru.ifmo.se.repository.data.OrganizationRepository;
-import ru.ifmo.se.repository.data.PersonRepository;
 import ru.ifmo.se.repository.data.WorkerRepository;
 import ru.ifmo.se.service.data.audit.AuditService;
 import ru.ifmo.se.service.user.UserService;
 import ru.ifmo.se.util.EntityMapper;
 import ru.ifmo.se.util.filter.FilterProcessor;
 import ru.ifmo.se.util.pagination.PaginationHandler;
-import ru.ifmo.se.websocket.WorkerWebSocketHandler;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 
 @Service
@@ -39,7 +34,6 @@ public class WorkerService {
     private final EntityMapper entityMapper;
     private final FilterProcessor<WorkerDTO, WorkerFilterCriteria> workerFilterProcessor;
     private final PaginationHandler paginationHandler;
-    private final WorkerWebSocketHandler workerWebSocketHandler;
 
     @Transactional(readOnly = true)
     public Page<WorkerDTO> getAllWorkers(String name, String organizationName,
@@ -69,18 +63,13 @@ public class WorkerService {
 
         Worker savedWorker = workerRepository.save(worker);
         auditService.auditWorker(savedWorker, AuditOperation.CREATE);
-        try {
-            workerWebSocketHandler.sendUpdate("create", entityMapper.toWorkerDTO(savedWorker));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         return entityMapper.toWorkerDTO(savedWorker);
     }
 
     @Transactional
     public WorkerDTO updateWorker(Long id, WorkerDTO workerDTO) {
         Worker worker = workerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Worker not found."));
-        if(!userService.canModifyWorker(worker)) {
+        if (userService.canModifyWorker(worker)) {
             throw new IllegalArgumentException("You are not allowed to modify this Worker.");
         }
 
@@ -95,11 +84,6 @@ public class WorkerService {
 
         Worker savedWorker = workerRepository.save(updatedWorker);
         auditService.auditWorker(savedWorker, AuditOperation.UPDATE);
-        try {
-            workerWebSocketHandler.sendUpdate("update", entityMapper.toWorkerDTO(savedWorker));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
 
         return entityMapper.toWorkerDTO(worker);
     }
@@ -107,23 +91,17 @@ public class WorkerService {
     @Transactional
     public void deleteWorker(Long id) {
         Worker worker = workerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Worker not found."));
-        if(!userService.canModifyWorker(worker)) {
+        if (userService.canModifyWorker(worker)) {
             throw new IllegalArgumentException("You are not allowed to delete this Worker.");
         }
         auditService.deleteWorkerAudits(worker.getId());
-        try {
-            workerWebSocketHandler.sendUpdate("delete", id);
-        } catch (IOException e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
-        }
         workerRepository.delete(worker);
     }
 
     @Transactional
     public void deleteWorkerByPerson(Long personId) {
         Worker worker = workerRepository.findWorkerByPersonId(personId).orElseThrow(() -> new IllegalArgumentException("Worker not found."));
-        if(!userService.canModifyWorker(worker)) {
+        if (userService.canModifyWorker(worker)) {
             throw new IllegalArgumentException("You are not allowed to delete this Worker.");
         }
         auditService.deleteWorkerAudits(worker.getId());

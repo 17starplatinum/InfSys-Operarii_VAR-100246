@@ -14,6 +14,7 @@ import ru.ifmo.se.service.data.AddressService;
 @RequiredArgsConstructor
 public class AddressController {
     private final AddressService addressService;
+
     @GetMapping
     public ResponseEntity<PaginationResponseDTO<AddressDTO>> getAllAddresses(
             @RequestParam(required = false) String zipCode,

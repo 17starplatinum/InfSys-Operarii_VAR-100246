@@ -14,6 +14,7 @@ import ru.ifmo.se.service.data.OrganizationService;
 @RequiredArgsConstructor
 public class OrganizationController {
     private final OrganizationService organizationService;
+
     @GetMapping
     public ResponseEntity<PaginationResponseDTO<OrganizationDTO>> getAllOrganizations(
             @RequestParam(required = false) String fullName,

@@ -5,7 +5,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 public class OperariiApplication {
-	public static void main(String[] args) {
-		SpringApplication.run(OperariiApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(OperariiApplication.class, args);
+    }
 }

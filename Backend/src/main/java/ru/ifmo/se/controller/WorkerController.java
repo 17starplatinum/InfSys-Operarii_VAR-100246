@@ -7,9 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.ifmo.se.dto.PaginationResponseDTO;
 import ru.ifmo.se.dto.data.WorkerDTO;
-import ru.ifmo.se.entity.data.Organization;
-import ru.ifmo.se.entity.data.Person;
-import ru.ifmo.se.entity.data.Worker;
 import ru.ifmo.se.service.data.WorkerService;
 
 @AllArgsConstructor
@@ -57,6 +54,7 @@ public class WorkerController {
         workerService.deleteWorker(id);
         return ResponseEntity.noContent().build();
     }
+
     @DeleteMapping("/delete-by-person")
     public ResponseEntity<WorkerDTO> deleteWorkerByPerson(@RequestParam Long personId) {
         workerService.deleteWorkerByPerson(personId);

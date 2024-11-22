@@ -15,10 +15,9 @@ import ru.ifmo.se.repository.data.AddressRepository;
 import ru.ifmo.se.service.data.audit.AuditService;
 import ru.ifmo.se.service.user.UserService;
 import ru.ifmo.se.util.EntityMapper;
+import ru.ifmo.se.util.filter.AddressFilterProcessor;
 import ru.ifmo.se.util.filter.FilterProcessor;
 import ru.ifmo.se.util.pagination.PaginationHandler;
-
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -59,6 +58,11 @@ public class AddressService {
     @Autowired
     public void setLocationService(LocationService locationService) {
         this.locationService = locationService;
+    }
+
+    @Autowired
+    public void setAddressFilterProcessor(AddressFilterProcessor addressFilterProcessor) {
+        this.addressFilterProcessor = addressFilterProcessor;
     }
 
     @Transactional(readOnly = true)
@@ -112,7 +116,7 @@ public class AddressService {
     @Transactional
     public Address createOrUpdateAddressForOrganization(AddressDTO addressDTO) {
         Location town = locationService.createOrUpdateLocationForObjects(addressDTO.getTown());
-        if(addressDTO.getId() != null) {
+        if (addressDTO.getId() != null) {
             Address existingAddress = addressRepository.findById(addressDTO.getId()).orElseThrow(() -> new IllegalArgumentException("Address not found."));
 
             existingAddress.setZipCode(addressDTO.getZipCode());

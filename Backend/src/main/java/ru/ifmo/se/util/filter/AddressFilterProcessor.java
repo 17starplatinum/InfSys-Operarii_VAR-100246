@@ -17,7 +17,7 @@ public class AddressFilterProcessor implements FilterProcessor<AddressDTO, Addre
 
     @Override
     public Page<AddressDTO> filter(AddressFilterCriteria criteria, Pageable pageable) {
-        if(criteria.getZipCode() == null || criteria.getZipCode().isEmpty()) {
+        if (criteria.getZipCode() == null || criteria.getZipCode().isEmpty()) {
             return addressRepository.findAll(pageable).map(entityMapper::toAddressDTO);
         } else {
             return addressRepository.findByZipCodeContaining(criteria.getZipCode(), pageable).map(entityMapper::toAddressDTO);

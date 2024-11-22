@@ -1,6 +1,6 @@
 package ru.ifmo.se.repository.user;
 
-import org.springframework.data.jpa.repository.Query;
+import lombok.NonNull;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import ru.ifmo.se.entity.data.enumerated.AdminRequestStatus;
@@ -13,15 +13,12 @@ import java.util.Optional;
 @Repository
 public interface UserRepository extends CrudRepository<User, Long> {
 
-    Optional<User> findById(Long id);
+    @NonNull
+    Optional<User> findById(@NonNull Long id);
 
     Optional<User> findByUsername(String username);
 
-    void deleteById(Long id);
-
-    @SuppressWarnings("unchecked")
-    @Query("from User where role = 'ADMIN'")
-    List<User> findAllAdmin();
+    void deleteById(@NonNull Long id);
 
     boolean existsByRole(UserRole role);
 
