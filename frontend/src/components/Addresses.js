@@ -181,7 +181,7 @@ export const AddressesFormComponent = ({ closeForm, item }) => {
                     town: { ...formData.town, x: e.target.value },
                   })
                 }
-                value={formData.zipCode}
+                value={formData.town.x}
               />
             </div>
             <div className="mb-4">
@@ -196,7 +196,7 @@ export const AddressesFormComponent = ({ closeForm, item }) => {
                     town: { ...formData.town, y: e.target.value },
                   })
                 }
-                value={formData.zipCode}
+                value={formData.town.y}
               />
             </div>
             <div className="mb-4">
@@ -211,7 +211,7 @@ export const AddressesFormComponent = ({ closeForm, item }) => {
                     town: { ...formData.town, z: e.target.value },
                   })
                 }
-                value={formData.zipCode}
+                value={formData.town.z}
               />
             </div>
             <div className="mb-4">
