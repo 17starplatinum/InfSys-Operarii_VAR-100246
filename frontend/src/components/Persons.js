@@ -166,6 +166,7 @@ export const PersonsFormComponent = ({ closeForm, item }) => {
     } catch (error) {
       alert(`Error!`);
     }
+    return false;
   };
 
   return (

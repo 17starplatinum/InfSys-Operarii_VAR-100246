@@ -159,6 +159,7 @@ export const OrganizationsFormComponent = ({ closeForm, item }) => {
     } catch (error) {
       alert(`Error!`);
     }
+    return false;
   };
 
   return (

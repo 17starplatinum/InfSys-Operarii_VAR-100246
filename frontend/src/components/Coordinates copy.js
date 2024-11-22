@@ -165,6 +165,7 @@ export const CoordinatesFormComponent = ({ closeForm, item }) => {
     } catch (error) {
       alert(`Error!`);
     }
+    return false;
   };
 
   return (

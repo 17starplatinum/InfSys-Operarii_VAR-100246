@@ -149,6 +149,7 @@ export const LocationsFormComponent = ({ closeForm, item }) => {
     } catch (error) {
       alert(`Error!`);
     }
+    return false;
   };
 
   return (
