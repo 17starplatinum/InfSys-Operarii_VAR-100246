@@ -133,8 +133,8 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
       employeesCount: 0,
       fullName: "",
       type: "",
-      postalAddress: { zipCode: "", location: { x: 0, y: 0, z: 0 } },
-      officialAddress: { zipCode: "", location: { x: 0, y: 0, z: 0 } },
+      postalAddress: { zipCode: "", town: { x: 0, y: 0, z: 0 } },
+      officialAddress: { zipCode: "", town: { x: 0, y: 0, z: 0 } },
     },
     person: {
       eyeColor: "",
@@ -193,7 +193,7 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
               <input
                 className="form-control"
                 name="name"
-                type="number"
+                type="text"
                 onChange={updateForm}
                 value={formData.name}
               />
