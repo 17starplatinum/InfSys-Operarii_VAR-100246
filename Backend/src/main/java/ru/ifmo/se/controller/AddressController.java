@@ -19,7 +19,7 @@ public class AddressController {
     public ResponseEntity<PaginationResponseDTO<AddressDTO>> getAllAddresses(
             @RequestParam(required = false) String zipCode,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "8") int size,
+            @RequestParam(defaultValue = "1000") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDirection
     ) {

@@ -18,7 +18,7 @@ public class PersonController {
     @GetMapping
     public ResponseEntity<PaginationResponseDTO<PersonDTO>> getAllPeople(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "8") int size,
+            @RequestParam(defaultValue = "1000") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDirection
     ) {
