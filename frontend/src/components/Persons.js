@@ -87,7 +87,7 @@ export const PersonsComponent = ({ setPage }) => {
         `${V1APIURL}/people/${item.id}`,
         getAxios()
       );
-      if (res.status !== 200) {
+      if (res.status !== 204) {
         alert(`Error: ${res.statusText}`);
         return false;
       }

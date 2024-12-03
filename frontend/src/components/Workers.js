@@ -80,7 +80,7 @@ export const WorkersComponent = ({ setPage }) => {
   const deleteItem = async (item) => {
     try {
       const res = await axios.delete(`${V1APIURL}/workers/${item.id}`, getAxios());
-      if (res.status !== 200) {
+      if (res.status !== 204) {
         alert(`Error: ${res.statusText}`);
         return false;
       }
