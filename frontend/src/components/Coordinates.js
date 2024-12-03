@@ -157,7 +157,7 @@ export const CoordinatesFormComponent = ({ closeForm, item }) => {
         formData,
         getAxios()
       );
-      if (res.status !== 200) {
+      if (res.status !== 200 || res.status !== 201) {
         alert(`Error: ${res.statusText}`);
         return false;
       }
