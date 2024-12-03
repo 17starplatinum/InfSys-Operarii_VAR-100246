@@ -7,7 +7,6 @@ plugins {
 }
 
 group = "ru.ifmo.se"
-version = "0.0.1-SNAPSHOT"
 description = "IS-Lab1"
 java.sourceCompatibility = JavaVersion.VERSION_17
 

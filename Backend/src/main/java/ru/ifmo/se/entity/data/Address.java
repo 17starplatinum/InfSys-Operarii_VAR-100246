@@ -32,7 +32,7 @@ public class Address {
     @JoinColumn(name = "location_id")
     private Location town;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "created_by")
     private User createdBy;
 
