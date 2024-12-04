@@ -12,6 +12,7 @@ import ru.ifmo.se.entity.data.Organization;
 import ru.ifmo.se.entity.data.Person;
 import ru.ifmo.se.entity.data.Worker;
 import ru.ifmo.se.entity.data.audit.AuditOperation;
+import ru.ifmo.se.repository.data.OrganizationRepository;
 import ru.ifmo.se.repository.data.WorkerRepository;
 import ru.ifmo.se.service.data.audit.AuditService;
 import ru.ifmo.se.service.user.UserService;
@@ -34,7 +35,9 @@ public class WorkerService {
     private final EntityMapper entityMapper;
     private final FilterProcessor<WorkerDTO, WorkerFilterCriteria> workerFilterProcessor;
     private final PaginationHandler paginationHandler;
+    private final OrganizationRepository organizationRepository;
 
+    private static final String notFoundMessage = "Worker not found";
     @Transactional(readOnly = true)
     public Page<WorkerDTO> getAllWorkers(String name, String organizationName,
                                          int page, int size, String sortBy, String sortDirection) {
@@ -48,7 +51,7 @@ public class WorkerService {
 
     @Transactional(readOnly = true)
     public WorkerDTO getWorkerById(long id) {
-        Worker worker = workerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Worker not found."));
+        Worker worker = workerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(notFoundMessage));
         return entityMapper.toWorkerDTO(worker);
     }
 
@@ -68,7 +71,7 @@ public class WorkerService {
 
     @Transactional
     public WorkerDTO updateWorker(Long id, WorkerDTO workerDTO) {
-        Worker worker = workerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Worker not found."));
+        Worker worker = workerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(notFoundMessage));
         if (userService.canModifyWorker(worker)) {
             throw new IllegalArgumentException("You are not allowed to modify this Worker.");
         }
@@ -90,7 +93,7 @@ public class WorkerService {
 
     @Transactional
     public void deleteWorker(Long id) {
-        Worker worker = workerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Worker not found."));
+        Worker worker = workerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(notFoundMessage));
         if (userService.canModifyWorker(worker)) {
             throw new IllegalArgumentException("You are not allowed to delete this Worker.");
         }
@@ -100,7 +103,7 @@ public class WorkerService {
 
     @Transactional
     public void deleteWorkerByPerson(Long personId) {
-        Worker worker = workerRepository.findWorkerByPersonId(personId).orElseThrow(() -> new IllegalArgumentException("Worker not found."));
+        Worker worker = workerRepository.findWorkerByPersonId(personId).orElseThrow(() -> new IllegalArgumentException(notFoundMessage));
         if (userService.canModifyWorker(worker)) {
             throw new IllegalArgumentException("You are not allowed to delete this Worker.");
         }
@@ -119,12 +122,20 @@ public class WorkerService {
     }
 
     @Transactional
-    public void fireWorkerFromOrganization(Long workerId) {
+    public int fireWorkerFromOrganization(Long workerId) {
+        Worker worker = workerRepository.findById(workerId).orElseThrow(() -> new IllegalArgumentException(notFoundMessage));
+        if(worker.getOrganization() == null) {
+            return -1;
+        }
+        Long organizationId = worker.getOrganization().getId();
         workerRepository.fireWorkerFromOrganization(workerId);
+        organizationRepository.updateEmployeesCount(organizationId, -1);
+        return 0;
     }
 
     @Transactional
-    public void transferWorkerToAnotherOrganization(Long organizationId, Long workerId) {
+    public int transferWorkerToAnotherOrganization(Long organizationId, Long workerId) {
         workerRepository.transferWorkerToAnotherOrganization(organizationId, workerId);
+        return 0;
     }
 }

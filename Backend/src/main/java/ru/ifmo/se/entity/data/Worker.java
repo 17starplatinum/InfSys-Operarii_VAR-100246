@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.lang.Nullable;
 import ru.ifmo.se.entity.data.audit.WorkerAudit;
 import ru.ifmo.se.entity.data.enumerated.Position;
 import ru.ifmo.se.entity.data.enumerated.Status;
@@ -39,20 +40,23 @@ public class Worker {
     @Column(name = "creation_date", nullable = false)
     private LocalDateTime creationDate = LocalDateTime.now();
 
+    @Nullable
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "organization_id")
+
     private Organization organization;
 
-    @Min(value = 1, message = "Salary must be a natural value")
+    @Min(value = 0, message = "Salary must be a natural value")
     private Double salary;
 
-    @Min(value = 1, message = "Rating must be a natural value")
+    @Min(value = 0, message = "Rating must be a natural value")
     private int rating;
 
     @NotNull
     @Enumerated(EnumType.STRING)
     private Position position;
 
+    @Nullable
     @Enumerated(EnumType.STRING)
     private Status status;
 

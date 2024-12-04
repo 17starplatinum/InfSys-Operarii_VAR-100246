@@ -58,7 +58,11 @@ public class EntityMapper {
         workerDTO.setName(workerDTO.getName());
         workerDTO.setCoordinates(toCoordinatesDTO(worker.getCoordinates()));
         workerDTO.setCreationDate(worker.getCreationDate());
-        workerDTO.setOrganization(toOrganizationDTO(worker.getOrganization()));
+        if(worker.getOrganization() == null){
+            workerDTO.setOrganization(null);
+        } else {
+            workerDTO.setOrganization(toOrganizationDTO(worker.getOrganization()));
+        }
         workerDTO.setRating(worker.getRating());
         workerDTO.setSalary(worker.getSalary());
         workerDTO.setPosition(worker.getPosition());
@@ -114,12 +118,16 @@ public class EntityMapper {
     }
 
     public @NotNull AddressDTO toAddressDTO(Address address) {
-        return new AddressDTO(
-                address.getId(),
-                address.getZipCode(),
-                toLocationDTO(address.getTown()),
-                address.getCreatedBy()
-        );
+        AddressDTO addressDTO = new AddressDTO();
+        addressDTO.setId(address.getId());
+        addressDTO.setZipCode(address.getZipCode());
+        if(address.getTown() == null) {
+            addressDTO.setTown(null);
+        } else {
+            addressDTO.setTown(toLocationDTO(address.getTown()));
+        }
+        addressDTO.setCreatedBy(address.getCreatedBy());
+        return addressDTO;
     }
 
     public UserDTO toUserDTO(User user) {

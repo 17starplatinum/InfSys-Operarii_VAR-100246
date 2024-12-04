@@ -75,13 +75,19 @@ public class WorkerController {
 
     @PutMapping("/fire-worker-from-org/{workerId}")
     public ResponseEntity<WorkerDTO> fireWorkerFromOrg(@PathVariable Long workerId) {
-        workerService.fireWorkerFromOrganization(workerId);
+        int code = workerService.fireWorkerFromOrganization(workerId);
+        if (code != 0) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/transfer-worker-to-another-organization/{organizationId}&{workerId}")
     public ResponseEntity<WorkerDTO> transferWorkerToAnotherOrganization(@PathVariable Long organizationId, @PathVariable Long workerId) {
-        workerService.transferWorkerToAnotherOrganization(organizationId, workerId);
+        int code = workerService.transferWorkerToAnotherOrganization(organizationId, workerId);
+        if (code != 0) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
+        }
         return ResponseEntity.noContent().build();
     }
 }

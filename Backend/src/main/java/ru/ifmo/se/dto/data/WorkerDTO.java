@@ -41,7 +41,6 @@ public class WorkerDTO {
 
     private Status status;
 
-    @NotNull
     private OrganizationDTO organization;
 
     private User createdBy;
