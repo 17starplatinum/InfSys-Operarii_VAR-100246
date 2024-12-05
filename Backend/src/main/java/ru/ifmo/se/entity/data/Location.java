@@ -37,6 +37,9 @@ public class Location {
     @OneToOne(mappedBy = "location")
     private Person person;
 
+    @OneToOne(mappedBy = "town")
+    private Address address;
+
     @ManyToOne
     @JoinColumn(name = "created_by")
     private User createdBy;

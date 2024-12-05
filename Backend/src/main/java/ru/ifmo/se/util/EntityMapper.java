@@ -55,7 +55,7 @@ public class EntityMapper {
     public WorkerDTO toWorkerDTO(Worker worker) {
         WorkerDTO workerDTO = new WorkerDTO();
         workerDTO.setId(worker.getId());
-        workerDTO.setName(workerDTO.getName());
+        workerDTO.setName(worker.getName());
         workerDTO.setCoordinates(toCoordinatesDTO(worker.getCoordinates()));
         workerDTO.setCreationDate(worker.getCreationDate());
         if(worker.getOrganization() == null){

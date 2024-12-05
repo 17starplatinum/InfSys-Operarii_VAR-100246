@@ -1,6 +1,5 @@
 package ru.ifmo.se.entity.data;
 
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
