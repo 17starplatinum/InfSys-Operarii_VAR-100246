@@ -30,6 +30,7 @@ public class AddressService {
     private LocationService locationService;
     private FilterProcessor<AddressDTO, AddressFilterCriteria> addressFilterProcessor;
 
+    private static final String NOT_FOUND_MESSAGE = "Address not found";
     @Autowired
     public void setAddressRepository(AddressRepository addressRepository) {
         this.addressRepository = addressRepository;
@@ -75,7 +76,7 @@ public class AddressService {
 
     @Transactional(readOnly = true)
     public AddressDTO getAddressById(Long id) {
-        Address address = addressRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Address not found."));
+        Address address = addressRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
         return entityMapper.toAddressDTO(address);
     }
 
@@ -91,7 +92,7 @@ public class AddressService {
 
     @Transactional
     public AddressDTO updateAddress(AddressDTO addressDTO) {
-        Address address = addressRepository.findById(addressDTO.getId()).orElseThrow(() -> new IllegalArgumentException("Address not found."));
+        Address address = addressRepository.findById(addressDTO.getId()).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
 
         Location savedLocation = locationService.createOrUpdateLocationForObjects(addressDTO.getTown());
 
@@ -107,7 +108,7 @@ public class AddressService {
 
     @Transactional
     public void deleteAddress(Long id) {
-        Address address = addressRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Address not found."));
+        Address address = addressRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
 
         auditService.deleteAddressAudits(address.getId());
         addressRepository.delete(address);
@@ -115,9 +116,11 @@ public class AddressService {
 
     @Transactional
     public Address createOrUpdateAddressForOrganization(AddressDTO addressDTO) {
-        Location town = locationService.createOrUpdateLocationForObjects(addressDTO.getTown());
+        Location town = (addressDTO == null) ?
+                locationService.createOrUpdateLocationForObjects(null) :
+                locationService.createOrUpdateLocationForObjects(addressDTO.getTown());
         if (addressDTO.getId() != null) {
-            Address existingAddress = addressRepository.findById(addressDTO.getId()).orElseThrow(() -> new IllegalArgumentException("Address not found."));
+            Address existingAddress = addressRepository.findById(addressDTO.getId()).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
 
             existingAddress.setZipCode(addressDTO.getZipCode());
             existingAddress.setTown(town);

@@ -24,6 +24,7 @@ public class LocationService {
     private AuditService auditService;
     private UserService userService;
     private PaginationHandler paginationHandler;
+    private static final String NOT_FOUND_MESSAGE = "Location not found";
 
     @Autowired
     public void setLocationRepository(LocationRepository locationRepository) {
@@ -58,7 +59,7 @@ public class LocationService {
 
     @Transactional(readOnly = true)
     public LocationDTO getLocationById(Long id) {
-        Location location = locationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Location not found."));
+        Location location = locationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
         return entityMapper.toLocationDTO(location);
     }
 
@@ -73,7 +74,7 @@ public class LocationService {
 
     @Transactional
     public LocationDTO updateLocation(LocationDTO locationDTO) {
-        Location location = locationRepository.findById(locationDTO.getId()).orElseThrow(() -> new IllegalArgumentException("Location not found."));
+        Location location = locationRepository.findById(locationDTO.getId()).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
 
         location.setX(locationDTO.getX());
         location.setY(locationDTO.getY());
@@ -86,8 +87,13 @@ public class LocationService {
 
     @Transactional
     public Location createOrUpdateLocationForObjects(LocationDTO locationDTO) {
+        if(locationDTO == null) {
+            Location location = locationRepository.save(null);
+            auditService.auditLocation(location, AuditOperation.CREATE);
+            return location;
+        }
         if (locationDTO.getId() != null) {
-            Location location = locationRepository.findById(locationDTO.getId()).orElseThrow(() -> new IllegalArgumentException("Location not found."));
+            Location location = locationRepository.findById(locationDTO.getId()).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
 
             location.setX(locationDTO.getX());
             location.setY(locationDTO.getY());
@@ -106,7 +112,7 @@ public class LocationService {
 
     @Transactional
     public void deleteLocation(Long id) {
-        Location location = locationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Location not found."));
+        Location location = locationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
         if (location.getPerson() != null) {
             throw new EntityDeletionException("Cannot delete this Location since it is linked to a Person.");
         }

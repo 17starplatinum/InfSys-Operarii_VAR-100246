@@ -82,7 +82,7 @@ public class WorkerController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/transfer-worker-to-another-organization/{organizationId}&{workerId}")
+    @PutMapping("/transfer-worker-to-another-organization/worker={workerId}&org={organizationId}")
     public ResponseEntity<WorkerDTO> transferWorkerToAnotherOrganization(@PathVariable Long organizationId, @PathVariable Long workerId) {
         int code = workerService.transferWorkerToAnotherOrganization(organizationId, workerId);
         if (code != 0) {

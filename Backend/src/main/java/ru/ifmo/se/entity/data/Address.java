@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import org.springframework.lang.Nullable;
 import ru.ifmo.se.entity.data.audit.AddressAudit;
 import ru.ifmo.se.entity.user.User;
 
@@ -29,6 +30,7 @@ public class Address {
     private String zipCode;
 
     @OneToOne
+    @Nullable
     @JoinColumn(name = "location_id")
     private Location town;
 

@@ -33,6 +33,6 @@ public interface WorkerRepository extends CrudRepository<Worker, Long>, PagingAn
     void fireWorkerFromOrganization(@Param("worker_id") Long workerId);
 
     @Modifying
-    @Query("UPDATE Worker AS w SET w.organization.employeesCount = w.organization.employeesCount - 1, w.organization.id = :org_id, w.organization.employeesCount = w.organization.employeesCount + 1 WHERE w.id = :worker_id")
+    @Query("UPDATE Worker AS w SET w.organization.id = :org_id WHERE w.id = :worker_id")
     void transferWorkerToAnotherOrganization(@Param("org_id") Long organizationId, @Param("worker_id") Long workerId);
 }

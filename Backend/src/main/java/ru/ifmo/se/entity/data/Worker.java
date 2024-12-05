@@ -43,7 +43,6 @@ public class Worker {
     @Nullable
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "organization_id")
-
     private Organization organization;
 
     @Min(value = 0, message = "Salary must be a natural value")
