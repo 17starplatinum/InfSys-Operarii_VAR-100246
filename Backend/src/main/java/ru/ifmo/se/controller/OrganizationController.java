@@ -47,9 +47,9 @@ public class OrganizationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(organizationService.createOrganization(organizationDTO));
     }
 
-    @PutMapping
-    public ResponseEntity<OrganizationDTO> updateOrganization(@RequestBody OrganizationDTO organizationDTO) {
-        return ResponseEntity.ok(organizationService.updateOrganization(organizationDTO));
+    @PutMapping("/{id}")
+    public ResponseEntity<OrganizationDTO> updateOrganization(@PathVariable Long id, @RequestBody OrganizationDTO organizationDTO) {
+        return ResponseEntity.ok(organizationService.updateOrganization(id, organizationDTO));
     }
 
     @DeleteMapping("/{id}")

@@ -73,8 +73,8 @@ public class LocationService {
     }
 
     @Transactional
-    public LocationDTO updateLocation(LocationDTO locationDTO) {
-        Location location = locationRepository.findById(locationDTO.getId()).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
+    public LocationDTO updateLocation(Long id, LocationDTO locationDTO) {
+        Location location = locationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
 
         location.setX(locationDTO.getX());
         location.setY(locationDTO.getY());

@@ -46,9 +46,9 @@ public class CoordinatesController {
         return ResponseEntity.status(HttpStatus.CREATED).body(coordinatesService.createCoordinates(coordinatesDTO));
     }
 
-    @PutMapping
-    public ResponseEntity<CoordinatesDTO> updateCoordinates(@RequestBody CoordinatesDTO coordinatesDTO) {
-        return ResponseEntity.ok(coordinatesService.updateCoordinates(coordinatesDTO));
+    @PutMapping("/{id}")
+    public ResponseEntity<CoordinatesDTO> updateCoordinates(@PathVariable Long id, @RequestBody CoordinatesDTO coordinatesDTO) {
+        return ResponseEntity.ok(coordinatesService.updateCoordinates(id, coordinatesDTO));
     }
 
     @DeleteMapping("/{id}")

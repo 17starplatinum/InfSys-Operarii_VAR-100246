@@ -56,8 +56,8 @@ public class OrganizationService {
     }
 
     @Transactional
-    public OrganizationDTO updateOrganization(OrganizationDTO organizationDTO) {
-        Organization organization = organizationRepository.findById(organizationDTO.getId()).orElseThrow(() -> new IllegalArgumentException("Organization not found."));
+    public OrganizationDTO updateOrganization(Long id, OrganizationDTO organizationDTO) {
+        Organization organization = organizationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Organization not found."));
         Address officialAddress = addressService.createOrUpdateAddressForOrganization(organizationDTO.getOfficialAddress());
         Address postalAddress = addressService.createOrUpdateAddressForOrganization(organizationDTO.getPostalAddress());
         organization.setOfficialAddress(officialAddress);

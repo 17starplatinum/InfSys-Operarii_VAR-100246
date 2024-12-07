@@ -42,9 +42,9 @@ public class PersonController {
         return ResponseEntity.status(HttpStatus.CREATED).body(personService.createPerson(personDTO));
     }
 
-    @PutMapping
-    public ResponseEntity<PersonDTO> updatePerson(@RequestBody PersonDTO personDTO) {
-        return ResponseEntity.ok(personService.updatePerson(personDTO));
+    @PutMapping("/{id}")
+    public ResponseEntity<PersonDTO> updatePerson(@PathVariable Long id, @RequestBody PersonDTO personDTO) {
+        return ResponseEntity.ok(personService.updatePerson(id, personDTO));
     }
 
     @DeleteMapping("/{id}")

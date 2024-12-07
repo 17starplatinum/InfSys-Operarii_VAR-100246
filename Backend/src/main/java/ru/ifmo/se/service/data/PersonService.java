@@ -50,8 +50,8 @@ public class PersonService {
     }
 
     @Transactional
-    public PersonDTO updatePerson(PersonDTO personDTO) {
-        Person person = personRepository.findById(personDTO.getId()).orElseThrow(() -> new IllegalArgumentException("Person not found."));
+    public PersonDTO updatePerson(Long id, PersonDTO personDTO) {
+        Person person = personRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Person not found."));
         person.setEyeColor(personDTO.getEyeColor());
         person.setHairColor(personDTO.getHairColor());
         person.setBirthday(personDTO.getBirthday());

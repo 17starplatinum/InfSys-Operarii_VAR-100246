@@ -91,8 +91,8 @@ public class AddressService {
     }
 
     @Transactional
-    public AddressDTO updateAddress(AddressDTO addressDTO) {
-        Address address = addressRepository.findById(addressDTO.getId()).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
+    public AddressDTO updateAddress(Long id, AddressDTO addressDTO) {
+        Address address = addressRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
 
         Location savedLocation = locationService.createOrUpdateLocationForObjects(addressDTO.getTown());
 
