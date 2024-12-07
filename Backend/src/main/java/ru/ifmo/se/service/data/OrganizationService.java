@@ -100,12 +100,7 @@ public class OrganizationService {
     @Transactional
     public void deleteOrganization(Long id) {
         Organization organization = organizationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Organization not found."));
-
-        if (!organization.getWorkers().isEmpty()) {
-            throw new EntityDeletionException("Cannot delete this Organization since it is linked to one or more Workers.");
-        }
         auditService.deleteOrganizationAudits(id);
-
         organizationRepository.delete(organization);
     }
 }
