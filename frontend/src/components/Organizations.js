@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
-import { V1APIURL } from "../shared/constants";
+import {OrganizationEnum, V1APIURL} from "../shared/constants";
 import axios from "axios";
 import { getAxios } from "../shared/utils";
 
@@ -203,49 +203,56 @@ export const OrganizationsFormComponent = ({ closeForm, item }) => {
                 value={formData.fullName}
               />
             </div>
-            <div className="mb-4">
-              <label htmlFor="type">type</label>
-              <input
-                className="form-control"
-                name="type"
-                type="text"
-                onChange={updateForm}
-                value={formData.type}
-              />
+            <div className="mb-4 dropdown">
+              <label htmlFor="type">Organization Type</label>
+              <select
+                  className="dropdown-menu-dark"
+                  name="type"
+                  onChange={updateForm}
+                  value={formData.type}
+              >
+                <option className="dropdown-item" value={OrganizationEnum.COMMERCIAL}>Commercial</option>
+                <option className="dropdown-item" value={OrganizationEnum.PUBLIC}>Public</option>
+                <option className="dropdown-item" value={OrganizationEnum.GOVERNMENT}>Government</option>
+                <option className="dropdown-item" value={OrganizationEnum.TRUST}>Trust</option>
+                <option className="dropdown-item" value={OrganizationEnum.PRIVATE_LIMITED_COMPANY}>Private Limited
+                  Company
+                </option>
+              </select>
             </div>
             <hr></hr>
             <div className="mb-4">
               <label htmlFor="postalAddress_zipCode">Postal Address Zip Code</label>
               <input
-                className="form-control"
-                name="postalAddress_zipCode"
-                type="text"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    postalAddress: {
-                      ...formData.postalAddress,
-                      zipCode: e.target.value,
-                    },
-                  })
-                }
-                value={formData.postalAddress.zipCode}
+                  className="form-control"
+                  name="postalAddress_zipCode"
+                  type="text"
+                  onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        postalAddress: {
+                          ...formData.postalAddress,
+                          zipCode: e.target.value,
+                        },
+                      })
+                  }
+                  value={formData.postalAddress.zipCode}
               />
             </div>
             <div className="mb-4">
               <label htmlFor="postalAddress_x">Location ID (X)</label>
               <input
-                className="form-control"
-                name="postalAddress_x"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    postalAddress: {
-                      ...formData.postalAddress,
-                      location: {
-                        ...formData.postalAddress.location,
-                        x: e.target.value,
+                  className="form-control"
+                  name="postalAddress_x"
+                  type="number"
+                  onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        postalAddress: {
+                          ...formData.postalAddress,
+                          location: {
+                            ...formData.postalAddress.location,
+                            x: e.target.value,
                       },
                     },
                   })

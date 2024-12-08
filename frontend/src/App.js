@@ -5,7 +5,7 @@ import { RegisterPage } from "./pages/Register";
 import { LayoutPage } from "./pages/Layout";
 import { DashboardComponent } from "./components/Dashboard";
 import { OrganizationsComponent } from "./components/Organizations";
-import { WorkersComponent } from "./components/Workers";
+import { WorkersComponent, SpecialComponent } from "./components/Workers";
 import { PersonsComponent } from "./components/Persons";
 import { CoordinatesComponent } from "./components/Coordinates";
 import { LocationsComponent } from "./components/Locations";
@@ -87,6 +87,15 @@ function App() {
           setUser={setUser}
           content={<AddressesComponent setPage={setPage} />}
         />
+      );
+    case "special":
+      return (
+          <LayoutPage
+            setPage={setPage}
+            user={user}
+            setUser={setUser}
+            content={<SpecialComponent setPage={setPage} />}
+          />
       );
     default:
       return (
