@@ -17,7 +17,7 @@ public class WorkerFilterProcessor implements FilterProcessor<WorkerDTO, WorkerF
 
     @Override
     public Page<WorkerDTO> filter(WorkerFilterCriteria criteria, Pageable pageable) {
-        if((criteria.getName() == null || criteria.getName().isEmpty()) && (criteria.getOrganizationName() == null || criteria.getOrganizationName().isEmpty())) {
+        if ((criteria.getName() == null || criteria.getName().isEmpty()) && (criteria.getOrganizationName() == null || criteria.getOrganizationName().isEmpty())) {
             return workerRepository.findAll(pageable).map(entityMapper::toWorkerDTO);
         } else {
             return workerRepository.findByFilters(criteria.getName(), criteria.getOrganizationName(), pageable).map(entityMapper::toWorkerDTO);

@@ -63,7 +63,7 @@ export const PersonsComponent = ({ setPage }) => {
         alert(`Error: ${res.statusText}`);
         return false;
       }
-      setItems((res.data?.content || []));
+      setItems(res.data?.content || []);
     } catch (error) {
       alert(`Error!`);
     }
@@ -87,7 +87,7 @@ export const PersonsComponent = ({ setPage }) => {
         `${V1APIURL}/people/${item.id}`,
         getAxios()
       );
-      if (res.status !== 200) {
+      if (res.status !== 204) {
         alert(`Error: ${res.statusText}`);
         return false;
       }
@@ -158,7 +158,7 @@ export const PersonsFormComponent = ({ closeForm, item }) => {
         formData,
         getAxios()
       );
-      if (res.status !== 200) {
+      if (res.status !== 200 || res.status !== 201) {
         alert(`Error: ${res.statusText}`);
         return false;
       }

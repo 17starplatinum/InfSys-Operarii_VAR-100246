@@ -7,9 +7,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.ifmo.se.dto.PaginationResponseDTO;
 import ru.ifmo.se.dto.data.WorkerDTO;
-import ru.ifmo.se.entity.data.Organization;
-import ru.ifmo.se.entity.data.Person;
-import ru.ifmo.se.entity.data.Worker;
 import ru.ifmo.se.service.data.WorkerService;
 
 @AllArgsConstructor
@@ -23,7 +20,7 @@ public class WorkerController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String organizationName,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "8") int size,
+            @RequestParam(defaultValue = "1000") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDirection
     ) {
@@ -57,32 +54,33 @@ public class WorkerController {
         workerService.deleteWorker(id);
         return ResponseEntity.noContent().build();
     }
-    @DeleteMapping("/delete-by-person")
-    public ResponseEntity<WorkerDTO> deleteWorkerByPerson(@RequestParam Long personId) {
+
+    @DeleteMapping("/delete-by-person/{personId}")
+    public ResponseEntity<WorkerDTO> deleteWorkerByPerson(@PathVariable Long personId) {
         workerService.deleteWorkerByPerson(personId);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/count-by-people")
-    public ResponseEntity<Long> countByPeople(@RequestParam Long personId) {
+    @GetMapping("/count-by-people/{personId}")
+    public ResponseEntity<Long> countByPeople(@PathVariable Long personId) {
         Long count = workerService.countWorkersByPerson(personId);
         return ResponseEntity.ok(count);
     }
 
-    @GetMapping("/count-by-less-than-rating")
-    public ResponseEntity<Long> countByLessThanRating(@RequestParam int rating) {
+    @GetMapping("/count-by-less-than-rating/{rating}")
+    public ResponseEntity<Long> countByLessThanRating(@PathVariable int rating) {
         Long count = workerService.countWorkersWithLessRating(rating);
         return ResponseEntity.ok(count);
     }
 
-    @PutMapping("/fire-worker-from-org")
-    public ResponseEntity<WorkerDTO> fireWorkerFromOrg(@RequestParam Long workerId) {
+    @PutMapping("/fire-worker-from-org/{workerId}")
+    public ResponseEntity<WorkerDTO> fireWorkerFromOrg(@PathVariable Long workerId) {
         workerService.fireWorkerFromOrganization(workerId);
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/transfer-worker-to-another-organization")
-    public ResponseEntity<WorkerDTO> transferWorkerToAnotherOrganization(@RequestParam Long organizationId, @RequestParam Long workerId) {
+    @PutMapping("/transfer-worker-to-another-organization/{organizationId}&{workerId}")
+    public ResponseEntity<WorkerDTO> transferWorkerToAnotherOrganization(@PathVariable Long organizationId, @PathVariable Long workerId) {
         workerService.transferWorkerToAnotherOrganization(organizationId, workerId);
         return ResponseEntity.noContent().build();
     }

@@ -24,6 +24,7 @@ public class CoordinatesService {
     private AuditService auditService;
     private UserService userService;
     private PaginationHandler paginationHandler;
+
     @Autowired
     public void setCoordinatesRepository(CoordinatesRepository coordinatesRepository) {
         this.coordinatesRepository = coordinatesRepository;
@@ -84,7 +85,7 @@ public class CoordinatesService {
 
     @Transactional
     public Coordinates createOrUpdateCoordinatesForWorker(CoordinatesDTO coordinatesDTO) {
-        if(coordinatesDTO.getId() != null) {
+        if (coordinatesDTO.getId() != null) {
             Coordinates coordinates = coordinatesRepository.findById(coordinatesDTO.getId()).orElseThrow(() -> new IllegalArgumentException("Coordinates not found."));
 
             coordinates.setX(coordinatesDTO.getX());
@@ -104,7 +105,7 @@ public class CoordinatesService {
     @Transactional
     public void deleteCoordinates(Long id) {
         Coordinates coordinates = coordinatesRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Coordinates not found."));
-        if(!coordinates.getWorkers().isEmpty()) {
+        if (!coordinates.getWorkers().isEmpty()) {
             throw new EntityDeletionException("Cannot delete Coordinates since it is linked to one or more Workers.");
         }
         auditService.deleteCoordinatesAudits(coordinates.getId());

@@ -18,7 +18,7 @@ public class CoordinatesController {
     @GetMapping
     public ResponseEntity<PaginationResponseDTO<CoordinatesDTO>> getAllCoordinates(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "8") int size,
+            @RequestParam(defaultValue = "1000") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDirection
     ) {

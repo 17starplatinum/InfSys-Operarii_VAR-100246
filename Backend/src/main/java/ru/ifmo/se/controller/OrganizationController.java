@@ -14,11 +14,12 @@ import ru.ifmo.se.service.data.OrganizationService;
 @RequiredArgsConstructor
 public class OrganizationController {
     private final OrganizationService organizationService;
+
     @GetMapping
     public ResponseEntity<PaginationResponseDTO<OrganizationDTO>> getAllOrganizations(
             @RequestParam(required = false) String fullName,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "8") int size,
+            @RequestParam(defaultValue = "1000") int size,
             @RequestParam(defaultValue = "id") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDirection
     ) {

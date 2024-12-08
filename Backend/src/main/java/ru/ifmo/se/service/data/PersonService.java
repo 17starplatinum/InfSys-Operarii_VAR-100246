@@ -67,7 +67,7 @@ public class PersonService {
     @Transactional
     public Person createOrUpdatePersonForWorker(PersonDTO personDTO) {
         Location location = locationService.createOrUpdateLocationForObjects(personDTO.getLocation());
-        if(personDTO.getId() != null) {
+        if (personDTO.getId() != null) {
             Person person = personRepository.findById(personDTO.getId()).orElseThrow(() -> new IllegalArgumentException("Person not found."));
             person.setEyeColor(personDTO.getEyeColor());
             person.setHairColor(personDTO.getHairColor());
@@ -92,7 +92,7 @@ public class PersonService {
     public void deletePerson(Long id) {
         Person person = personRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Person not found."));
 
-        if(person.getWorker() != null) {
+        if (person.getWorker() != null) {
             throw new EntityDeletionException("Cannot delete this Person since it is linked to a Worker.");
         }
 

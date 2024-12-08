@@ -21,9 +21,9 @@ public class UserController {
     private final EntityMapper entityMapper;
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerUser(@RequestBody UserRegistrationDTO userRegistrationDTO) {
-        userService.registerUser(userRegistrationDTO);
-        return ResponseEntity.ok("User registered successfully");
+    public ResponseEntity<User> registerUser(@RequestBody UserRegistrationDTO userRegistrationDTO) {
+        User user = userService.registerUser(userRegistrationDTO);
+        return ResponseEntity.ok(user);
     }
 
     @GetMapping("/admin-exists")

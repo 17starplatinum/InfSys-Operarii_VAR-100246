@@ -70,7 +70,7 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public User registerUser(UserRegistrationDTO registrationDTO) {
-        if(userRepository.findByUsername(registrationDTO.getUsername()).isPresent()) {
+        if (userRepository.findByUsername(registrationDTO.getUsername()).isPresent()) {
             throw new IllegalArgumentException("Username is already in use.");
         }
         User newUser = new User();
@@ -104,12 +104,12 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public String requestAdminApproval(Long userId){
+    public String requestAdminApproval(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User has not been found."));
-        if(user.getRole() != UserRole.USER) {
+        if (user.getRole() != UserRole.USER) {
             throw new IllegalArgumentException("Only users can make a request for admin rights.");
         }
-        if(!adminExists()) {
+        if (!adminExists()) {
             user.setRole(UserRole.ADMIN);
             user.setAdminRequestStatus(AdminRequestStatus.ACCEPTED);
             userRepository.save(user);
@@ -122,11 +122,11 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional(readOnly = true)
-    public String getAdminRequestStatus(Long userId){
+    public String getAdminRequestStatus(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User has not been found."));
 
         AdminRequestStatusHandler adminRequestStatusHandler = statusHandlerMap.get(user.getRole().toString());
-        if(adminRequestStatusHandler == null) {
+        if (adminRequestStatusHandler == null) {
             throw new IllegalStateException("Handler for the following status: " + user.getAdminRequestStatus().toString() + " has not been found.");
         }
         return adminRequestStatusHandler.getStatusMessage();
@@ -140,7 +140,7 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void approveRequest(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User has not been found."));
-        if(user.getAdminRequestStatus() != AdminRequestStatus.PENDING) {
+        if (user.getAdminRequestStatus() != AdminRequestStatus.PENDING) {
             throw new IllegalArgumentException("There are no pending requests.");
         }
 
@@ -152,7 +152,7 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void rejectRequest(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User has not been found."));
-        if(user.getAdminRequestStatus() != AdminRequestStatus.PENDING) {
+        if (user.getAdminRequestStatus() != AdminRequestStatus.PENDING) {
             throw new IllegalArgumentException("There are no pending requests.");
         }
         user.setAdminRequestStatus(AdminRequestStatus.REJECTED);
@@ -162,7 +162,7 @@ public class UserService implements UserDetailsService {
     @Transactional(readOnly = true)
     public User getCurrentUser() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if(principal instanceof User) {
+        if (principal instanceof User) {
             String username = ((UserDetails) principal).getUsername();
             return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException("User with the name: " + username + " has not been found."));
         } else {
@@ -170,21 +170,22 @@ public class UserService implements UserDetailsService {
         }
     }
 
+    @Transactional
     public boolean canModifyWorker(Worker worker) {
         User currentUser = getCurrentUser();
-        return Objects.equals(worker.getCreatedBy().getUsername(), currentUser.getUsername()) || currentUser.getRole() == UserRole.ADMIN;
+        return !Objects.equals(worker.getCreatedBy().getUsername(), currentUser.getUsername()) && currentUser.getRole() != UserRole.ADMIN;
     }
 
     @Transactional
     public UserUpdateResponseDTO updateCurrentUser(UserUpdateDTO userUpdateDTO) {
         User currentUser = getCurrentUser();
-        if(userUpdateDTO.getUsername() != null && !userUpdateDTO.getUsername().isEmpty()) {
-            if(userRepository.findByUsername(userUpdateDTO.getUsername()).isPresent()) {
+        if (userUpdateDTO.getUsername() != null && !userUpdateDTO.getUsername().isEmpty()) {
+            if (userRepository.findByUsername(userUpdateDTO.getUsername()).isPresent()) {
                 throw new UserAlreadyExistsException("Username is already taken.");
             }
             currentUser.setUsername(userUpdateDTO.getUsername());
         }
-        if(userUpdateDTO.getPassword() != null && !userUpdateDTO.getPassword().isEmpty()) {
+        if (userUpdateDTO.getPassword() != null && !userUpdateDTO.getPassword().isEmpty()) {
             currentUser.setPassword(passwordEncoder.encode(userUpdateDTO.getPassword()));
         }
         User updatedUser = userRepository.save(currentUser);

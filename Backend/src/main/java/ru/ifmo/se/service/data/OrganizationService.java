@@ -76,7 +76,7 @@ public class OrganizationService {
     public Organization createOrUpdateOrganizationForWorker(OrganizationDTO organizationDTO) {
         Address officialAddress = addressService.createOrUpdateAddressForOrganization(organizationDTO.getOfficialAddress());
         Address postalAddress = addressService.createOrUpdateAddressForOrganization(organizationDTO.getPostalAddress());
-        if(organizationDTO.getId() != null) {
+        if (organizationDTO.getId() != null) {
             Organization organization = organizationRepository.findById(organizationDTO.getId()).orElseThrow(() -> new IllegalArgumentException("Organization not found."));
             organization.setOfficialAddress(officialAddress);
             organization.setAnnualTurnover(organizationDTO.getAnnualTurnover());
@@ -101,10 +101,10 @@ public class OrganizationService {
     public void deleteOrganization(Long id) {
         Organization organization = organizationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Organization not found."));
 
-        if(!organization.getWorkers().isEmpty()) {
+        if (!organization.getWorkers().isEmpty()) {
             throw new EntityDeletionException("Cannot delete this Organization since it is linked to one or more Workers.");
         }
-        auditService.deleteLocationAudits(id);
+        auditService.deleteOrganizationAudits(id);
 
         organizationRepository.delete(organization);
     }

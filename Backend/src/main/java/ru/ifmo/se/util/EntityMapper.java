@@ -112,6 +112,7 @@ public class EntityMapper {
                 location.getCreatedBy()
         );
     }
+
     public @NotNull AddressDTO toAddressDTO(Address address) {
         return new AddressDTO(
                 address.getId(),
@@ -195,6 +196,7 @@ public class EntityMapper {
         workerAudit.setOperationDateAndTime(LocalDateTime.now());
         return workerAudit;
     }
+
     public CoordinatesAudit toCoordinatesAudit(Coordinates coordinates, AuditOperation auditOperation) {
         CoordinatesAudit coordinatesAudit = new CoordinatesAudit();
         coordinatesAudit.setCoordinates(coordinates);
@@ -203,6 +205,7 @@ public class EntityMapper {
         coordinatesAudit.setOperationDateAndTime(LocalDateTime.now());
         return coordinatesAudit;
     }
+
     public OrganizationAudit toOrganizationAudit(Organization organization, AuditOperation auditOperation) {
         OrganizationAudit organizationAudit = new OrganizationAudit();
         organizationAudit.setOrganization(organization);
@@ -211,6 +214,7 @@ public class EntityMapper {
         organizationAudit.setOperationDateAndTime(LocalDateTime.now());
         return organizationAudit;
     }
+
     public PersonAudit toPersonAudit(Person person, AuditOperation auditOperation) {
         PersonAudit personAudit = new PersonAudit();
         personAudit.setPerson(person);
@@ -219,6 +223,7 @@ public class EntityMapper {
         personAudit.setOperationDateAndTime(LocalDateTime.now());
         return personAudit;
     }
+
     public LocationAudit toLocationAudit(Location location, AuditOperation auditOperation) {
         LocationAudit locationAudit = new LocationAudit();
         locationAudit.setLocation(location);
@@ -227,6 +232,7 @@ public class EntityMapper {
         locationAudit.setOperationDateAndTime(LocalDateTime.now());
         return locationAudit;
     }
+
     public AddressAudit toAddressAudit(Address address, AuditOperation auditOperation) {
         AddressAudit addressAudit = new AddressAudit();
         addressAudit.setAddress(address);

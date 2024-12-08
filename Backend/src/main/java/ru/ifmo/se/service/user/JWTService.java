@@ -65,7 +65,7 @@ public class JWTService {
                     .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                     .compact();
         } catch (JwtException e) {
-            log.error("Error build JWT: " + e.getMessage(), e);
+            log.error("Error building JWT: {}", e.getMessage(), e);
             throw e;
         }
     }
@@ -97,7 +97,7 @@ public class JWTService {
             log.info("Extracted claims: {}", claims);
             return claims;
         } catch (JwtException e) {
-            log.error("Error parsing JWT: " + e.getMessage(), e);
+            log.error("Error parsing JWT: {}", e.getMessage(), e);
             throw e;
         }
     }
@@ -109,7 +109,7 @@ public class JWTService {
             byte[] keyBytes = Decoders.BASE64.decode(secretKey);
             return Keys.hmacShaKeyFor(keyBytes);
         } catch (JwtException e) {
-            log.error("Error decode JWT: " + e.getMessage(), e);
+            log.error("Error decoding JWT: {}", e.getMessage(), e);
             throw e;
         }
     }
