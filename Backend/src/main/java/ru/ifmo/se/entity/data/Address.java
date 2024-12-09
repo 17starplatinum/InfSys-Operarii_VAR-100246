@@ -24,7 +24,7 @@ public class Address {
     @Column(name = "id", nullable = false, unique = true)
     private long id;
 
-    @NotNull(message = "Zip code cannot be null")
+    @NotNull
     @Column(name = "zip_code", nullable = false)
     private String zipCode;
 

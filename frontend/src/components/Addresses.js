@@ -129,17 +129,53 @@ export const AddressesFormComponent = ({ closeForm, item }) => {
 
   const updateForm = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    validateField(e.target.name, e.target.value);
   };
 
+  const validateField = (name, value) => {
+    let errorMsg = "";
+    switch (name) {
+      case "zipCode":
+        if(!value || value.trim() === "") {
+          errorMsg = "";
+        }
+        break;
+      case "town":
+        validate
+    }
+  }
   const submitForm = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post(
-        `${V1APIURL}/addresses${item ? `/${item.id}` : ""}`,
-        formData,
-        getAxios()
+      let res;
+        res = await axios.post(
+            `${V1APIURL}/addresses${item}`,
+            formData,
+            getAxios()
+        );
+
+      if (res.status !== 201) {
+        alert(`Error: ${res.statusText}`);
+        return false;
+      }
+      alert(`Item ${item ? "Updated" : "Deleted"}`);
+      closeForm(true);
+    } catch (error) {
+      alert(`Error!`);
+    }
+    return false;
+  };
+
+  const submitUpdate = async (e) => {
+    e.preventDefault();
+    try {
+      const res = await axios.put(
+          `${V1APIURL}/addresses${item}/${item.id}`,
+          formData,
+          getAxios()
       );
-      if (res.status !== 200 || res.status !== 201) {
+
+      if (res.status !== 200) {
         alert(`Error: ${res.statusText}`);
         return false;
       }

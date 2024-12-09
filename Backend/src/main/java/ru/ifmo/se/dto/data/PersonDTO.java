@@ -1,7 +1,7 @@
 package ru.ifmo.se.dto.data;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -27,7 +27,7 @@ public class PersonDTO {
 
     private LocalDate birthday;
 
-    @Min(1)
+    @Positive
     @NotNull
     private Double weight;
 

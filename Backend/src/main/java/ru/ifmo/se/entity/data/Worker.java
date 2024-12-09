@@ -1,8 +1,8 @@
 package ru.ifmo.se.entity.data;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,10 +45,10 @@ public class Worker {
     @JoinColumn(name = "organization_id")
     private Organization organization;
 
-    @Min(value = 0, message = "Salary must be a natural value")
+    @Positive
     private Double salary;
 
-    @Min(value = 0, message = "Rating must be a natural value")
+    @Positive
     private int rating;
 
     @NotNull

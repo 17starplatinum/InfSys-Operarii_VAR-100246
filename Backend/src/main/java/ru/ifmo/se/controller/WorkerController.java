@@ -4,16 +4,26 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import ru.ifmo.se.dto.PaginationResponseDTO;
 import ru.ifmo.se.dto.data.WorkerDTO;
+import ru.ifmo.se.dto.info.ImportHistoryDTO;
+import ru.ifmo.se.entity.user.User;
+import ru.ifmo.se.service.data.ImportService;
 import ru.ifmo.se.service.data.WorkerService;
+
+import java.util.Map;
+import java.util.Objects;
 
 @AllArgsConstructor
 @RestController
 @RequestMapping("/api/workers")
 public class WorkerController {
     private final WorkerService workerService;
+    private final ImportService importService;
 
     @GetMapping
     public ResponseEntity<PaginationResponseDTO<WorkerDTO>> getAllWorkers(
@@ -89,5 +99,20 @@ public class WorkerController {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/import")
+    public ResponseEntity<ImportHistoryDTO> importWorkers(@RequestParam("file") MultipartFile file) {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            User currentUser = (User) authentication.getPrincipal();
+            ImportHistoryDTO importHistoryDTO = importService.importWorkersFromFile(file, currentUser);
+            if(Objects.equals(importHistoryDTO.getStatus(), "FAILED")) {
+                return ResponseEntity.status(HttpStatus.CONFLICT).build();
+            }
+            return ResponseEntity.ok(importHistoryDTO);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body((ImportHistoryDTO) Map.of("status", "FAILED", "message", e.getMessage()));
+        }
     }
 }

@@ -1,8 +1,8 @@
 package ru.ifmo.se.entity.data;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,11 +31,11 @@ public class Organization {
     private Address officialAddress;
 
     @NotNull
-    @Min(value = 1, message = "Annual turnover must be a natural value")
+    @Positive
     @Column(name = "annual_turnover", nullable = false)
     private Float annualTurnover;
 
-    @Min(value = 1)
+    @Positive
     @Column(name = "employees_count")
     private int employeesCount;
 

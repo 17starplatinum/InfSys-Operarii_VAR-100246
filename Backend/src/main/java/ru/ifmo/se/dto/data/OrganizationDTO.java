@@ -2,6 +2,7 @@ package ru.ifmo.se.dto.data;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -19,16 +20,17 @@ public class OrganizationDTO {
     private AddressDTO officialAddress;
 
     @NotNull
-    @Min(1)
+    @Positive
     private Float annualTurnover;
 
-    @Min(1)
+    @Positive
     private int employeesCount;
 
     @Size(min = 1, max = 1576)
     private String fullName;
 
     private OrganizationType type;
+
     @NotNull
     private AddressDTO postalAddress;
 

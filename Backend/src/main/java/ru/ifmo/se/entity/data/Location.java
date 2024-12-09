@@ -1,6 +1,5 @@
 package ru.ifmo.se.entity.data;
 
-
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
@@ -23,14 +22,14 @@ public class Location {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotNull(message = "This abscissa CANNOT be null")
+    @NotNull
     @Column(name = "x", nullable = false)
     private Float x;
 
     @Column(name = "y")
     private long y;
 
-    @NotNull(message = "This applicate CANNOT be null")
+    @NotNull
     @Column(name = "z", nullable = false)
     private Long z;
 

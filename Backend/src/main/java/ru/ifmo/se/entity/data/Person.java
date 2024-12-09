@@ -1,8 +1,8 @@
 package ru.ifmo.se.entity.data;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,7 +26,7 @@ public class Person {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotNull(message = "Eye color CANNOT be null")
+    @NotNull
     @Enumerated(EnumType.STRING)
     @Column(name = "eye_color")
     private Color eyeColor;
@@ -35,7 +35,7 @@ public class Person {
     @Column(name = "hair_color")
     private Color hairColor;
 
-    @NotNull(message = "Location CANNOT be null")
+    @NotNull
     @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "location_id")
     private Location location;
@@ -43,7 +43,7 @@ public class Person {
     private LocalDate birthday;
 
     @NotNull(message = "Weight CANNOT be null")
-    @Min(value = 1, message = "Weight must be a natural value")
+    @Positive
     private Double weight;
 
     @NotNull(message = "Nationality CANNOT be null")

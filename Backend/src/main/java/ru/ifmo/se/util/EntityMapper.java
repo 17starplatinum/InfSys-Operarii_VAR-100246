@@ -4,9 +4,11 @@ import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import ru.ifmo.se.dto.data.*;
+import ru.ifmo.se.dto.info.ImportHistoryDTO;
 import ru.ifmo.se.dto.user.UserDTO;
 import ru.ifmo.se.entity.data.*;
 import ru.ifmo.se.entity.data.audit.*;
+import ru.ifmo.se.entity.info.ImportHistory;
 import ru.ifmo.se.entity.user.User;
 import ru.ifmo.se.service.data.*;
 import ru.ifmo.se.service.user.UserService;
@@ -248,5 +250,15 @@ public class EntityMapper {
         addressAudit.setOperation(auditOperation);
         addressAudit.setOperationDateAndTime(LocalDateTime.now());
         return addressAudit;
+    }
+
+    public ImportHistoryDTO fromEntity(ImportHistory importHistory) {
+        ImportHistoryDTO dto = new ImportHistoryDTO();
+        dto.setId(importHistory.getId());
+        dto.setStatus(importHistory.getStatus());
+        dto.setUsername(importHistory.getUser().getUsername());
+        dto.setAddedObjectsCount(importHistory.getAddedObjectsCount());
+        dto.setTotalObjectsCount(importHistory.getTotalObjectsCount());
+        return dto;
     }
 }

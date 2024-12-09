@@ -44,6 +44,7 @@ dependencies {
 	implementation("org.springframework:spring-orm:6.1.13")
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
 	implementation("org.hibernate.orm:hibernate-core:6.6.1.Final")
+	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 
 	implementation("jakarta.persistence:jakarta.persistence-api:3.2.0")
 	implementation("jakarta.validation:jakarta.validation-api:3.1.0")

@@ -9,9 +9,12 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.dao.DataIntegrityViolationException;
 import ru.ifmo.se.dto.ErrorResponseDTO;
+import ru.ifmo.se.exception.entity.APIError;
 
 import java.util.Arrays;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -131,5 +134,13 @@ public class GlobalExceptionHandler {
                 System.currentTimeMillis()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<APIError> handleUniqueConstraintException(DataIntegrityViolationException e) {
+        String message = "Повторяющееся значение ключа. Возможно, объект с таким именем уже существует.";
+        String details = e.getMostSpecificCause().getMessage();
+        APIError apiError = new APIError(HttpStatus.CONFLICT.value(), message, details);
+        return new ResponseEntity<>(apiError, HttpStatus.CONFLICT);
     }
 }

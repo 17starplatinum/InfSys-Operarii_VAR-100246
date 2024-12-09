@@ -1,8 +1,8 @@
 package ru.ifmo.se.dto.data;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -21,10 +21,10 @@ public class WorkerDTO {
     @NotBlank
     private String name;
 
-    @Min(1)
+    @Positive
     private Double salary;
 
-    @Min(1)
+    @Positive
     private int rating;
 
     @NotNull
