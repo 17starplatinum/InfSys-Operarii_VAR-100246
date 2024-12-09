@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
-import { V1APIURL } from "../shared/constants";
+import { V1APIURL, CountryEnum, ColorEnum, StatusEnum, PositionEnum, OrganizationEnum } from "../shared/constants";
 import axios from "axios";
 import { getAxios } from "../shared/utils";
 
@@ -8,23 +8,23 @@ export const WorkersComponent = ({ setPage }) => {
   const columns = [
     {
       name: "name",
-      selector: (item) => item.name,
+      selector: (item) => item.name
     },
     {
       name: "salary",
-      selector: (item) => item.salary,
+      selector: (item) => item.salary
     },
     {
       name: "rating",
-      selector: (item) => item.rating,
-    },
-    {
-      name: "creationDate",
-      selector: (item) => item.creationDate,
+      selector: (item) => item.rating
     },
     {
       name: "position",
-      selector: (item) => item.position,
+      selector: (item) => item.position
+    },
+    {
+      name: "status",
+      selector: (item) => item.status
     },
     {
       name: "Actions",
@@ -127,7 +127,8 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
     salary: 0,
     rating: 0,
     position: "",
-    coordinates: { x: 0, y: 0, z: 0 },
+    status: "",
+    coordinates: { x: 0, y: 0 },
     organization: {
       annualTurnover: 0,
       employeesCount: 0,
@@ -189,78 +190,95 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
         <div className="col-12">
           <form onSubmit={submitForm}>
             <div className="mb-4">
-              <label htmlFor="name">name</label>
+              <label htmlFor="Name">name</label>
               <input
-                className="form-control"
-                name="name"
-                type="text"
-                onChange={updateForm}
-                value={formData.name}
+                  className="form-control"
+                  name="name"
+                  type="text"
+                  onChange={updateForm}
+                  value={formData.name}
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="salary">salary</label>
+              <label htmlFor="Salary">salary</label>
               <input
-                className="form-control"
-                name="salary"
-                type="number"
-                onChange={updateForm}
-                value={formData.salary}
-                step={0.01}
+                  className="form-control"
+                  name="salary"
+                  type="number"
+                  onChange={updateForm}
+                  value={formData.salary}
+                  step={0.01}
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="rating">rating</label>
+              <label htmlFor="Rating">rating</label>
               <input
-                className="form-control"
-                name="rating"
-                type="number"
-                onChange={updateForm}
-                value={formData.rating}
+                  className="form-control"
+                  name="rating"
+                  type="number"
+                  onChange={updateForm}
+                  value={formData.rating}
               />
             </div>
-            <div className="mb-4">
-              <label htmlFor="position">position</label>
-              <input
-                className="form-control"
-                name="position"
-                type="text"
-                onChange={updateForm}
-                value={formData.position}
-              />
+            <div className="mb-4 dropdown">
+              <label htmlFor="Position">Position</label>
+              <select
+                  className="dropdown-menu-dark"
+                  name="position"
+                  onChange={updateForm}
+                  value={formData.position}
+              >
+                <option className="dropdown-item" value={PositionEnum.DIRECTOR}>Director</option>
+                <option className="dropdown-item" value={PositionEnum.LABORER}>Laborer</option>
+                <option className="dropdown-item" value={PositionEnum.BAKER}>Baker</option>
+              </select>
+            </div>
+            <div className="mb-4 dropdown">
+              <label htmlFor="Status">Status</label>
+              <select
+                  className="dropdown-menu-dark"
+                  name="status"
+                  onChange={updateForm}
+                  value={formData.status}
+              >
+                <option className="dropdown-item" value={StatusEnum.FIRED}>Fired</option>
+                <option className="dropdown-item" value={StatusEnum.HIRED}>Hired</option>
+                <option className="dropdown-item" value={StatusEnum.RECOMMENDED_FOR_PROMOTION}>Recommended For Promotion</option>
+                <option className="dropdown-item" value={StatusEnum.REGULAR}>Regular</option>
+              </select>
             </div>
             <hr></hr>
             <div className="mb-4">
-              <h3>Coordinates</h3>
+            <h3>Coordinates</h3>
             </div>
             <div className="mb-4">
               <label htmlFor="x">Coordinates ID (X)</label>
               <input
-                className="form-control"
-                name="x"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    coordinates: { ...formData.coordinates, x: e.target.value },
-                  })
-                }
-                value={formData.coordinates.x}
+                  className="form-control"
+                  name="x"
+                  type="number"
+                  onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        coordinates: {...formData.coordinates, x: e.target.value},
+                      })
+                  }
+                  value={formData.coordinates.x}
               />
             </div>
             <div className="mb-4">
               <label htmlFor="y">Location ID (Y)</label>
               <input
-                className="form-control"
-                name="y"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    coordinates: { ...formData.coordinates, y: e.target.value },
-                  })
-                }
-                value={formData.coordinates.y}
+                  className="form-control"
+                  name="y"
+                  type="number"
+                  onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        coordinates: {...formData.coordinates, y: e.target.value},
+                      })
+                  }
+                  value={formData.coordinates.y}
               />
             </div>
             <hr></hr>
@@ -269,79 +287,84 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
             </div>
             <div className="mb-4">
               <label htmlFor="organization_annualTurnover">
-                annualTurnover
+                Annual Turnover
               </label>
               <input
-                className="form-control"
-                name="organization_annualTurnover"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    organization: {
-                      ...formData.organization,
-                      annualTurnover: e.target.value,
-                    },
-                  })
-                }
-                value={formData.organization.annualTurnover}
+                  className="form-control"
+                  name="organization_annualTurnover"
+                  type="number"
+                  onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        organization: {
+                          ...formData.organization,
+                          annualTurnover: e.target.value,
+                        },
+                      })
+                  }
+                  value={formData.organization.annualTurnover}
               />
             </div>
             <div className="mb-4">
               <label htmlFor="organization_employeesCount">
-                employeesCount
+                Employees Count
               </label>
               <input
-                className="form-control"
-                name="organization_employeesCount"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    organization: {
-                      ...formData.organization,
-                      employeesCount: e.target.value,
-                    },
-                  })
-                }
-                value={formData.organization.employeesCount}
+                  className="form-control"
+                  name="organization_employeesCount"
+                  type="number"
+                  onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        organization: {
+                          ...formData.organization,
+                          employeesCount: e.target.value,
+                        },
+                      })
+                  }
+                  value={formData.organization.employeesCount}
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="organization_fullName">fullName</label>
+              <label htmlFor="organization_fullName">Full Name</label>
               <input
-                className="form-control"
-                name="organization_fullName"
-                type="text"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    organization: {
-                      ...formData.organization,
-                      fullName: e.target.value,
-                    },
-                  })
-                }
-                value={formData.organization.fullName}
+                  className="form-control"
+                  name="organization_fullName"
+                  type="text"
+                  onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        organization: {
+                          ...formData.organization,
+                          fullName: e.target.value,
+                        },
+                      })
+                  }
+                  value={formData.organization.fullName}
               />
             </div>
-            <div className="mb-4">
-              <label htmlFor="organization_type">type</label>
-              <input
-                className="form-control"
-                name="organization_type"
-                type="text"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    organization: {
-                      ...formData.organization,
-                      type: e.target.value,
-                    },
-                  })
-                }
-                value={formData.organization.type}
-              />
+            <div className="mb-4 dropdown">
+              <label htmlFor="organization_type">Organization Type</label>
+              <select
+                  className="dropdown-menu-dark"
+                  name="organization_type"
+                  onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        organization: {
+                          ...formData.organization,
+                          type: e.target.value,
+                        },
+                      })
+                  }
+                  value={formData.organization.type}
+              >
+                <option className="dropdown-item" value={OrganizationEnum.COMMERCIAL}>Commercial</option>
+                <option className="dropdown-item" value={OrganizationEnum.PUBLIC}>Public</option>
+                <option className="dropdown-item" value={OrganizationEnum.GOVERNMENT}>Government</option>
+                <option className="dropdown-item" value={OrganizationEnum.TRUST}>Trust</option>
+                <option className="dropdown-item" value={OrganizationEnum.PRIVATE_LIMITED_COMPANY}>Private Limited Company</option>
+              </select>
             </div>
             <hr></hr>
             <div className="mb-4">
@@ -349,100 +372,100 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                 Organization Postal Address Zip Code
               </label>
               <input
-                className="form-control"
-                name="organization_postalAddress_zipCode"
-                type="text"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    organization: {
-                      ...formData.organization,
-                      postalAddress: {
-                        ...formData.organization.postalAddress,
-                        zipCode: e.target.value,
-                      },
-                    },
-                  })
-                }
-                value={formData.organization.postalAddress.zipCode}
+                  className="form-control"
+                  name="organization_postalAddress_zipCode"
+                  type="text"
+                  onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        organization: {
+                          ...formData.organization,
+                          postalAddress: {
+                            ...formData.organization.postalAddress,
+                            zipCode: e.target.value,
+                          },
+                        },
+                      })
+                  }
+                  value={formData.organization.postalAddress.zipCode}
               />
             </div>
             <div className="mb-4">
               <label htmlFor="organization_postalAddress_town_x">
-                Town ID (X)
+                Town (X)
               </label>
               <input
-                className="form-control"
-                name="organization_postalAddress_town_x"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    organization: {
-                      ...formData.organization,
-                      postalAddress: {
-                        ...formData.organization.postalAddress,
-                        town: {
-                          ...formData.organization.postalAddress.town,
-                          x: e.target.value,
+                  className="form-control"
+                  name="organization_postalAddress_town_x"
+                  type="number"
+                  onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        organization: {
+                          ...formData.organization,
+                          postalAddress: {
+                            ...formData.organization.postalAddress,
+                            town: {
+                              ...formData.organization.postalAddress.town,
+                              x: e.target.value,
+                            },
+                          },
                         },
-                      },
-                    },
-                  })
-                }
-                value={formData.organization.postalAddress.town.x}
+                      })
+                  }
+                  value={formData.organization.postalAddress.town.x}
               />
             </div>
             <div className="mb-4">
               <label htmlFor="organization_postalAddress_town_y">
-                Town ID (Y)
+                Town (Y)
               </label>
               <input
-                className="form-control"
-                name="organization_postalAddress_town_y"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    organization: {
-                      ...formData.organization,
-                      postalAddress: {
-                        ...formData.organization.postalAddress,
-                        town: {
-                          ...formData.organization.postalAddress.town,
-                          y: e.target.value,
+                  className="form-control"
+                  name="organization_postalAddress_town_y"
+                  type="number"
+                  onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        organization: {
+                          ...formData.organization,
+                          postalAddress: {
+                            ...formData.organization.postalAddress,
+                            town: {
+                              ...formData.organization.postalAddress.town,
+                              y: e.target.value,
+                            },
+                          },
                         },
-                      },
-                    },
-                  })
-                }
-                value={formData.organization.postalAddress.town.y}
+                      })
+                  }
+                  value={formData.organization.postalAddress.town.y}
               />
             </div>
             <div className="mb-4">
               <label htmlFor="organization_postalAddress_town_z">
-                Town ID (Z)
+                Town (Z)
               </label>
               <input
-                className="form-control"
-                name="organization_postalAddress_town_z"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    organization: {
-                      ...formData.organization,
-                      postalAddress: {
-                        ...formData.organization.postalAddress,
-                        town: {
-                          ...formData.organization.postalAddress.town,
-                          z: e.target.value,
+                  className="form-control"
+                  name="organization_postalAddress_town_z"
+                  type="number"
+                  onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        organization: {
+                          ...formData.organization,
+                          postalAddress: {
+                            ...formData.organization.postalAddress,
+                            town: {
+                              ...formData.organization.postalAddress.town,
+                              z: e.target.value,
+                            },
+                          },
                         },
-                      },
-                    },
-                  })
-                }
-                value={formData.organization.postalAddress.town.z}
+                      })
+                  }
+                  value={formData.organization.postalAddress.town.z}
               />
             </div>
             <hr></hr>
@@ -451,195 +474,195 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                 Organization Official Address Zip Code
               </label>
               <input
-                className="form-control"
-                name="organization_officialAddress_zipCode"
-                type="text"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    organization: {
-                      ...formData.organization,
-                      officialAddress: {
-                        ...formData.organization.officialAddress,
-                        zipCode: e.target.value,
-                      },
-                    },
-                  })
-                }
-                value={formData.organization.officialAddress.zipCode}
+                  className="form-control"
+                  name="organization_officialAddress_zipCode"
+                  type="text"
+                  onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        organization: {
+                          ...formData.organization,
+                          officialAddress: {
+                            ...formData.organization.officialAddress,
+                            zipCode: e.target.value,
+                          },
+                        },
+                      })
+                  }
+                  value={formData.organization.officialAddress.zipCode}
               />
             </div>
             <div className="mb-4">
               <label htmlFor="organization_officialAddress_town_x">
-                Town ID (X)
+                Town (X)
               </label>
               <input
-                className="form-control"
-                name="organization_officialAddress_town_x"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    organization: {
-                      ...formData.organization,
-                      officialAddress: {
-                        ...formData.organization.officialAddress,
-                        town: {
-                          ...formData.organization.officialAddress.town,
-                          x: e.target.value,
+                  className="form-control"
+                  name="organization_officialAddress_town_x"
+                  type="number"
+                  onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        organization: {
+                          ...formData.organization,
+                          officialAddress: {
+                            ...formData.organization.officialAddress,
+                            town: {
+                              ...formData.organization.officialAddress.town,
+                              x: e.target.value,
+                            },
+                          },
                         },
-                      },
-                    },
-                  })
-                }
-                value={formData.organization.officialAddress.town.x}
+                      })
+                  }
+                  value={formData.organization.officialAddress.town.x}
               />
             </div>
             <div className="mb-4">
               <label htmlFor="organization_officialAddress_town_y">
-                Town ID (Y)
+                Town (Y)
               </label>
               <input
-                className="form-control"
-                name="organization_officialAddress_town_y"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    organization: {
-                      ...formData.organization,
-                      officialAddress: {
-                        ...formData.organization.officialAddress,
-                        town: {
-                          ...formData.organization.officialAddress.town,
-                          y: e.target.value,
+                  className="form-control"
+                  name="organization_officialAddress_town_y"
+                  type="number"
+                  onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        organization: {
+                          ...formData.organization,
+                          officialAddress: {
+                            ...formData.organization.officialAddress,
+                            town: {
+                              ...formData.organization.officialAddress.town,
+                              y: e.target.value,
+                            },
+                          },
                         },
-                      },
-                    },
-                  })
-                }
-                value={formData.organization.officialAddress.town.y}
+                      })
+                  }
+                  value={formData.organization.officialAddress.town.y}
               />
             </div>
             <div className="mb-4">
               <label htmlFor="organization_officialAddress_town_z">
-                Town ID (Z)
+                Town (Z)
               </label>
               <input
-                className="form-control"
-                name="organization_officialAddress_town_z"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    organization: {
-                      ...formData.organization,
-                      officialAddress: {
-                        ...formData.organization.officialAddress,
-                        town: {
-                          ...formData.organization.officialAddress.town,
-                          z: e.target.value,
+                  className="form-control"
+                  name="organization_officialAddress_town_z"
+                  type="number"
+                  onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        organization: {
+                          ...formData.organization,
+                          officialAddress: {
+                            ...formData.organization.officialAddress,
+                            town: {
+                              ...formData.organization.officialAddress.town,
+                              z: e.target.value,
+                            },
+                          },
                         },
-                      },
-                    },
-                  })
-                }
-                value={formData.organization.officialAddress.town.z}
+                      })
+                  }
+                  value={formData.organization.officialAddress.town.z}
               />
             </div>
             <hr></hr>
             <div className="mb-4">
               <h3>Person Data</h3>
             </div>
-            <div className="mb-4">
-              <label htmlFor="person_eyeColor">eyeColor</label>
-              <input
-                className="form-control"
-                name="person_eyeColor"
-                type="text"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    person: {
-                      ...formData.person,
-                      eyeColor: e.target.value,
-                    },
-                  })
-                }
-                value={formData.person.eyeColor}
-              />
+            <div className="mb-4 dropdown">
+              <label htmlFor="person_eyeColor">Eye Color</label>
+              <select className="dropdown-menu-dark" name="person_eyeColor"
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        person: {
+                          ...formData.person,
+                          eyeColor: e.target.value,
+                        },
+                      })
+                      }
+                      value={formData.person.eyeColor}>
+                <option className="dropdown-item" value={ColorEnum.GREEN}>Green</option>
+                <option className="dropdown-item" value={ColorEnum.BLACK}>Black</option>
+                <option className="dropdown-item" value={ColorEnum.BLUE}>Blue</option>
+                <option className="dropdown-item" value={ColorEnum.ORANGE}>Orange</option>
+              </select>
+            </div>
+            <div className="mb-4 dropdown">
+              <label htmlFor="person_hairColor">Hair Color</label>
+              <select className="dropdown-menu-dark" name="person_hairColor"
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        person: {
+                          ...formData.person,
+                          hairColor: e.target.value,
+                        },
+                      })
+                      }
+                      value={formData.person.hairColor}>
+                <option className="dropdown-item" value={""}></option>
+                <option className="dropdown-item" value={ColorEnum.GREEN}>Green</option>
+                <option className="dropdown-item" value={ColorEnum.BLACK}>Black</option>
+                <option className="dropdown-item" value={ColorEnum.BLUE}>Blue</option>
+                <option className="dropdown-item" value={ColorEnum.ORANGE}>Orange</option>
+              </select>
             </div>
             <div className="mb-4">
-              <label htmlFor="person_hairColor">hairColor</label>
+              <label htmlFor="person_birthday">Birthday</label>
               <input
-                className="form-control"
-                name="person_hairColor"
-                type="text"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    person: {
-                      ...formData.person,
-                      hairColor: e.target.value,
-                    },
-                  })
-                }
-                value={formData.person.hairColor}
+                  className="form-control"
+                  name="person_birthday"
+                  type="date"
+                  onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        person: {
+                          ...formData.person,
+                          birthday: e.target.value,
+                        },
+                      })
+                  }
+                  value={formData.person.birthday}
               />
             </div>
-            <div className="mb-4">
-              <label htmlFor="person_birthday">birthday</label>
-              <input
-                className="form-control"
-                name="person_birthday"
-                type="date"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    person: {
-                      ...formData.person,
-                      birthday: e.target.value,
-                    },
-                  })
-                }
-                value={formData.person.birthday}
-              />
+            <div className="mb-4 dropdown">
+              <label htmlFor="person_nationality">Nationality</label>
+              <select className="dropdown-menu-dark" name="person_nationality"
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        person: {
+                          ...formData.person,
+                          nationality: e.target.value,
+                        },
+                      })
+                      }
+                      value={formData.person.nationality}>
+                <option className="dropdown-item" value={CountryEnum.UNITED_KINGDOM}>United Kingdom</option>
+                <option className="dropdown-item" value={CountryEnum.FRANCE}>France</option>
+                <option className="dropdown-item" value={CountryEnum.NORTH_KOREA}>North Korea</option>
+              </select>
             </div>
             <div className="mb-4">
-              <label htmlFor="person_nationality">nationality</label>
+              <label htmlFor="person_weight">Weight</label>
               <input
-                className="form-control"
-                name="person_nationality"
-                type="text"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    person: {
-                      ...formData.person,
-                      nationality: e.target.value,
-                    },
-                  })
-                }
-                value={formData.person.nationality}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="person_weight">weight</label>
-              <input
-                className="form-control"
-                name="person_weight"
-                type="text"
-                step={0.01}
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    person: {
-                      ...formData.person,
-                      weight: e.target.value,
-                    },
-                  })
-                }
-                value={formData.person.weight}
+                  className="form-control"
+                  name="person_weight"
+                  type="text"
+                  step={0.01}
+                  onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        person: {
+                          ...formData.person,
+                          weight: e.target.value,
+                        },
+                      })
+                  }
+                  value={formData.person.weight}
               />
             </div>
             <hr></hr>
@@ -648,22 +671,22 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                 Person Location X
               </label>
               <input
-                className="form-control"
-                name="person_postalAddress_x"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    person: {
-                      ...formData.person,
-                      location: {
-                        ...formData.person.location,
-                        x: e.target.value,
-                      },
-                    },
-                  })
-                }
-                value={formData.person.location.x}
+                  className="form-control"
+                  name="person_postalAddress_x"
+                  type="number"
+                  onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        person: {
+                          ...formData.person,
+                          location: {
+                            ...formData.person.location,
+                            x: e.target.value,
+                          },
+                        },
+                      })
+                  }
+                  value={formData.person.location.x}
               />
             </div>
             <div className="mb-4">
@@ -671,22 +694,22 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                 Person Location Y
               </label>
               <input
-                className="form-control"
-                name="person_postalAddress_y"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    person: {
-                      ...formData.person,
-                      location: {
-                        ...formData.person.location,
-                        y: e.target.value,
-                      },
-                    },
-                  })
-                }
-                value={formData.person.location.y}
+                  className="form-control"
+                  name="person_postalAddress_y"
+                  type="number"
+                  onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        person: {
+                          ...formData.person,
+                          location: {
+                            ...formData.person.location,
+                            y: e.target.value,
+                          },
+                        },
+                      })
+                  }
+                  value={formData.person.location.y}
               />
             </div>
             <div className="mb-4">
@@ -694,22 +717,22 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                 Person Location Z
               </label>
               <input
-                className="form-control"
-                name="person_postalAddress_z"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    person: {
-                      ...formData.person,
-                      location: {
-                        ...formData.person.location,
-                        z: e.target.value,
-                      },
-                    },
-                  })
-                }
-                value={formData.person.location.z}
+                  className="form-control"
+                  name="person_postalAddress_z"
+                  type="number"
+                  onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        person: {
+                          ...formData.person,
+                          location: {
+                            ...formData.person.location,
+                            z: e.target.value,
+                          },
+                        },
+                      })
+                  }
+                  value={formData.person.location.z}
               />
             </div>
             <div className="mb-4">
@@ -717,9 +740,9 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                 <i className="fa fa-send"></i>&nbsp;Submit
               </button>
               <button
-                className="btn btn-secondary mz-2"
-                type="button"
-                onClick={() => closeForm(null)}
+                  className="btn btn-secondary mz-2"
+                  type="button"
+                  onClick={() => closeForm(null)}
               >
                 <i className="fa fa-cancel"></i>&nbsp;Cancel
               </button>
@@ -730,3 +753,80 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
     </div>
   );
 };
+
+export const SpecialComponent = () => {
+  const [deleteByPersonId, setDeleteByPersonId] = useState(1);
+  const [countByPeopleId, setCountByPeopleId] = useState(1);
+  const [rating, setRating] = useState(1);
+  const [fireByWorkerId, setFireByWorkerId] = useState(1);
+  const [transferWorkerIds, setTransferWorkerIds] = useState({workerId: 1, orgId: 1});
+
+  useEffect(() => {
+  }, []);
+
+  useEffect(() => {
+    if (deleteByPersonId) {
+      setDeleteByPersonId(deleteByPersonId);
+    }
+    if (countByPeopleId) {
+      setCountByPeopleId(countByPeopleId);
+    }
+    if (rating) {
+      setRating(rating);
+    }
+    if(fireByWorkerId) {
+      setFireByWorkerId(fireByWorkerId);
+    }
+    if (transferWorkerIds) {
+      setTransferWorkerIds(transferWorkerIds);
+    }
+  }, [deleteByPersonId, countByPeopleId, rating, fireByWorkerId, transferWorkerIds]);
+
+  const updateDeleteByPersonId = (e) => {
+    setDeleteByPersonId(e.target.value);
+  };
+  const updateCountByPeopleId = (e) => {
+    setCountByPeopleId(e.target.value);
+  };
+  const updateRating = (e) => {
+    setRating(e.target.value);
+  };
+  const updateFireByWorkerId = (e) => {
+    setFireByWorkerId(e.target.value);
+  };
+  const updateTransferWorkerIds = (e) => {
+    setTransferWorkerIds({...transferWorkerIds, [e.target.name]: e.target.value});
+  };
+
+  const submitForm = async (e, apiString) => {
+    e.preventDefault();
+    let res, url = `${V1APIURL}/workers/${apiString`/${e.target.value}`}`;
+    try {
+      if(apiString === "count-by-people" || apiString === "count-by-less-than-rating") {
+        res = await axios.get(url, getAxios());
+      } else if(apiString !== "delete-by-person") {
+        res = await axios.put(url, formData, getAxios());
+      } else {
+        res = await axios.delete(url, getAxios());
+      }
+
+      if (res.status !== 200 || res.status !== 204) {
+        alert(`Error: ${res.statusText}`);
+        return false;
+      }
+      alert(`Item ${item ? "Updated" : "Deleted"}`);
+
+    } catch (error) {
+      alert(`Error!`);
+    }
+    return false;
+  };
+
+  return(
+      <div className="container py-5">
+        <div className="row">
+
+        </div>
+      </div>
+  );
+}

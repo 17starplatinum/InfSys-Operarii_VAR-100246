@@ -31,6 +31,12 @@ export const LayoutPage = ({ setPage, user, content, setUser }) => {
               </button>
               <button
                 className="btn btn-primary mx-1"
+                onClick={() => setPage("special")}
+                >
+                <i className="fa fa-toolbox"></i>&nbsp; Special
+              </button>
+              <button
+                className="btn btn-primary mx-1"
                 onClick={() => setPage("dashboard")}
               >
                 <i className="fa fa-home"></i>&nbsp; Dashboard

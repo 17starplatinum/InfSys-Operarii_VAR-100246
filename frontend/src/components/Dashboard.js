@@ -33,11 +33,11 @@ export const DashboardComponent = ({ setPage }) => {
             title: "Locations",
             icon: "fa-solid fa-location-pin",
           },
-        //   {
-        //     page: "organizations",
-        //     title: "Organizations",
-        //     icon: "fa fa-building",
-        //   },
+          {
+            page: "special operations",
+            title: "Special Operations",
+            icon: "fa-solid fa-toolbox",
+          }
         ].map((item, index) => (
           <div className="col-lg-4 col-md-6 mb-3" key={index}>
             <div className="card border border-1" onClick={() => setPage(item.page)}>
