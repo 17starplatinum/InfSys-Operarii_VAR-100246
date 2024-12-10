@@ -121,7 +121,7 @@ export const LocationsComponent = ({ setPage }) => {
 };
 
 export const LocationsFormComponent = ({ closeForm, item }) => {
-  const [formData, setFormData] = useState({ x: "", y: "", z: "" });
+  const [formData, setFormData] = useState({ x: 0, y: null, z: 0 });
 
   useEffect(() => {
     if (item) {

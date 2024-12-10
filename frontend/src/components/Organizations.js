@@ -125,10 +125,10 @@ export const OrganizationsFormComponent = ({ closeForm, item }) => {
   const [formData, setFormData] = useState({
     annualTurnover: 0,
     employeesCount: 0,
-    fullName: "",
-    type: "",
-    postalAddress: { zipCode: "", location: { x: 0, y: 0, z: 0 } },
-    officialAddress: { zipCode: "", location: { x: 0, y: 0, z: 0 } },
+    fullName: null,
+    type: null,
+    postalAddress: { zipCode: "", location: { x: 0, y: null, z: 0 } },
+    officialAddress: { zipCode: "", location: { x: 0, y: null, z: 0 } },
   });
 
   useEffect(() => {}, []);

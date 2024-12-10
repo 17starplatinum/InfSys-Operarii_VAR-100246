@@ -137,7 +137,7 @@ export const CoordinatesComponent = ({ setPage }) => {
 };
 
 export const CoordinatesFormComponent = ({ closeForm, item }) => {
-  const [formData, setFormData] = useState({ x: "", y: "" });
+  const [formData, setFormData] = useState({ x: null, y: null });
 
   useEffect(() => {
     if (item) {

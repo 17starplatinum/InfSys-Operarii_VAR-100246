@@ -131,8 +131,8 @@ export const PersonsComponent = ({ setPage }) => {
 export const PersonsFormComponent = ({ closeForm, item }) => {
   const [formData, setFormData] = useState({
     eyeColor: "",
-    hairColor: "",
-    birthday: "",
+    hairColor: null,
+    birthday: null,
     weight: "",
     nationality: "",
     location: { x: 0, y: 0, z: 0 },

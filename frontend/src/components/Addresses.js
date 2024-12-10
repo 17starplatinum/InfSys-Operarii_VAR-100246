@@ -4,6 +4,7 @@ import { V1APIURL } from "../shared/constants";
 import axios from "axios";
 import { getAxios } from "../shared/utils";
 
+
 export const AddressesComponent = ({ setPage }) => {
   const columns = [
     {
@@ -115,8 +116,7 @@ export const AddressesComponent = ({ setPage }) => {
 export const AddressesFormComponent = ({ closeForm, item }) => {
   const [formData, setFormData] = useState({
     zipCode: "",
-    town: { x: 0, y: 0, z: 0 },
-    locationWrapper: null,
+    town: { x: 0, y: null, z: 0 }
   });
 
   useEffect(() => {}, []);
