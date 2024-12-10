@@ -3,7 +3,7 @@ import DataTable from "react-data-table-component";
 import { V1APIURL, CountryEnum, ColorEnum, StatusEnum, PositionEnum, OrganizationEnum } from "../shared/constants";
 import axios from "axios";
 import { getAxios } from "../shared/utils";
-// import { jsonschema } from "jsonschema"
+import { jsonschema } from "jsonschema";
 import { locationValidation } from "./validation/LocationValidation";
 import { coordinatesValidation } from "./validation/CoordinatesValidation";
 import { addressValidation } from "./validation/AddressValidation";
@@ -130,6 +130,7 @@ export const WorkersComponent = ({ setPage }) => {
 };
 
 export const WorkersFormComponent = ({ closeForm, item }) => {
+  let Validator = require('jsonschema').Validator;
   const [formData, setFormData] = useState({
     name: "",
     salary: null,
@@ -149,7 +150,7 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
       eyeColor: "",
       hairColor: null,
       birthday: null,
-      weight: "",
+      weight: 0,
       nationality: "",
       location: {x: 0, y: null, z: 0},
     },
@@ -161,6 +162,136 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
     useExistingLocation: false,
     useExistingTown: false
   });
+
+  let v = new Validator();
+  let locationSchema = {
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    $id: "/Location",
+    type: "object",
+    "properties": {
+      "x": {"type": "number"},
+      "y": {"type": ["integer", "null"]},
+      "z": {"type": "integer"}
+    },
+    "required": ["x", "z"]
+  };
+  let addressSchema = {
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    "id": "/Address",
+    "type": "object",
+    "properties": {
+      "zipCode": {"type": "string"},
+      "town": {"$ref": "/Location"}
+    },
+    "required": ["zipCode"]
+  };
+  let coordinatesSchema = {
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    "id": "/Coordinates",
+    "type": "object",
+    "properties": {
+      "x": {
+        "type": "number",
+        "maximum": 960
+      },
+      "y": {
+        "type": "integer",
+        "maximum": 12
+      }
+    }
+  };
+  let personSchema = {
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    "id": "/Person",
+    "type": "object",
+    "properties": {
+      "eyeColor": {
+        "type": "string",
+        "enum": [`${ColorEnum.GREEN}`, `${ColorEnum.BLACK}`, `${ColorEnum.BLUE}`, `${ColorEnum.ORANGE}`]
+      },
+      "hairColor": {
+        "type": ["string", "null"],
+        "enum": ["", `${ColorEnum.GREEN}`, `${ColorEnum.BLACK}`, `${ColorEnum.BLUE}`, `${ColorEnum.ORANGE}`]
+      },
+      "birthday": {
+        "type": ["string", "null"],
+        "format": "date"
+      },
+      "location": {"$ref": "/Location"},
+      "weight": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      },
+      "nationality": {
+        "type": "string",
+        "enum": [`${CountryEnum.UNITED_KINGDOM}`, `${CountryEnum.FRANCE}`, `${CountryEnum.NORTH_KOREA}`]
+      },
+      "required": ["eyeColor", "location", "weight", "nationality"]
+    }
+  }
+  let organizationSchema = {
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    "id": "/Organization",
+    "type": "object",
+    "properties": {
+      "officialAddress": {"$ref": "/Address"},
+      "annualTurnover": {
+        "type": "number",
+        "exclusiveMinimum": 0
+      },
+      "employeesCount": {
+        "type": "integer",
+        "exclusiveMinimum": 0
+      },
+      "fullName": {
+        "type": ["string", "null"],
+        "minLength": 1,
+        "maxLength": 1576
+      },
+      "type": {
+        "type": ["string", "null"],
+        "enum": ["", `${OrganizationEnum.COMMERCIAL}`, `${OrganizationEnum.PUBLIC}`, `${OrganizationEnum.GOVERNMENT}`, `${OrganizationEnum.TRUST}`, `${OrganizationEnum.PRIVATE_LIMITED_COMPANY}`]
+      },
+      "postalAddress": {"$ref": "/Address"}
+    },
+    "required": ["officialAddress", "annualTurnover", "fullName", "postalAddress"]
+  };
+  let workerSchema = {
+    $schema: "https://json-schema.org/draft/2020-12/schema",
+    "id": "/Worker",
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "minLength": 1
+      },
+      "coordinates": {"$ref": "/Coordinates"},
+      "organization": {
+          "nullable": true,
+          "allOf": [{"$ref": "/Organization"}]
+      },
+      "salary": {
+        "type": ["number", "null"],
+        "exclusiveMinimum": 0
+      },
+      "rating": {
+        "type": ["integer", "null"],
+        "exclusiveMinimum": 0
+      },
+      "position": {
+        "type": "string",
+        "enum": [`${PositionEnum.DIRECTOR}`, `${PositionEnum.LABORER}`, `${PositionEnum.BAKER}`]
+      },
+      "status": {
+        "type": ["string", "null"],
+        "enum": ["", `${StatusEnum.FIRED}`, `${StatusEnum.HIRED}`, `${StatusEnum.RECOMMENDED_FOR_PROMOTION}`,`${StatusEnum.REGULAR}`]
+      },
+      "person": {"$ref": "/Person"}
+    },
+    "required": ["name", "coordinates", "position", "person"]
+  };
+  let schemas = [locationSchema, coordinatesSchema, addressSchema, personSchema, organizationSchema, workerSchema];
+  schemas.forEach(schema => v.addSchema(schema, schema.id));
   const [coordinatesList, setCoordinatesList] = useState([]);
   const [organizationsList, setOrganizationsList] = useState([]);
   const [peopleList, setPeopleList] = useState([]);
@@ -168,6 +299,13 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
   const [locationsList, setLocationsList] = useState([]);
   const [errors, setErrors] = useState({});
 
+
+
+
+  v.validate(formData.organization.officialAddress, addressSchema);
+  v.validate(formData.organization.postalAddress, addressSchema);
+  v.validate(formData.organization.officialAddress.town, locationSchema);
+  v.validate(formData.organization.postalAddress.town, locationSchema);
 
   useEffect(() => {
   }, []);
@@ -342,6 +480,11 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
 
   const submitForm = async (e) => {
     e.preventDefault();
+    const isValid = validateFields();
+    if (!isValid) {
+      alert('Не получилось создать Worker.');
+      return;
+    }
     try {
       const token = localStorage.getItem("token");
       axios.defaults.headers.common = {
@@ -364,198 +507,15 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
     return false;
   };
 
-  const validateFields = (field, value) => {
-    let errorMsg = workerValidation(field, value);
-    setErrors(prevError => ({
-      ...prevError,
-      [field]: errorMsg
-    }));
-    return errorMsg;
+  const validateFields = () => {
+    let errorMsg = v.validate(formData, workerSchema, {nestedErrors: true}).toString()
+      if(errorMsg === "") {
+        return true;
+      }
+      console.log(errorMsg);
+      return false;
   };
 
-  const validateCoordinates = (field, value) => {
-    let errorMsg = "";
-    if (!formData.useExistingCoordinates) {
-      errorMsg = coordinatesValidation(field, value);
-      setErrors(prevErrors => ({
-        ...prevErrors,
-        [`coordinates_${field}`]: errorMsg
-      }));
-    }
-    return errorMsg;
-  };
-
-  const validateOrganization = (field, value) => {
-    let errorMsg = "";
-    if (!formData.useExistingOrganization) {
-      errorMsg = organizationValidation(field, value);
-      setErrors(prevErrors => ({
-        ...prevErrors,
-        [`organization_${field}`]: errorMsg
-      }));
-    }
-    return errorMsg;
-  }
-
-  const validatePerson = (field, value) => {
-    let errorMsg = "";
-    if (!formData.useExistingPerson) {
-      errorMsg = personValidation(field, value);
-      setErrors(prevErrors => ({
-        ...prevErrors,
-        [`person_${value}`]: errorMsg
-      }));
-    }
-    return errorMsg;
-  };
-
-  const validateAddress = (field, value) => {
-    let errorMsg;
-    if (!(formData.useExistingOfficialAddress || formData.useExistingPostalAddress)) {
-      errorMsg = addressValidation(field, value);
-      setErrors(prevErrors => ({
-        ...prevErrors,
-        [`address_${value}`]: errorMsg
-      }));
-    }
-  };
-
-  const validateLocation = (field, value) => {
-    let errorVar = "";
-    let errorMsg = errorVar + " не должен быть пустым";
-    if (!formData.useExistingLocation) {
-      errorVar = locationValidation(field, value);
-      if(errorVar.trim() === "") {
-        errorMsg = "";
-      }
-      setErrors(prevErrors => ({
-        ...prevErrors,
-        [`location_${field}`]: errorMsg
-      }));
-    }
-    return errorMsg;
-  };
-
-  const validateAllFields = () => {
-    let valid = true;
-    let newErrors = {};
-
-    if (validateFields("name", formData.name) !== "") {
-      newErrors.name = validateFields("name", formData.name);
-      valid = false;
-    }
-
-    if (formData.salary === "" || isNaN(formData.salary) || Number(formData.salary) <= 0) {
-      newErrors.area = "Зарплата должна быть больше 0";
-      valid = false;
-    }
-
-    if (formData.rating === "" || isNaN(formData.rating) || Number(formData.rating) <= 0) {
-      newErrors.population = "Рейтинг должно быть больше 0";
-      valid = false;
-    }
-
-    if (!formData.position || !Object.values(PositionEnum).includes(formData.position.trim())) {
-      newErrors.government = "Позиция работника обязательна";
-      valid = false;
-    }
-
-    if (!formData.coordinates) {
-      newErrors.coordinates = "Координаты обязательны";
-      valid = false;
-    } else {
-      if (!formData.useExistingCoordinates) {
-        if ((isNaN(formData.coordinates.x) && formData.coordinates.x === "") || Number(formData.coordinates.x) > 990) {
-          newErrors.coordinates_x = "X должно быть числом не больше 990";
-          valid = false;
-        }
-        if ((isNaN(formData.coordinates.y) && formData.coordinates.y === "") || Number(formData.coordinates.y) > 12) {
-          newErrors.coordinates_y = "Y должно быть числом не больше 12";
-          valid = false;
-        }
-      }
-    }
-
-    if (!formData.useExistingOrganization) {
-      if (!formData.useExistingOfficialAddress) {
-        if (!formData.organization.officialAddress.zipCode || formData.organization.officialAddress.zipCode.trim() === "") {
-          newErrors.organization_officialAddress_zipCode = "Почтовый индекс не должен быть пустым";
-          valid = false;
-        }
-        if (!formData.useExistingTown && formData.organization.officialAddress.town !== null) {
-          if (!formData.organization.officialAddress.town.x || isNaN(formData.organization.officialAddress.town.x)) {
-            newErrors.person_location_x = "X не должен быть пустым"
-          }
-          if (!formData.organization.officialAddress.town.z || isNaN(formData.organization.officialAddress.town.z)) {
-            newErrors.person_location_z = "Z не должен быть пустым"
-          }
-        }
-      }
-      if ((!formData.organization.annualTurnover || isNaN(formData.organization.annualTurnover) || Number(formData.organization.annualTurnover) <= 0)) {
-        newErrors.organization_annualTurnover = "Годовой оборот должен быть положительным числом и не может быть null";
-        valid = false;
-      }
-      if (isNaN(formData.organization.employeesCount) || Number(formData.organization.employeesCount) <= 0) {
-        newErrors.organization_employeesCount = "Число работников должно быть положительным числом";
-        valid = false;
-      }
-      if (formData.organization.fullName.trim() === "" || formData.organization.fullName.toString().length > 1576) {
-        newErrors.organization_fullName = "Полное название не должно быть пустым и не должно превышать 1576 символов по длине";
-        valid = false;
-      }
-      if (!(formData.organization.type === null || formData.organization.type.trim() === "" || Object.values(OrganizationEnum).includes(formData.organization.type.trim()))) {
-        newErrors.organization_type = "Национальность не должна быть пустым и должна быть из перечисленных значений";
-        valid = false;
-      }
-      if (!formData.useExistingPostalAddress) {
-        if (!formData.organization.postalAddress.zipCode || formData.organization.postalAddress.zipCode.trim() === "") {
-          newErrors.organization_postalAddress_zipCode = "Почтовый индекс не должен быть пустым";
-          valid = false;
-        }
-        if (!formData.useExistingTown && formData.organization.postalAddress.town !== null) {
-          if (!formData.organization.postalAddress.town.x || isNaN(formData.organization.postalAddress.town.x)) {
-            newErrors.person_location_x = "X не должен быть пустым"
-          }
-          if (!formData.organization.postalAddress.town.z || isNaN(formData.organization.postalAddress.town.z)) {
-            newErrors.person_location_z = "Z не должен быть пустым"
-          }
-        }
-      }
-
-      if (!formData.useExistingPerson) {
-        if (!formData.person.eyeColor || formData.person.eyeColor.trim() === "" || !Object.values(ColorEnum).includes(formData.person.eyeColor.trim())) {
-          newErrors.person_eyeColor = "Цвет глаз не должен быть пустым и должен быть из перечисленных значений";
-          valid = false;
-        }
-        if (!formData.person.hairColor === null || formData.person.hairColor.trim() === "" || Object.values(ColorEnum).includes(formData.person.hairColor.trim())) {
-          newErrors.person_hairColor = "Цвет волос должен быть из перечисленных значений";
-          valid = false;
-        }
-        if (!formData.useExistingLocation) {
-          if (!formData.person.location.x || isNaN(formData.person.location.x)) {
-            newErrors.person_location_x = "X не должен быть пустым"
-          }
-          if (!formData.person.location.z || isNaN(formData.person.location.z)) {
-            newErrors.person_location_z = "Z не должен быть пустым"
-          }
-        }
-        if (Object.prototype.toString.call(formData.person.birthday) === "[object Date]" && !isNaN(formData.person.birthday)) {
-          newErrors.person_eyeColor = "День рождения должен быть валидной датой";
-          valid = false;
-        }
-        if (!formData.person.weight || isNaN(formData.person.weight) || Number(formData.person.weight) <= 0) {
-          newErrors.person_weight = "Вес человека должен быть положительным ненулевым числом";
-          valid = false;
-        }
-        if (!formData.person.nationality || formData.person.nationality.trim() === "" || !Object.values(CountryEnum).includes(formData.person.nationality.trim())) {
-          newErrors.person_hairColor = "Национальность не должна быть пустым и должна быть из перечисленных значений";
-          valid = false;
-        }
-      }
-      setErrors(newErrors);
-      return valid;
-    }
-  }
 
     return (
         <div className="container py-5">
