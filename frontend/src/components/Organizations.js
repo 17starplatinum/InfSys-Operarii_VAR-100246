@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import DataTable from "react-data-table-component";
 import {OrganizationEnum, V1APIURL} from "../shared/constants";
 import axios from "axios";
-import { getAxios } from "../shared/utils";
+import {getAxios} from "../shared/utils";
 
 export const OrganizationsComponent = ({ setPage }) => {
   const columns = [
@@ -127,8 +127,8 @@ export const OrganizationsFormComponent = ({ closeForm, item }) => {
     employeesCount: 0,
     fullName: null,
     type: null,
-    postalAddress: { zipCode: "", location: { x: 0, y: null, z: 0 } },
-    officialAddress: { zipCode: "", location: { x: 0, y: null, z: 0 } },
+    postalAddress: { zipCode: "", town: { x: 0, y: null, z: 0 } },
+    officialAddress: { zipCode: "", town: { x: 0, y: null, z: 0 } },
   });
 
   useEffect(() => {}, []);
@@ -240,7 +240,7 @@ export const OrganizationsFormComponent = ({ closeForm, item }) => {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="postalAddress_x">Location ID (X)</label>
+              <label htmlFor="postalAddress_x">Town (X)</label>
               <input
                   className="form-control"
                   name="postalAddress_x"
@@ -250,18 +250,18 @@ export const OrganizationsFormComponent = ({ closeForm, item }) => {
                         ...formData,
                         postalAddress: {
                           ...formData.postalAddress,
-                          location: {
-                            ...formData.postalAddress.location,
+                          town: {
+                            ...formData.postalAddress.town,
                             x: e.target.value,
                       },
                     },
                   })
                 }
-                value={formData.postalAddress.location.x}
+                value={formData.postalAddress.town.x}
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="postalAddress_y">Location ID (Y)</label>
+              <label htmlFor="postalAddress_y">Town (Y)</label>
               <input
                 className="form-control"
                 name="postalAddress_y"
@@ -271,18 +271,18 @@ export const OrganizationsFormComponent = ({ closeForm, item }) => {
                     ...formData,
                     postalAddress: {
                       ...formData.postalAddress,
-                      location: {
-                        ...formData.postalAddress.location,
+                      town: {
+                        ...formData.postalAddress.town,
                         y: e.target.value,
                       },
                     },
                   })
                 }
-                value={formData.postalAddress.location.y}
+                value={formData.postalAddress.town.y}
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="postalAddress_z">Location ID (Z)</label>
+              <label htmlFor="postalAddress_z">Town (Z)</label>
               <input
                 className="form-control"
                 name="postalAddress_z"
@@ -292,14 +292,14 @@ export const OrganizationsFormComponent = ({ closeForm, item }) => {
                     ...formData,
                     postalAddress: {
                       ...formData.postalAddress,
-                      location: {
-                        ...formData.postalAddress.location,
+                      town: {
+                        ...formData.postalAddress.town,
                         z: e.target.value,
                       },
                     },
                   })
                 }
-                value={formData.postalAddress.location.z}
+                value={formData.postalAddress.town.z}
               />
             </div>
             <hr></hr>
@@ -322,7 +322,7 @@ export const OrganizationsFormComponent = ({ closeForm, item }) => {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="officialAddress_x">Location ID (X)</label>
+              <label htmlFor="officialAddress_x">Town (X)</label>
               <input
                 className="form-control"
                 name="officialAddress_x"
@@ -332,18 +332,18 @@ export const OrganizationsFormComponent = ({ closeForm, item }) => {
                     ...formData,
                     officialAddress: {
                       ...formData.officialAddress,
-                      location: {
-                        ...formData.officialAddress.location,
+                      town: {
+                        ...formData.officialAddress.town,
                         x: e.target.value,
                       },
                     },
                   })
                 }
-                value={formData.officialAddress.location.x}
+                value={formData.officialAddress.town.x}
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="officialAddress_y">Location ID (Y)</label>
+              <label htmlFor="officialAddress_y">Town ID (Y)</label>
               <input
                 className="form-control"
                 name="officialAddress_y"
@@ -353,18 +353,18 @@ export const OrganizationsFormComponent = ({ closeForm, item }) => {
                     ...formData,
                     officialAddress: {
                       ...formData.officialAddress,
-                      location: {
-                        ...formData.officialAddress.location,
+                      town: {
+                        ...formData.officialAddress.town,
                         y: e.target.value,
                       },
                     },
                   })
                 }
-                value={formData.officialAddress.location.y}
+                value={formData.officialAddress.town.y}
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="officialAddress_z">Location ID (Z)</label>
+              <label htmlFor="officialAddress_z">Town ID (Z)</label>
               <input
                 className="form-control"
                 name="officialAddress_z"
@@ -374,14 +374,14 @@ export const OrganizationsFormComponent = ({ closeForm, item }) => {
                     ...formData,
                     officialAddress: {
                       ...formData.officialAddress,
-                      location: {
-                        ...formData.officialAddress.location,
+                      town: {
+                        ...formData.officialAddress.town,
                         z: e.target.value,
                       },
                     },
                   })
                 }
-                value={formData.officialAddress.location.z}
+                value={formData.officialAddress.town.z}
               />
             </div>
             <div className="mb-4">

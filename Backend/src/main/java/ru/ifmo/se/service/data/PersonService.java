@@ -26,6 +26,7 @@ public class PersonService {
     private final EntityMapper entityMapper;
     private final PaginationHandler paginationHandler;
     private final LocationService locationService;
+    private static final String NOT_FOUND_MESSAGE = "Person not found";
 
     @Transactional(readOnly = true)
     public Page<PersonDTO> getAllPeople(int page, int size, String sortBy, String sortDirection) {
@@ -35,7 +36,7 @@ public class PersonService {
 
     @Transactional(readOnly = true)
     public PersonDTO getPersonById(Long id) {
-        Person person = personRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Person not found."));
+        Person person = personRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
         return entityMapper.toPersonDTO(person);
     }
 
@@ -51,7 +52,7 @@ public class PersonService {
 
     @Transactional
     public PersonDTO updatePerson(Long id, PersonDTO personDTO) {
-        Person person = personRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Person not found."));
+        Person person = personRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
         person.setEyeColor(personDTO.getEyeColor());
         person.setHairColor(personDTO.getHairColor());
         person.setBirthday(personDTO.getBirthday());
@@ -68,7 +69,7 @@ public class PersonService {
     public Person createOrUpdatePersonForWorker(PersonDTO personDTO) {
         Location location = locationService.createOrUpdateLocationForObjects(personDTO.getLocation());
         if (personDTO.getId() != null) {
-            Person person = personRepository.findById(personDTO.getId()).orElseThrow(() -> new IllegalArgumentException("Person not found."));
+            Person person = personRepository.findById(personDTO.getId()).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
             person.setEyeColor(personDTO.getEyeColor());
             person.setHairColor(personDTO.getHairColor());
             person.setBirthday(personDTO.getBirthday());
@@ -90,7 +91,7 @@ public class PersonService {
 
     @Transactional
     public void deletePerson(Long id) {
-        Person person = personRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Person not found."));
+        Person person = personRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
 
         if (person.getWorker() != null) {
             throw new EntityDeletionException("Cannot delete this Person since it is linked to a Worker.");

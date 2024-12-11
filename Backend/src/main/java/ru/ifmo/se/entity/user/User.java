@@ -8,6 +8,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import ru.ifmo.se.entity.data.enumerated.AdminRequestStatus;
 import ru.ifmo.se.entity.data.enumerated.UserRole;
+import ru.ifmo.se.entity.info.ImportHistory;
 
 import java.util.Collection;
 import java.util.List;
@@ -39,6 +40,9 @@ public class User implements UserDetails {
     @Builder.Default
     @Column(name = "admin_request_status", nullable = false, length = 20)
     private AdminRequestStatus adminRequestStatus = AdminRequestStatus.NONE;
+
+    @OneToMany(mappedBy = "user")
+    private List<ImportHistory> historyList;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

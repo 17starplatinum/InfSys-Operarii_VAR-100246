@@ -10,7 +10,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import ru.ifmo.se.entity.data.Worker;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -36,6 +35,4 @@ public interface WorkerRepository extends CrudRepository<Worker, Long>, PagingAn
     @Modifying
     @Query("UPDATE Worker AS w SET w.organization.id = :org_id WHERE w.id = :worker_id")
     void transferWorkerToAnotherOrganization(@Param("org_id") Long organizationId, @Param("worker_id") Long workerId);
-
-    void saveAll(List<Worker> workers);
 }

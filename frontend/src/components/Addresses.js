@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import DataTable from "react-data-table-component";
-import { V1APIURL } from "../shared/constants";
+import {V1APIURL} from "../shared/constants";
 import axios from "axios";
-import { getAxios } from "../shared/utils";
+import {getAxios} from "../shared/utils";
 
 
 export const AddressesComponent = ({ setPage }) => {
@@ -129,21 +129,8 @@ export const AddressesFormComponent = ({ closeForm, item }) => {
 
   const updateForm = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
-    validateField(e.target.name, e.target.value);
   };
 
-  const validateField = (name, value) => {
-    let errorMsg = "";
-    switch (name) {
-      case "zipCode":
-        if(!value || value.trim() === "") {
-          errorMsg = "";
-        }
-        break;
-      case "town":
-        validate
-    }
-  }
   const submitForm = async (e) => {
     e.preventDefault();
     try {
@@ -208,7 +195,7 @@ export const AddressesFormComponent = ({ closeForm, item }) => {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="x">Location ID (X)</label>
+              <label htmlFor="x">Town (X)</label>
               <input
                 className="form-control"
                 name="x"
@@ -223,7 +210,7 @@ export const AddressesFormComponent = ({ closeForm, item }) => {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="y">Location ID (Y)</label>
+              <label htmlFor="y">Town (Y)</label>
               <input
                 className="form-control"
                 name="y"
@@ -238,7 +225,7 @@ export const AddressesFormComponent = ({ closeForm, item }) => {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="z">Location ID (Z)</label>
+              <label htmlFor="z">Town (Z)</label>
               <input
                 className="form-control"
                 name="z"

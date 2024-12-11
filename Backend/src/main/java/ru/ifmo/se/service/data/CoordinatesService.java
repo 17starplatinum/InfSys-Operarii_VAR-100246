@@ -24,6 +24,7 @@ public class CoordinatesService {
     private AuditService auditService;
     private UserService userService;
     private PaginationHandler paginationHandler;
+    private static final String NOT_FOUND_MESSAGE = "Coordinates not found";
 
     @Autowired
     public void setCoordinatesRepository(CoordinatesRepository coordinatesRepository) {
@@ -58,7 +59,7 @@ public class CoordinatesService {
 
     @Transactional(readOnly = true)
     public CoordinatesDTO getCoordinatesById(Long id) {
-        Coordinates coordinates = coordinatesRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Coordinates not found."));
+        Coordinates coordinates = coordinatesRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
         return entityMapper.toCoordinatesDTO(coordinates);
     }
 
@@ -73,7 +74,7 @@ public class CoordinatesService {
 
     @Transactional
     public CoordinatesDTO updateCoordinates(Long id, CoordinatesDTO coordinatesDTO) {
-        Coordinates coordinates = coordinatesRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Coordinates not found."));
+        Coordinates coordinates = coordinatesRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
 
         coordinates.setX(coordinatesDTO.getX());
         coordinates.setY(coordinatesDTO.getY());
@@ -86,7 +87,7 @@ public class CoordinatesService {
     @Transactional
     public Coordinates createOrUpdateCoordinatesForWorker(CoordinatesDTO coordinatesDTO) {
         if (coordinatesDTO.getId() != null) {
-            Coordinates coordinates = coordinatesRepository.findById(coordinatesDTO.getId()).orElseThrow(() -> new IllegalArgumentException("Coordinates not found."));
+            Coordinates coordinates = coordinatesRepository.findById(coordinatesDTO.getId()).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
 
             coordinates.setX(coordinatesDTO.getX());
             coordinates.setY(coordinatesDTO.getY());
@@ -104,7 +105,7 @@ public class CoordinatesService {
 
     @Transactional
     public void deleteCoordinates(Long id) {
-        Coordinates coordinates = coordinatesRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Coordinates not found."));
+        Coordinates coordinates = coordinatesRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
         if (!coordinates.getWorkers().isEmpty()) {
             throw new EntityDeletionException("Cannot delete Coordinates since it is linked to one or more Workers.");
         }

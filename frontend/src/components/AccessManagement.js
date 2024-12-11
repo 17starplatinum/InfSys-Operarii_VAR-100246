@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import DataTable from "react-data-table-component";
-import { V1APIURL } from "../shared/constants";
+import {V1APIURL} from "../shared/constants";
 import axios from "axios";
-import { getAxios } from "../shared/utils";
+import {getAxios} from "../shared/utils";
 
 export const AccessManagement = ({ setPage }) => {
   const columns = [
@@ -14,10 +14,6 @@ export const AccessManagement = ({ setPage }) => {
       name: "Username",
       selector: (item) => item.x,
     },
-    // {
-    //   name: "Y",
-    //   selector: (item) => item.y,
-    // },
     {
       name: "Actions",
       grow: 1,
@@ -45,8 +41,8 @@ export const AccessManagement = ({ setPage }) => {
   const loadItems = async () => {
     try {
       const res = await axios.get(
-        `${V1APIURL}/auth/admin-requests`,
-        getAxios()
+          `${V1APIURL}/auth/admin-requests`,
+          getAxios()
       );
       if (res.status !== 200) {
         alert(`Error: ${res.statusText}`);
@@ -61,8 +57,7 @@ export const AccessManagement = ({ setPage }) => {
   const reject = async (item) => {
     try {
       const res = await axios.post(
-        `${V1APIURL}/auth/reject-admin`,
-        { userId: item.id },
+        `${V1APIURL}/auth/reject-admin/${item.id}`,
         getAxios()
       );
       if (res.status !== 204) {
@@ -79,8 +74,7 @@ export const AccessManagement = ({ setPage }) => {
   const approve = async (item) => {
     try {
       const res = await axios.post(
-        `${V1APIURL}/auth/approve-admin`,
-        { id: item.id },
+        `${V1APIURL}/auth/approve-admin/${item.id}`,
         getAxios()
       );
       if (res.status !== 204) {
@@ -114,9 +108,12 @@ export const RequestAdminAccess = ({ setPage }) => {
   const submitForm = async (e) => {
     e.preventDefault();
     try {
+      const token = localStorage.getItem("token");
+      axios.defaults.headers.common = {
+        "Authorization": `Bearer ${token}`
+      };
       const res = await axios.post(
         `${V1APIURL}/auth/request-admin`,
-        {},
         getAxios()
       );
       if (res.status !== 200 || res.status !== 201) {

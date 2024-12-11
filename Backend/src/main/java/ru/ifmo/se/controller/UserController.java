@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.ifmo.se.dto.user.*;
-import ru.ifmo.se.dto.user.admin.AdminApprovalDTO;
 import ru.ifmo.se.entity.user.User;
 import ru.ifmo.se.service.user.JWTService;
 import ru.ifmo.se.service.user.UserService;
@@ -54,20 +53,21 @@ public class UserController {
     }
 
     @PostMapping("/request-admin")
-    public ResponseEntity<String> requestAdminApproval(@RequestBody AdminApprovalDTO adminApprovalDTO) {
-        String response = userService.requestAdminApproval(adminApprovalDTO.getUserId());
+    public ResponseEntity<String> requestAdminApproval() {
+        User currentUser = userService.getCurrentUser();
+        String response = userService.requestAdminApproval(currentUser.getId());
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/approve-admin")
-    public ResponseEntity<String> approveAdmin(@RequestBody AdminApprovalDTO adminApprovalDTO) {
-        userService.approveRequest(adminApprovalDTO.getUserId());
+    @PostMapping("/approve-admin/{id}")
+    public ResponseEntity<String> approveAdmin(@PathVariable Long id) {
+        userService.approveRequest(id);
         return ResponseEntity.ok("Admin request approved.");
     }
 
-    @PostMapping("/reject-admin")
-    public ResponseEntity<String> rejectAdmin(@RequestBody AdminApprovalDTO adminApprovalDTO) {
-        userService.rejectRequest(adminApprovalDTO.getUserId());
+    @PostMapping("/reject-admin/{id}")
+    public ResponseEntity<String> rejectAdmin(@PathVariable Long id) {
+        userService.rejectRequest(id);
         return ResponseEntity.ok("Admin request rejected.");
     }
 

@@ -103,7 +103,7 @@ public class EntityMapper {
                 organization.getAnnualTurnover(),
                 organization.getEmployeesCount(),
                 organization.getFullName(),
-                organization.getType(),
+                organization.getOrganizationType(),
                 toAddressDTO(organization.getPostalAddress()),
                 organization.getCreatedBy()
         );
@@ -182,7 +182,7 @@ public class EntityMapper {
         organization.setAnnualTurnover(organizationDTO.getAnnualTurnover());
         organization.setEmployeesCount(organizationDTO.getEmployeesCount());
         organization.setFullName(organizationDTO.getFullName());
-        organization.setType(organizationDTO.getType());
+        organization.setOrganizationType(organizationDTO.getOrganizationType());
         organization.setPostalAddress(postalAddress);
         return organization;
     }

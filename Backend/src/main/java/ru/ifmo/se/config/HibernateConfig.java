@@ -16,7 +16,7 @@ public class HibernateConfig {
     public LocalSessionFactoryBean sessionFactory(DataSource dataSource) {
         LocalSessionFactoryBean sessionFactory = new LocalSessionFactoryBean();
         sessionFactory.setDataSource(dataSource);
-        sessionFactory.setPackagesToScan("ru.ifmo.se.entity.data", "ru.ifmo.se.entity.data.audit", "ru.ifmo.se.entity.user");
+        sessionFactory.setPackagesToScan("ru.ifmo.se.entity.data", "ru.ifmo.se.entity.data.audit", "ru.ifmo.se.entity.user", "ru.ifmo.se.entity.info");
         sessionFactory.setHibernateProperties(hibernateProperties());
 
         return sessionFactory;

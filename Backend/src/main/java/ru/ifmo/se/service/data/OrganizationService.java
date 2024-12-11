@@ -10,7 +10,6 @@ import ru.ifmo.se.dto.data.filter.OrganizationFilterCriteria;
 import ru.ifmo.se.entity.data.Address;
 import ru.ifmo.se.entity.data.Organization;
 import ru.ifmo.se.entity.data.audit.AuditOperation;
-import ru.ifmo.se.exception.EntityDeletionException;
 import ru.ifmo.se.repository.data.OrganizationRepository;
 import ru.ifmo.se.service.data.audit.AuditService;
 import ru.ifmo.se.service.user.UserService;
@@ -28,6 +27,7 @@ public class OrganizationService {
     private final FilterProcessor<OrganizationDTO, OrganizationFilterCriteria> organizationFilterProcessor;
     private final PaginationHandler paginationHandler;
     private final AddressService addressService;
+    private static final String NOT_FOUND_MESSAGE = "Organization not found.";
 
     @Transactional(readOnly = true)
     public Page<OrganizationDTO> getAllOrganizations(String fullName, int page, int size, String sortBy, String sortDirection) {
@@ -40,7 +40,7 @@ public class OrganizationService {
 
     @Transactional(readOnly = true)
     public OrganizationDTO getOrganizationById(Long id) {
-        Organization organization = organizationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Organization not found."));
+        Organization organization = organizationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
         return entityMapper.toOrganizationDTO(organization);
     }
 
@@ -57,14 +57,14 @@ public class OrganizationService {
 
     @Transactional
     public OrganizationDTO updateOrganization(Long id, OrganizationDTO organizationDTO) {
-        Organization organization = organizationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Organization not found."));
+        Organization organization = organizationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
         Address officialAddress = addressService.createOrUpdateAddressForOrganization(organizationDTO.getOfficialAddress());
         Address postalAddress = addressService.createOrUpdateAddressForOrganization(organizationDTO.getPostalAddress());
         organization.setOfficialAddress(officialAddress);
         organization.setAnnualTurnover(organizationDTO.getAnnualTurnover());
         organization.setEmployeesCount(organizationDTO.getEmployeesCount());
         organization.setFullName(organizationDTO.getFullName());
-        organization.setType(organizationDTO.getType());
+        organization.setOrganizationType(organizationDTO.getOrganizationType());
         organization.setPostalAddress(postalAddress);
 
         Organization savedOrganization = organizationRepository.save(organization);
@@ -77,12 +77,12 @@ public class OrganizationService {
         Address officialAddress = addressService.createOrUpdateAddressForOrganization(organizationDTO.getOfficialAddress());
         Address postalAddress = addressService.createOrUpdateAddressForOrganization(organizationDTO.getPostalAddress());
         if (organizationDTO.getId() != null) {
-            Organization organization = organizationRepository.findById(organizationDTO.getId()).orElseThrow(() -> new IllegalArgumentException("Organization not found."));
+            Organization organization = organizationRepository.findById(organizationDTO.getId()).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
             organization.setOfficialAddress(officialAddress);
             organization.setAnnualTurnover(organizationDTO.getAnnualTurnover());
             organization.setEmployeesCount(organizationDTO.getEmployeesCount());
             organization.setFullName(organizationDTO.getFullName());
-            organization.setType(organizationDTO.getType());
+            organization.setOrganizationType(organizationDTO.getOrganizationType());
             organization.setPostalAddress(postalAddress);
 
             Organization savedOrganization = organizationRepository.save(organization);
@@ -99,7 +99,7 @@ public class OrganizationService {
 
     @Transactional
     public void deleteOrganization(Long id) {
-        Organization organization = organizationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Organization not found."));
+        Organization organization = organizationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
         auditService.deleteOrganizationAudits(id);
         organizationRepository.delete(organization);
     }

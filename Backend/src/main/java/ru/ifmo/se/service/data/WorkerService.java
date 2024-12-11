@@ -36,8 +36,8 @@ public class WorkerService {
     private final FilterProcessor<WorkerDTO, WorkerFilterCriteria> workerFilterProcessor;
     private final PaginationHandler paginationHandler;
     private final OrganizationRepository organizationRepository;
-
     private static final String NOT_FOUND_MESSAGE = "Worker not found";
+
     @Transactional(readOnly = true)
     public Page<WorkerDTO> getAllWorkers(String name, String organizationName,
                                          int page, int size, String sortBy, String sortDirection) {

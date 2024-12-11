@@ -10,5 +10,5 @@ import ru.ifmo.se.entity.data.enumerated.OrganizationType;
 @AllArgsConstructor
 public class OrganizationFilterCriteria {
     private String fullName;
-    private OrganizationType type;
+    private OrganizationType organizationType;
 }

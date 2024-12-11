@@ -1,6 +1,5 @@
 package ru.ifmo.se.dto.data;
 
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
@@ -29,7 +28,7 @@ public class OrganizationDTO {
     @Size(min = 1, max = 1576)
     private String fullName;
 
-    private OrganizationType type;
+    private OrganizationType organizationType;
 
     @NotNull
     private AddressDTO postalAddress;

@@ -44,7 +44,7 @@ public class Organization {
     private String fullName;
 
     @Enumerated(EnumType.STRING)
-    private OrganizationType type;
+    private OrganizationType organizationType;
 
     @NotNull
     @OneToOne(cascade = {CascadeType.DETACH, CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REFRESH})

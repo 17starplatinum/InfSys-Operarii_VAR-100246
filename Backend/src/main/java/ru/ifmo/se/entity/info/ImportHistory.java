@@ -7,10 +7,10 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.ifmo.se.entity.user.User;
 
-@Getter
-@Table(name = "history", schema = "s372799")
-@Setter
 @Entity
+@Table(name = "import_history", schema = "s372799")
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class ImportHistory {
@@ -21,7 +21,7 @@ public class ImportHistory {
     private String status;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
 
     private Integer totalObjectsCount;
