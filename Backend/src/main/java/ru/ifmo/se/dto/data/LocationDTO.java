@@ -1,5 +1,6 @@
 package ru.ifmo.se.dto.data;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -14,6 +15,7 @@ public class LocationDTO {
     @NotNull
     private Float x;
 
+    @Nullable
     private long y;
 
     @NotNull

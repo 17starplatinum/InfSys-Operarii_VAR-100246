@@ -6,7 +6,7 @@ export const locationSchema = {
     type: "object",
     "properties": {
         "x": {"type": "number"},
-        "y": {"type": ["integer", "null"]},
+        "y": {"type": "integer"},
         "z": {"type": "integer"}
     },
     "required": ["x", "z"]
@@ -19,7 +19,12 @@ export const addressSchema = {
         "zipCode": {
             "type": "string",
         },
-        "town": {"$ref": "/Location"}
+        "town": {
+            "oneOf": [
+                {"$ref": "/Location"},
+                {"type": "null"}
+            ]
+        }
     },
     "required": ["zipCode"]
 };
@@ -105,15 +110,17 @@ export const workerSchema = {
         },
         "coordinates": {"$ref": "/Coordinates"},
         "organization": {
-            "nullable": true,
-            "allOf": [{"$ref": "/Organization"}]
+            "oneOf": [
+                {"$ref": "/Organization"},
+                {"type": "null"}
+            ]
         },
         "salary": {
             "type": ["number", "null"],
             "exclusiveMinimum": 0
         },
         "rating": {
-            "type": ["integer", "null"],
+            "type": "integer",
             "exclusiveMinimum": 0
         },
         "position": {

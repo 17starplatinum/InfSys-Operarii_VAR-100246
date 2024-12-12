@@ -1,5 +1,6 @@
 package ru.ifmo.se.dto.data;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.Max;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,10 +14,10 @@ public class CoordinatesDTO {
     private Long id;
 
     @Max(920)
-    private Double x;
+    private double x;
 
     @Max(27)
-    private Integer y;
+    private int y;
 
     private User createdBy;
 }

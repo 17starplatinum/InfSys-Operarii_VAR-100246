@@ -15,6 +15,10 @@ import {
 export const WorkersComponent = ({ setPage }) => {
   const columns = [
     {
+      name: "id",
+      selector: (item) => item.id
+    },
+    {
       name: "name",
       selector: (item) => item.name
     },
@@ -134,25 +138,25 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
   const [formData, setFormData] = useState({
     name: "Random",
     salary: null,
-    rating: 0,
+    rating: 1,
     position: "LABORER",
     status: null,
-    coordinates: {x: null, y: null},
+    coordinates: {x: 0, y: 0},
     organization: {
-      annualTurnover: 0,
-      employeesCount: 0,
+      annualTurnover: 1,
+      employeesCount: 1,
       fullName: null,
       organizationType: null,
-      postalAddress: {zipCode: "g684grer", town: {x: 0, y: null, z: 0}},
-      officialAddress: {zipCode: "6weg8we5", town: {x: 0, y: null, z: 0}},
+      postalAddress: {zipCode: "g684grer", town: {x: 0, y: 0, z: 0}},
+      officialAddress: {zipCode: "6weg8we5", town: {x: 0, y: 0, z: 0}},
     },
     person: {
       eyeColor: "BLACK",
       hairColor: null,
       birthday: null,
-      weight: 0,
+      weight: 1,
       nationality: "UNITED_KINGDOM",
-      location: {x: 0, y: null, z: 0},
+      location: {x: 0, y: 0, z: 0},
     },
     useExistingCoordinates: false,
     useExistingOrganization: false,
@@ -189,31 +193,31 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
     if (formData.useExistingCoordinates && coordinatesList.length === 0) {
       getCoordinates();
     }
-  }, [formData.useExistingCoordinates]);
+  }, [formData.useExistingCoordinates, coordinatesList.length]);
 
   useEffect(() => {
     if (formData.useExistingOrganization && organizationsList.length === 0) {
       getOrganizations();
     }
-  }, [formData.useExistingOrganization]);
+  }, [formData.useExistingOrganization, organizationsList.length]);
 
   useEffect(() => {
     if (formData.useExistingPerson && peopleList.length === 0) {
       getPeople();
     }
-  }, [formData.useExistingPerson]);
+  }, [formData.useExistingPerson, peopleList.length]);
 
   useEffect(() => {
     if ((formData.useExistingOfficialAddress || formData.useExistingPostalAddress) && addressesList.length === 0) {
       getAddresses();
     }
-  }, [formData.useExistingOfficialAddress, formData.useExistingPostalAddress]);
+  }, [formData.useExistingOfficialAddress, formData.useExistingPostalAddress, addressesList.length]);
 
   useEffect(() => {
-    if (formData.useExistingLocation && locationsList.length === 0) {
+    if ((formData.useExistingLocation || formData.useExistingOfficialTown || formData.useExistingPostalTown) && locationsList.length === 0) {
       getLocations();
     }
-  }, [formData.useExistingLocation]);
+  }, [formData.useExistingOfficialTown, formData.useExistingPostalTown, formData.useExistingLocation, locationsList.length]);
 
   const getCoordinates = async () => {
     try {
@@ -331,7 +335,7 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
             }
           }
         }));
-        setErrors(prevErrors => ({...prevErrors, officialAddress: ""}))
+        setErrors(prevErrors => ({...prevErrors, officialTown: ""}))
         break;
       case "postalTown":
         setFormData(prevState => ({
@@ -342,10 +346,11 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
             }
           }
         }));
-        setErrors(prevErrors => ({...prevErrors, postalAddress: ""}))
+        setErrors(prevErrors => ({...prevErrors, postalTown: ""}))
+        break;
+      default:
         break;
     }
-
   };
 
   const updateFields = (field, value, schema) => {
@@ -356,7 +361,7 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
     validateFields(value, schema)
   };
 
-  const submitForm = async (e) => {
+  const submitForm = async (e, action) => {
     e.preventDefault();
     const isValid = validateAllFields();
     if (!isValid) {
@@ -368,24 +373,40 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
       axios.defaults.headers.common = {
         'Authorization': `Bearer ${token}`
       };
-      const res = await axios.post(
-          `${V1APIURL}/workers${item ? `/${item.id}` : ""}`,
-          formData,
-          getAxios()
-      );
-      if (res.status !== 200 || res.status !== 201) {
-        alert(`Error: ${res.statusText}`);
-        return false;
+      if(action === "post") {
+        const res = await axios.post(
+            `${V1APIURL}/workers${item ? `/${item.id}` : ""}`,
+            formData,
+            getAxios()
+        );
+        if (res.status !== 201) {
+          alert(`Error: ${res.statusText}`);
+          return false;
+        }
+        alert(`Item Created`);
+        closeForm(true);
+      } else if(action === "put") {
+        const res = await axios.put(
+            `${V1APIURL}/workers/${item.id}`,
+            formData,
+            getAxios()
+        );
+        if (res.status !== 201) {
+          alert(`Error: ${res.statusText}`);
+          return false;
+        }
+        alert(`Item Created`);
+        closeForm(true);
       }
-      alert(`Item ${item ? "Updated" : "Deleted"}`);
-      closeForm(true);
+
+
     } catch (error) {
       alert(`Error!`);
     }
     return false;
   };
 
-  function validateFields(value, schema) {
+  const validateFields = (value, schema) => {
     return v.validate(value, schema);
   }
 
@@ -402,7 +423,7 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
       return false;
   };
 
-  function updateObjects(objectProperty, field, value, schema) {
+  const updateObjects = (objectProperty, field, value, schema) => {
     switch (objectProperty) {
       case "coordinates":
         value = Number(value)
@@ -434,7 +455,6 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
           ...prevState,
           person: {
             ...prevState.person,
-
             [field]: value
           }
         }));
@@ -442,18 +462,24 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
       case "officialAddress":
         setFormData(prevState => ({
           ...prevState,
-          officialAddress: {
-            ...prevState.organization.officialAddress,
-            [field]: value
+          organization: {
+            ...prevState.organization,
+            officialAddress: {
+              ...prevState.organization.officialAddress,
+              [field]: value
+            }
           }
         }));
         break;
       case "postalAddress":
         setFormData(prevState => ({
           ...prevState,
-          postalAddress: {
-            ...prevState.organization.postalAddress,
-            [field]: value
+          organization: {
+            ...prevState.organization,
+            postalAddress: {
+              ...prevState.organization.postalAddress,
+              [field]: value
+            }
           }
         }));
         break;
@@ -461,11 +487,14 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
         value = Number(value)
         setFormData(prevState => ({
           ...prevState,
-          officialAddress: {
-            ...prevState.coordinates.officialAddress,
-            town: {
-              ...prevState.organization.officialAddress.town,
-              [field]: Number(value)
+          organization: {
+            ...prevState.organization,
+            officialAddress: {
+              ...prevState.organization.officialAddress,
+              town: {
+                ...prevState.organization.officialAddress.town,
+                [field]: value
+              }
             }
           }
         }));
@@ -474,11 +503,14 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
         value = Number(value)
         setFormData(prevState => ({
           ...prevState,
-          postalAddress: {
-            ...prevState.organization.postalAddress,
-            town: {
-              ...prevState.organization.postalAddress.town,
-              [field]: value
+          organization: {
+            ...prevState.organization,
+            postalAddress: {
+              ...prevState.organization.postalAddress,
+              town: {
+                ...prevState.organization.postalAddress.town,
+                [field]: value
+              }
             }
           }
         }));
@@ -496,8 +528,9 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
           }
         }));
         break;
+      default:
+        break;
     }
-
 
     let errorMsg = validateFields(value, schema).toString();
     if(errorMsg !== '') {
@@ -517,7 +550,7 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
           </div>
           <div className="row">
             <div className="col-12">
-              <form onSubmit={submitForm}>
+              <form onSubmit={(e) => submitForm(e, "post")}>
                 <div className="mb-4">
                   <label htmlFor="Name">name</label>
                   <input
@@ -536,7 +569,7 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                       name="salary"
                       type="number"
                       onChange={(e) => updateFields('salary', e.target.value, schemas[5].properties.salary)}
-                      value={formData.salary}
+                      value={formData.salary ?? 0}
                       step={0.01}
                   />
                 </div>
@@ -571,9 +604,9 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                       className="dropdown-menu-dark"
                       name="status"
                       onChange={(e) => updateFields('status', e.target.value, schemas[5].properties.status)}
-                      value={formData.status}
+                      value={formData.status ?? ''}
                   >
-                    <option className="dropdown-item" value={null}>Choose...</option>
+                    <option className="dropdown-item" value=''>Choose...</option>
                     <option className="dropdown-item" value={StatusEnum.FIRED}>Fired</option>
                     <option className="dropdown-item" value={StatusEnum.HIRED}>Hired</option>
                     <option className="dropdown-item" value={StatusEnum.RECOMMENDED_FOR_PROMOTION}>Recommended For
@@ -592,18 +625,18 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                         type="radio"
                         name="coordinatesOption"
                         checked={!formData.useExistingCoordinates}
-                        onChange={() => updateFields('useExistingCoordinates', false)}
+                        onChange={() => updateFields('useExistingCoordinates', false, schemas[5].properties.useExistingCoordinates)}
                     />
                   </label>
                   {!formData.useExistingCoordinates && (
                       <div className="mb-4">
                         <label htmlFor="x">Coordinates (X)
                           <input
-                            className="form-control"
-                            name="x"
-                            type="number"
-                            onChange={(e) => updateObjects("coordinates", 'x', e.target.value, schemas[1].properties.x)}
-                            value={formData.coordinates.x}
+                              className="form-control"
+                              name="x"
+                              type="number"
+                              onChange={(e) => updateObjects("coordinates", 'x', e.target.value, schemas[1].properties.x)}
+                              value={formData.coordinates.x}
                           />
                           {errors.coordinates_x && <span className="error">{errors.coordinates_x}</span>}
                         </label>
@@ -649,167 +682,320 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                   <label className="radio-label">
                     <span>Создать новые</span>
                     <input
-                      type="radio"
-                      name="organizationOption"
-                      checked={!formData.useExistingOrganization}
-                      onChange={() => updateFields('useExistingOrganization', false, schemas[5].properties.useExistingOrganization)}
+                        type="radio"
+                        name="organizationOption"
+                        checked={!formData.useExistingOrganization}
+                        onChange={() => updateFields('useExistingOrganization', false, schemas[5].properties.useExistingOrganization)}
                     />
                   </label>
                   {!formData.useExistingOrganization && (
-                  <div className="mb-4">
-                    <label htmlFor="organization_annualTurnover">
-                      Annual Turnover
-                      <input
-                        className="form-control"
-                        name="organization_annualTurnover"
-                        type="number"
-                        onChange={(e) => updateObjects("organization", 'annualTurnover', e.target.value, schemas[4].properties.annualTurnover)}
-                        value={formData.organization.annualTurnover}
-                      />
-                    {errors.organization_annualTurnover &&
-                        <span className="error">{errors.organization_annualTurnover}</span>}
-                    </label>
+                      <div className="mb-4">
+                        <label htmlFor="organization_annualTurnover">
+                          Annual Turnover
+                          <input
+                              className="form-control"
+                              name="organization_annualTurnover"
+                              type="number"
+                              onChange={(e) => updateObjects("organization", 'annualTurnover', e.target.value, schemas[4].properties.annualTurnover)}
+                              value={formData.organization.annualTurnover}
+                          />
+                          {errors.organization_annualTurnover &&
+                              <span className="error">{errors.organization_annualTurnover}</span>}
+                        </label>
 
-                    <label htmlFor="organization_employeesCount">
-                      Employees Count
+                        <label htmlFor="organization_employeesCount">
+                          Employees Count
 
-                    <input
-                        className="form-control"
-                        name="organization_employeesCount"
-                        type="number"
-                        onChange={(e) => updateObjects("organization", 'employeesCount', e.target.value, schemas[4].properties.employeesCount)}
-                        value={formData.organization.employeesCount}
-                    />
-                    {errors.organization_employeesCount &&
-                        <span className="error">{errors.organization_employeesCount}</span>}
-                    </label>
-                    <label htmlFor="organization_fullName">Full Name
-                    <input
-                        className="form-control"
-                        name="organization_fullName"
-                        type="text"
-                        onChange={(e) => updateObjects("organization", 'fullName', e.target.value, schemas[4].properties.fullName)}
-                        value={formData.organization.fullName}
-                    />
-                    {errors.organization_fullName && <span className="error">{errors.organization_fullName}</span>}
-                    </label>
-                    <label htmlFor="organization_type">Organization Type
-                    <select
-                        className="dropdown-menu-dark"
-                        name="organization_type"
-                        onChange={(e) => updateObjects("organization", "organizationType", e.target.value, schemas[4].properties.organizationType)}
-                        value={formData.organization.organizationType}
-                    >
-                      <option className="dropdown-item" value={null}>Choose...</option>
-                      <option className="dropdown-item" value={OrganizationEnum.COMMERCIAL}>Commercial</option>
-                      <option className="dropdown-item" value={OrganizationEnum.PUBLIC}>Public</option>
-                      <option className="dropdown-item" value={OrganizationEnum.GOVERNMENT}>Government</option>
-                      <option className="dropdown-item" value={OrganizationEnum.TRUST}>Trust</option>
-                      <option className="dropdown-item" value={OrganizationEnum.PRIVATE_LIMITED_COMPANY}>Private Limited
-                        Company
-                      </option>
-                    </select>
-                    {errors.organization_organizationType && <span className="error">{errors.organization_organizationType}</span>}
-                    </label>
-                    <hr></hr>
-                    <label htmlFor="organization_postalAddress_zipCode">
-                      Organization Postal Address Zip Code
-                    </label>
-                    <input
-                        className="form-control"
-                        name="organization_postalAddress_zipCode"
-                        type="text"
-                        onChange={(e) => updateObjects("postalAddress", "zipCode", e.target.value, schemas[2].properties.zipCode)}
-                        value={formData.organization.postalAddress.zipCode}
-                    />
-                    {errors.postalAddress_zipCode && <span className="error">{errors.postalAddress_zipCode}</span>}
-
-                    <label htmlFor="organization_postalAddress_town_x">
-                      Town (X)
-                    </label>
-                    <input
-                        className="form-control"
-                        name="organization_postalAddress_town_x"
-                        type="number"
-                        onChange={(e) => updateObjects("postalTown", "x", e.target.value, schemas[0].properties.x)}
-                        value={formData.organization.postalAddress.town.x}
-                    />
-                    {errors.postalTown_x && <span className="error">{errors.town_x}</span>}
-                    <label htmlFor="organization_postalAddress_town_y">
-                      Town (Y)
-                    </label>
-                    <input
-                        className="form-control"
-                        name="organization_postalAddress_town_y"
-                        type="number"
-                        onChange={(e) => updateObjects("postalTown", "y", e.target.value, schemas[0].properties.y)}
-                        value={formData.organization.postalAddress.town.y}
-                    />
-                    {errors.postalTown_y && <span className="error">{errors.town_y}</span>}
-                    <label htmlFor="organization_postalAddress_town_z">
-                      Town (Z)
-                    </label>
-                    <input
-                        className="form-control"
-                        name="organization_postalAddress_town_z"
-                        type="number"
-                        onChange={(e) => updateObjects("postalTown", "z", e.target.value, schemas[0].properties.z)}
-                        value={formData.organization.postalAddress.town.z}
-                    />
-                    {errors.postalTown_z && <span className="error">{errors.town_z}</span>}
-                  <hr></hr>
-                    <label htmlFor="organization_officialAddress_zipCode">
-                      Organization Official Address Zip Code
-                    </label>
-                    <input
-                        className="form-control"
-                        name="organization_officialAddress_zipCode"
-                        type="text"
-                        onChange={(e) => updateObjects("officialAddress", "zipCode", e.target.value, schemas[2].properties.zipCode)}
-                        value={formData.organization.officialAddress.zipCode}
-                    />
-                    {errors.offfcialAddress_zipCode && <span className="error">{errors.officialAddress_zipCode}</span>}
-                    <label htmlFor="organization_officialAddress_town_x">
-                      Town (X)
-                    </label>
-                    <input
-                        className="form-control"
-                        name="organization_officialAddress_town_x"
-                        type="number"
-                        onChange={(e) => updateObjects("officialTown", "x", e.target.value, schemas[0].properties.x)}
-                        value={formData.organization.officialAddress.town.x}
-                    />
-                    {errors.officialTown_x && <span className="error">{errors.town_x}</span>}
-                    <label htmlFor="organization_officialAddress_town_y">
-                      Town (Y)
-                    </label>
-                    <input
-                        className="form-control"
-                        name="organization_officialAddress_town_y"
-                        type="number"
-                        onChange={(e) => updateObjects("officialTown", "y", e.target.value, schemas[0].properties.y)}
-                        value={formData.organization.officialAddress.town.y}
-                    />
-                    {errors.officialTown_y && <span className="error">{errors.town_y}</span>}
-                    <label htmlFor="organization_officialAddress_town_z">
-                      Town (Z)
-                    </label>
-                    <input
-                        className="form-control"
-                        name="organization_officialAddress_town_z"
-                        type="number"
-                        onChange={(e) => updateObjects("officialTown", "z", e.target.value, schemas[0].properties.z)}
-                        value={formData.organization.officialAddress.town.z}
-                    />
-                    {errors.officialTown_z && <span className="error">{errors.town_z}</span>}
-                  </div>)}
+                          <input
+                              className="form-control"
+                              name="organization_employeesCount"
+                              type="number"
+                              onChange={(e) => updateObjects("organization", 'employeesCount', e.target.value, schemas[4].properties.employeesCount)}
+                              value={formData.organization.employeesCount}
+                          />
+                          {errors.organization_employeesCount &&
+                              <span className="error">{errors.organization_employeesCount}</span>}
+                        </label>
+                        <label htmlFor="organization_fullName">Full Name
+                          <input
+                              className="form-control"
+                              name="organization_fullName"
+                              type="text"
+                              onChange={(e) => updateObjects("organization", 'fullName', e.target.value, schemas[4].properties.fullName)}
+                              value={formData.organization.fullName}
+                          />
+                          {errors.organization_fullName &&
+                              <span className="error">{errors.organization_fullName}</span>}
+                        </label>
+                        <label htmlFor="organization_type">Organization Type
+                          <select
+                              className="dropdown-menu-dark"
+                              name="organization_type"
+                              onChange={(e) => updateObjects("organization", "organizationType", e.target.value, schemas[4].properties.organizationType)}
+                              value={formData.organization.organizationType ?? ''}
+                          >
+                            <option className="dropdown-item" value={null}>Choose...</option>
+                            <option className="dropdown-item" value={OrganizationEnum.COMMERCIAL}>Commercial</option>
+                            <option className="dropdown-item" value={OrganizationEnum.PUBLIC}>Public</option>
+                            <option className="dropdown-item" value={OrganizationEnum.GOVERNMENT}>Government</option>
+                            <option className="dropdown-item" value={OrganizationEnum.TRUST}>Trust</option>
+                            <option className="dropdown-item" value={OrganizationEnum.PRIVATE_LIMITED_COMPANY}>Private
+                              Limited
+                              Company
+                            </option>
+                          </select>
+                          {errors.organization_organizationType &&
+                              <span className="error">{errors.organization_organizationType}</span>}
+                        </label>
+                        <hr></hr>
+                        <fieldset>
+                          <label className="radio-label">
+                            <legend>Official Address</legend>
+                            <span>Создать нового</span>
+                            <input
+                                type="radio"
+                                name="officialAddressOption"
+                                checked={!formData.useExistingOfficialAddress}
+                                onChange={() => updateFields('useExistingOfficialAddress', false, schemas[5].properties.useExistingOfficialAddress)}
+                            />
+                          </label>
+                          {!formData.useExistingOfficialAddress && (
+                              <div className="mb-4">
+                                <label htmlFor="organization_officialAddress">
+                                  ZipCode
+                                  <input
+                                      className="form-control"
+                                      name="organization_officialAddress_zipCode"
+                                      type="text"
+                                      onChange={(e) => updateObjects("officialAddress", "zipCode", e.target.value, schemas[2].properties.zipCode)}
+                                      value={formData.organization.officialAddress.zipCode}
+                                  />
+                                  {errors.officialAddress_zipCode &&
+                                      <span className="error">{errors.officialAddress_zipCode}</span>}
+                                </label>
+                                <fieldset>
+                                  <legend>Official Address Town</legend>
+                                  <label className="radio-label">
+                                    <span>Создать новую</span>
+                                    <input
+                                        type="radio"
+                                        name="officialAddressTownOption"
+                                        checked={!formData.useExistingOfficialTown}
+                                        onChange={() => updateFields('useExistingOfficialTown', false, schemas[5].properties.useExistingOfficialTown)}
+                                    />
+                                  </label>
+                                  {!formData.useExistingOfficialTown && (
+                                      <div className="mb-4">
+                                        <label htmlFor="x">Town (X)
+                                          <input
+                                              className="form-control"
+                                              name="x"
+                                              type="number"
+                                              onChange={(e) => updateObjects("officialTown", 'x', e.target.value, schemas[0].properties.x)}
+                                              value={formData.organization.officialAddress.town.x}
+                                          />
+                                          {errors.officialTown_x && <span className="error">{errors.officialTown_x}</span>}
+                                        </label>
+                                        <label htmlFor="y">Town (Y)
+                                          <input
+                                              className="form-control"
+                                              name="y"
+                                              type="number"
+                                              onChange={(e) => updateObjects("officialTown", 'y', e.target.value, schemas[0].properties.y)}
+                                              value={formData.organization.officialAddress.town.y}
+                                          />
+                                          {errors.officialTown_y && <span className="error">{errors.officialTown_y}</span>}
+                                          <label htmlFor="x">Town (Z)
+                                            <input
+                                                className="form-control"
+                                                name="z"
+                                                type="number"
+                                                onChange={(e) => updateObjects("officialTown", 'z', e.target.value, schemas[0].properties.z)}
+                                                value={formData.organization.officialAddress.town.z}
+                                            />
+                                            {errors.officialTown_z &&
+                                                <span className="error">{errors.officialTown_z}</span>}
+                                          </label>
+                                        </label>
+                                      </div>
+                                  )}
+                                  <label className="radio-label">
+                                    <span>Выбрать существующие</span>
+                                    <input
+                                        type="radio"
+                                        name="officialAddressTownOption"
+                                        checked={formData.useExistingOfficialTown}
+                                        onChange={() => updateFields('useExistingOfficialTown', true, schemas[5].properties.useExistingOfficialTown)}
+                                    />
+                                  </label>
+                                  {formData.useExistingOfficialTown && (
+                                      <select
+                                          onChange={(e) => handleObjectSelect("officialTown", e.target.value, locationsList)}
+                                          required
+                                      >
+                                        <option value="">Available Towns</option>
+                                        {locationsList.map((location) => (
+                                            <option key={location.id} value={location.id}>
+                                              X: {location.x}, Y: {location.y}, Z: {location.z}
+                                            </option>
+                                        ))}
+                                      </select>
+                                  )}
+                                  {errors.officialTown && <span className="error">{errors.officialTown}</span>}
+                                </fieldset>
+                              </div>
+                          )}
+                          <label className="radio-label">
+                            <span>Выбрать существующего</span>
+                            <input
+                                type="radio"
+                                name="officialAddressOption"
+                                checked={formData.useExistingOfficialAddress}
+                                onChange={() => updateFields("useExistingOfficialAddress", true, schemas[5].properties.useExistingOfficialAddress)}
+                            />
+                          </label>
+                          {formData.useExistingOfficialAddress && (
+                              <select
+                                  onChange={(e) => handleObjectSelect("officialAddress", e.target.value, addressesList)}
+                                  required
+                              >
+                                {addressesList.map((address) => (
+                                    <option key={address.id} value={address.id}>
+                                      ZipCode: {address.zipCode}
+                                    </option>
+                                ))}
+                              </select>
+                          )}
+                          {errors.officialAddress && <span className="error">{errors.officialAddress}</span>}
+                        </fieldset>
+                        <fieldset>
+                          <label className="radio-label">
+                            <legend>Postal Address</legend>
+                            <span>Создать нового</span>
+                            <input
+                                type="radio"
+                                name="postalAddressOption"
+                                checked={!formData.useExistingPostalAddress}
+                                onChange={() => updateFields('useExistingPostalAddress', false, schemas[5].properties.useExistingPostalAddress)}
+                            />
+                          </label>
+                          {!formData.useExistingPostalAddress && (
+                              <div className="mb-4">
+                                <label htmlFor="organization_postalAddress">
+                                  ZipCode
+                                  <input
+                                      className="form-control"
+                                      name="organization_postalAddress_zipCode"
+                                      type="text"
+                                      onChange={(e) => updateObjects("postalAddress", "zipCode", e.target.value, schemas[2].properties.zipCode)}
+                                      value={formData.organization.postalAddress.zipCode}
+                                  />
+                                  {errors.postalAddress_zipCode &&
+                                      <span className="error">{errors.postalAddress_zipCode}</span>}
+                                </label>
+                                <fieldset>
+                                  <legend>Postal Address Town</legend>
+                                  <label className="radio-label">
+                                    <span>Создать новую</span>
+                                    <input
+                                        type="radio"
+                                        name="postalAddressTownOption"
+                                        checked={!formData.useExistingPostalTown}
+                                        onChange={() => updateFields('useExistingPostalTown', false, schemas[5].properties.useExistingPostalTown)}
+                                    />
+                                  </label>
+                                  {!formData.useExistingPostalTown && (
+                                      <div className="mb-4">
+                                        <label htmlFor="x">Town (X)
+                                          <input
+                                              className="form-control"
+                                              name="x"
+                                              type="number"
+                                              onChange={(e) => updateObjects("postalTown", 'x', e.target.value, schemas[0].properties.x)}
+                                              value={formData.organization.postalAddress.town.x}
+                                          />
+                                          {errors.postalTown_x && <span className="error">{errors.postalTown_x}</span>}
+                                        </label>
+                                        <label htmlFor="y">Town (Y)
+                                          <input
+                                              className="form-control"
+                                              name="y"
+                                              type="number"
+                                              onChange={(e) => updateObjects("postalTown", 'y', e.target.value, schemas[0].properties.y)}
+                                              value={formData.organization.postalAddress.town.y}
+                                          />
+                                          {errors.postalTown_y && <span className="error">{errors.postalTown_y}</span>}
+                                          <label htmlFor="x">Town (Z)
+                                            <input
+                                                className="form-control"
+                                                name="z"
+                                                type="number"
+                                                onChange={(e) => updateObjects("postalTown", 'z', e.target.value, schemas[0].properties.z)}
+                                                value={formData.organization.postalAddress.town.z}
+                                            />
+                                            {errors.postalTown_z &&
+                                                <span className="error">{errors.postalTown_z}</span>}
+                                          </label>
+                                        </label>
+                                      </div>
+                                  )}
+                                  <label className="radio-label">
+                                    <span>Выбрать существующие</span>
+                                    <input
+                                        type="radio"
+                                        name="postalAddressTownOption"
+                                        checked={formData.useExistingPostalTown}
+                                        onChange={() => updateFields('useExistingPostalTown', true, schemas[5].properties.useExistingPostalTown)}
+                                    />
+                                  </label>
+                                  {formData.useExistingPostalTown && (
+                                      <select
+                                          onChange={(e) => handleObjectSelect("postalTown", e.target.value, locationsList)}
+                                          required
+                                      >
+                                        <option value="">Available Towns</option>
+                                        {locationsList.map((location) => (
+                                            <option key={location.id} value={location.id}>
+                                              X: {location.x}, Y: {location.y}, Z: {location.z}
+                                            </option>
+                                        ))}
+                                      </select>
+                                  )}
+                                  {errors.postalTown && <span className="error">{errors.postalTown}</span>}
+                                </fieldset>
+                              </div>
+                          )}
+                          <label className="radio-label">
+                            <span>Выбрать существующего</span>
+                            <input
+                                type="radio"
+                                name="postalAddressOption"
+                                checked={formData.useExistingPostalAddress}
+                                onChange={() => updateFields("useExistingPostalAddress", true, schemas[5].properties.useExistingPostalAddress)}
+                            />
+                          </label>
+                          {formData.useExistingPostalAddress && (
+                              <select
+                                  onChange={(e) => handleObjectSelect("postalAddress", e.target.value, addressesList)}
+                                  required
+                              >
+                                {addressesList.map((address) => (
+                                    <option key={address.id} value={address.id}>
+                                      ZipCode: {address.zipCode}
+                                    </option>
+                                ))}
+                              </select>
+                          )}
+                          {errors.postalAddress && <span className="error">{errors.postalAddress}</span>}
+                        </fieldset>
+                      </div>)}
                   <label className="radio-label">
                     <span>Выбрать существующие</span>
                     <input
                         type="radio"
                         name="organizationOption"
-                        checked={formData.useExistingCoordinates}
-                        onChange={() => updateFields('useExistingCoordinates', true, schemas[5].properties.useExistingOrganization)}
+                        checked={formData.useExistingOrganization}
+                        onChange={() => updateFields('useExistingOrganization', true, schemas[5].properties.useExistingOrganization)}
                     />
                   </label>
                   {formData.useExistingOrganization && (
@@ -817,170 +1003,193 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                         <option value="">Выберите организацию</option>
                         {organizationsList.map((org) => (
                             <option key={org.id} value={org.id}>
-                              officialAddress: {
-                                formData.useExistingOfficialAddress && (
-                                    <select onChange={(e) => handleObjectSelect("officialAddress", e.target.value, addressesList)}>
-                                      {addressesList.map((address) => (
-                                          <option key={address.id} value={address.id}>
-                                            ZipCode: {address.zipCode},
-                                            town: {
-                                            formData.useExistingOfficialTown && (
-                                                <select onChange={(e) => handleObjectSelect("officialTown", e.target.value, locationsList)}>
-                                                  <option value="">Выберите городок</option>
-                                                  {locationsList.map((town) => (
-                                                      <option key={town.id} value={town.id}>
-                                                        X: {town.x}, Y: {town.y}, Z: {town.z}
-                                                      </option>
-                                                  ))}
-                                                </select>
-
-                                              )
-                                          }{errors.town && <span className="error">{errors.town}</span>}
-                                          </option>
-                                      ))}
-                                    </select>
-                                  )
-                            }{errors.officialAddress && <span className="error">{errors.officialAddress}</span>},
+                              officialAddress: {org.officialAddress.id}
                               annualTurnover: {org.annualTurnover},
                               employeesCount: {org.employeesCount},
                               fullName: {org.fullName},
                               organizationType: {org.organizationType},
-                              postalAddress: {
-                                formData.useExistingPostalAddress && (
-                                    <select onChange={(e) => handleObjectSelect("postalAddress", e.target.value, addressesList)}>
-                                      {addressesList.map((address) => (
-                                          <option key={address.id} value={address.id}>
-                                            ZipCode: {address.zipCode},
-                                            town: {
-                                              formData.useExistingPostalTown && (
-                                                  <select onChange={(e) => handleObjectSelect("postalTown", e.target.value, locationsList)}>
-                                                    <option value="">Выберите городок</option>
-                                                    {locationsList.map((town) => (
-                                                        <option key={town.id} value={town.id}>
-                                                          X: {town.x}, Y: {town.y}, Z: {town.z}
-                                                        </option>
-                                                    ))}
-                                                  </select>
-
-                                              )
-                                          }{errors.town && <span className="error">{errors.town}</span>}
-                                          </option>
-                                      ))}
-                                    </select>
-                                )
-                            }{errors.postalAddress && <span className="error">{errors.postalAddress}</span>}
+                              postalAddress: {org.postalAddress.id}
                             </option>
                         ))}
                       </select>
                   )}
                   {errors.organization && <span className="error">{errors.organization}</span>}
-                  </fieldset>
-                  <hr></hr>
-                  <div className="mb-4">
-                    <h3>Person Data</h3>
-                  </div>
-                  <div className="mb-4 dropdown">
-                    <label htmlFor="person_eyeColor">Eye Color</label>
-                    <select className="dropdown-menu-dark"
-                            name="person_eyeColor"
-                            onChange={(e) => updateObjects("person", "eyeColor", e.target.value, schemas[3].properties.eyeColor)}
-                            value={formData.person.eyeColor}>
-                      <option className="dropdown-item" value={ColorEnum.GREEN}>Green</option>
-                      <option className="dropdown-item" value={ColorEnum.BLACK}>Black</option>
-                      <option className="dropdown-item" value={ColorEnum.BLUE}>Blue</option>
-                      <option className="dropdown-item" value={ColorEnum.ORANGE}>Orange</option>
-                    </select>
-                    {errors.person_eyeColor && <span className="error">{errors.person_eyeColor}</span>}
-                  </div>
-                  <div className="mb-4 dropdown">
-                    <label htmlFor="person_hairColor">Hair Color</label>
-                    <select className="dropdown-menu-dark"
-                            name="person_hairColor"
-                            onChange={(e) => updateObjects("person", "hairColor", e.target.value, schemas[3].properties.hairColor)}
-                            value={formData.person.hairColor}>
-                      <option className="dropdown-item" value={null}>Choose...</option>
-                      <option className="dropdown-item" value={ColorEnum.GREEN}>Green</option>
-                      <option className="dropdown-item" value={ColorEnum.BLACK}>Black</option>
-                      <option className="dropdown-item" value={ColorEnum.BLUE}>Blue</option>
-                      <option className="dropdown-item" value={ColorEnum.ORANGE}>Orange</option>
-                    </select>
-                    {errors.person_hairColor && <span className="error">{errors.person_hairColor}</span>}
-                  </div>
-                  <div className="mb-4">
-                    <label htmlFor="person_birthday">Birthday</label>
+                </fieldset>
+                <hr></hr>
+                <fieldset>
+                  <legend>Person Data</legend>
+                  <label className="radio-label">
+                    <span>Создать нового</span>
                     <input
-                        className="form-control"
-                        name="person_birthday"
-                        type="date"
-                        onChange={(e) => updateObjects("person", "birthday", e.target.value, schemas[3].properties.birthday)}
-                        value={formData.person.birthday}
+                        type="radio"
+                        name="personOption"
+                        checked={!formData.useExistingPerson}
+                        onChange={() => updateFields('useExistingPerson', false, schemas[5].properties.useExistingPerson)}
                     />
-                    {errors.person_birthday && <span className="error">{errors.person_birthday}</span>}
-                  </div>
-                  <div className="mb-4">
-                    <label htmlFor="person_weight">Weight</label>
+                  </label>
+                  {!formData.useExistingPerson && (
+                      <div className="mb-4">
+                        <label htmlFor="person_eyeColor">Eye Color
+                          <select className="dropdown-menu-dark"
+                                  name="person_eyeColor"
+                                  onChange={(e) => updateObjects("person", "eyeColor", e.target.value, schemas[3].properties.eyeColor)}
+                                  value={formData.person.eyeColor}>
+                            <option className="dropdown-item" value={ColorEnum.GREEN}>Green</option>
+                            <option className="dropdown-item" value={ColorEnum.BLACK}>Black</option>
+                            <option className="dropdown-item" value={ColorEnum.BLUE}>Blue</option>
+                            <option className="dropdown-item" value={ColorEnum.ORANGE}>Orange</option>
+                          </select>
+                        </label>
+                        {errors.person_eyeColor && <span className="error">{errors.person_eyeColor}</span>}
+                        <label htmlFor="person_hairColor">Hair Color
+                          <select className="dropdown-menu-dark"
+                                  name="person_hairColor"
+                                  onChange={(e) => updateObjects("person", "hairColor", e.target.value, schemas[3].properties.hairColor)}
+                                  value={formData.person.hairColor ?? ''}>
+                            <option className="dropdown-item" value={''}>Choose...</option>
+                            <option className="dropdown-item" value={ColorEnum.GREEN}>Green</option>
+                            <option className="dropdown-item" value={ColorEnum.BLACK}>Black</option>
+                            <option className="dropdown-item" value={ColorEnum.BLUE}>Blue</option>
+                            <option className="dropdown-item" value={ColorEnum.ORANGE}>Orange</option>
+                          </select>
+                        </label>
+                        {errors.person_hairColor && <span className="error">{errors.person_hairColor}</span>}
+                        <label htmlFor="person_birthday">Birthday
+                          <input
+                              className="form-control"
+                                name="person_birthday"
+                                type="date"
+                                onChange={(e) => updateObjects("person", "birthday", e.target.value, schemas[3].properties.birthday)}
+                                value={formData.person.birthday}
+                            />
+                            {errors.person_birthday && <span className="error">{errors.person_birthday}</span>}
+                          </label>
+                          <label htmlFor="person_weight">Weight
+                            <input
+                                className="form-control"
+                                name="person_weight"
+                                type="number"
+                                step={0.01}
+                                onChange={(e) => updateObjects("person", "weight", e.target.value, schemas[3].properties.weight)}
+                                value={formData.person.weight}
+                            />
+                            {errors.person_weight && <span className="error">{errors.person_weight}</span>}
+                          </label>
+                          <label htmlFor="person_nationality">Nationality
+                            <select className="dropdown-menu-dark"
+                                    name="person_nationality"
+                                    onChange={(e) => updateObjects("person", "nationality", e.target.value, schemas[3].properties.nationality)}
+                                    value={formData.person.nationality}>
+                              <option className="dropdown-item" value={CountryEnum.UNITED_KINGDOM}>United Kingdom
+                              </option>
+                              <option className="dropdown-item" value={CountryEnum.FRANCE}>France</option>
+                              <option className="dropdown-item" value={CountryEnum.NORTH_KOREA}>North Korea</option>
+                            </select>
+                            {errors.person_nationality && <span className="error">{errors.person_nationality}</span>}
+                          </label>
+                          <fieldset>
+                            <legend>Location</legend>
+                            <label>Создать новую
+                            <input
+                                type="radio"
+                                name="locationOption"
+                                checked={!formData.useExistingLocation}
+                                onChange={() => updateFields('useExistingLocation', false, schemas[5].properties.useExistingLocation)}
+                            />
+                            </label>
+                            {!formData.useExistingLocation && (
+                                <div className="mb-4">
+                                  <label htmlFor="person_location_x">
+                                    Location (X)
+                                    <input
+                                        className="form-control"
+                                        name="person_location_x"
+                                        type="number"
+                                        onChange={(e) => updateObjects("location", "x", e.target.value, schemas[0].properties.z)}
+                                        value={formData.person.location.x}
+                                    />
+                                    {errors.location_x && <span className="error">{errors.location_x}</span>}
+                                  </label>
+                                  <label htmlFor="person_location_y">
+                                    Location (Y)
+                                    <input
+                                        className="form-control"
+                                        name="person_location_y"
+                                        type="number"
+                                        onChange={(e) => updateObjects("location", "y", e.target.value, schemas[0].properties.y)}
+                                        value={formData.person.location.y}
+                                    />
+                                    {errors.location_y && <span className="error">{errors.location_y}</span>}
+                                  </label>
+                                  <label htmlFor="person_location_z">
+                                    Location (Z)
+                                    <input
+                                        className="form-control"
+                                        name="person_location_z"
+                                        type="number"
+                                        onChange={(e) => updateObjects("location", "z", e.target.value, schemas[0].properties.z)}
+                                        value={formData.person.location.z}
+                                    />
+                                    {errors.location_z && <span className="error">{errors.location_z}</span>}
+                                  </label>
+                                </div>
+                            )}
+                            <label className="radio-label">
+                              <span>Выбрать существующего</span>
+                              <input
+                                  type="radio"
+                                  name="locationOption"
+                                  checked={formData.useExistingLocation}
+                                  onChange={() => updateFields("useExistingLocation", true, schemas[5].properties.useExistingLocation)}
+                              />
+                            </label>
+                              {formData.useExistingLocation && (
+                                  <select
+                                      onChange={(e) => handleObjectSelect("location", e.target.value, locationsList)}
+                                      required
+                                  >
+                                    <option value={null}>Choose...</option>
+                                    {locationsList.map((location) => (
+                                        <option key={location.id} value={location.id}>
+                                          X: {location.x}, Y: {location.y}, Z: {location.z}
+                                        </option>
+                                    ))}
+                                  </select>
+                              )}
+                            {errors.location && <span className="error">{errors.location}</span>}
+                          </fieldset>
+                        </div>
+                    )}
+                  <label className="radio-label">
+                    <span>Выбрать существующего</span>
                     <input
-                        className="form-control"
-                        name="person_weight"
-                        type="number"
-                        step={0.01}
-                        onChange={(e) => updateObjects("person", "weight", e.target.value, schemas[3].properties.weight)}
-                        value={formData.person.weight}
+                        type="radio"
+                        name="personOption"
+                        checked={formData.useExistingPerson}
+                        onChange={() => updateFields('useExistingPerson', true, schemas[5].properties.useExistingPerson)}
                     />
-                    {errors.person_weight && <span className="error">{errors.person_weight}</span>}
-                  </div>
-                  <div className="mb-4 dropdown">
-                    <label htmlFor="person_nationality">Nationality</label>
-                    <select className="dropdown-menu-dark"
-                            name="person_nationality"
-                            onChange={(e) => updateObjects("person", "nationality", e.target.value, schemas[3].properties.nationality)}
-                            value={formData.person.nationality}>
-                      <option className="dropdown-item" value={CountryEnum.UNITED_KINGDOM}>United Kingdom</option>
-                      <option className="dropdown-item" value={CountryEnum.FRANCE}>France</option>
-                      <option className="dropdown-item" value={CountryEnum.NORTH_KOREA}>North Korea</option>
-                    </select>
-                    {errors.person_nationality && <span className="error">{errors.person_nationality}</span>}
-                  </div>
-                  <hr></hr>
-                  <div className="mb-4">
-                    <label htmlFor="person_location_x">
-                      Person Location X
-                    </label>
-                    <input
-                        className="form-control"
-                        name="person_location_x"
-                        type="number"
-                        onChange={(e) => updateObjects("location", "x", e.target.value, schemas[0].properties.z)}
-                        value={formData.person.location.x}
-                    />
-                    {errors.location_x && <span className="error">{errors.location_x}</span>}
-                  </div>
-                  <div className="mb-4">
-                    <label htmlFor="person_location_y">
-                      Person Location Y
-                    </label>
-                    <input
-                        className="form-control"
-                        name="person_location_y"
-                        type="number"
-                        onChange={(e) => updateObjects("location", "y", e.target.value, schemas[0].properties.y)}
-                        value={formData.person.location.y}
-                    />
-                    {errors.location_y && <span className="error">{errors.location_y}</span>}
-                  </div>
-                  <div className="mb-4">
-                    <label htmlFor="person_location_z">
-                      Person Location Z
-                    </label>
-                    <input
-                        className="form-control"
-                        name="person_location_z"
-                        type="number"
-                        onChange={(e) => updateObjects("location", "z", e.target.value, schemas[0].properties.z)}
-                        value={formData.person.location.z}
-                    />
-                    {errors.location_z && <span className="error">{errors.location_z}</span>}
-                  </div>
+                  </label>
+                  {formData.useExistingPerson && (
+                      <select
+                          onChange={(e) => handleObjectSelect("person", e.target.value, peopleList)}
+                          required
+                      >
+                        {peopleList.map((person) => (
+                            <option key={person.id} value={person.id}>
+                              EyeColor: {person.eyeColor}
+                              HairColor: {person.hairColor}
+                              Location: {person.location.id}
+                              Birthday: {person.birthday}
+                              Weight: {person.weight}
+                              Nationality: {person.nationality}
+                            </option>
+                        ))}
+                      </select>
+                  )}{errors.person && <span className="error">{errors.person}</span>}
+                </fieldset>
+
+                <hr></hr>
+                <div className="mb-4">
                   <div className="mb-4">
                     <button className="btn btn-primary" type="submit">
                       <i className="fa fa-send"></i>&nbsp;Submit
@@ -993,11 +1202,12 @@ export const WorkersFormComponent = ({ closeForm, item }) => {
                       <i className="fa fa-cancel"></i>&nbsp;Cancel
                     </button>
                   </div>
+                </div>
               </form>
             </div>
           </div>
         </div>
-);
+  );
 }
 
 export const SpecialComponent = () => {
@@ -1021,7 +1231,7 @@ export const SpecialComponent = () => {
       setRating(rating);
     }
     if (fireByWorkerId) {
-        setFireByWorkerId(fireByWorkerId);
+      setFireByWorkerId(fireByWorkerId);
       }
       if (transferWorkerIds) {
         setTransferWorkerIds(transferWorkerIds);
