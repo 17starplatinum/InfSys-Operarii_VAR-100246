@@ -13,12 +13,18 @@ export const LoginPage = ({setPage, setUser}) => {
     e.preventDefault();
     console.log(formData)
     try {
-      const res = await axios.post(`${V1APIURL}/auth/login`, formData)
+      let res = await axios.post(`${V1APIURL}/auth/login`, formData)
       if (res.status !== 200) {
-        alert("Not found")
+        alert("Wrong creds")
         return false
       }
-      setUser({...res.data, username: formData.username})
+      const data = {...res.data, username: formData.username}
+      res = await axios.get(`${V1APIURL}/auth/current`, { headers: { Authorization: `Bearer ${data.token}` }})
+      if (res.status !== 200) {
+        alert("Failed to fetch user")
+        return false
+      }
+      setUser({...res.data, ...data})
     } catch (error) {
       console.log(error)
       alert("Error, please try again.")
