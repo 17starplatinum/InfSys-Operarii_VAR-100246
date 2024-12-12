@@ -104,7 +104,7 @@ function App() {
                 setPage={setPage}
                 user={user}
                 setUser={setUser}
-                content={user.is_admin ? <AccessManagement setPage={setPage}/> : <RequestAdminAccess setPage={setPage}/>}
+                content={user.role === "ADMIN" ? <AccessManagement setPage={setPage}/> : <RequestAdminAccess setPage={setPage}/>}
               />
           );
     default:
