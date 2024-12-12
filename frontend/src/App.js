@@ -10,10 +10,7 @@ import { PersonsComponent } from "./components/Persons";
 import { CoordinatesComponent } from "./components/Coordinates";
 import { LocationsComponent } from "./components/Locations";
 import { AddressesComponent } from "./components/Addresses";
-import {
-  AccessManagement,
-  RequestAdminAccess,
-} from "./components/AccessManagement";
+import { AccessManagement, RequestAdminAccess } from "./components/AccessManagement";
 
 function App() {
   const [user, setUser] = useState();
@@ -22,7 +19,6 @@ function App() {
   useEffect(() => {
     if (user) {
       window.localStorage.setItem("token", user.token);
-
       window.localStorage.setItem(
         "axios",
         JSON.stringify({ headers: { Authorization: `Bearer ${user.token}` } })
@@ -93,30 +89,24 @@ function App() {
           content={<AddressesComponent setPage={setPage} />}
         />
       );
-    case "special":
-      return (
-        <LayoutPage
-          setPage={setPage}
-          user={user}
-          setUser={setUser}
-          content={<SpecialComponent setPage={setPage} />}
-        />
-      );
-    case "access-management":
-      return (
-        <LayoutPage
-          setPage={setPage}
-          user={user}
-          setUser={setUser}
-          content={
-            user.role === "ADMIN" ? (
-              <AccessManagement setPage={setPage} />
-            ) : (
-              <RequestAdminAccess setPage={setPage} />
-            )
-          }
-        />
-      );
+      case "special":
+        return (
+            <LayoutPage
+              setPage={setPage}
+              user={user}
+              setUser={setUser}
+              content={<SpecialComponent setPage={setPage} />}
+            />
+        );
+        case "access-management":
+          return (
+              <LayoutPage
+                setPage={setPage}
+                user={user}
+                setUser={setUser}
+                content={user.role === "ADMIN" ? <AccessManagement setPage={setPage}/> : <RequestAdminAccess setPage={setPage}/>}
+              />
+          );
     default:
       return (
         <LayoutPage
