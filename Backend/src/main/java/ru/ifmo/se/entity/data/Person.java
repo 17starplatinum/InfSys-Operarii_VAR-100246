@@ -21,7 +21,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 @Setter
-public class Person {
+public class Person implements Creatable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

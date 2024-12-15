@@ -1,5 +1,6 @@
 package ru.ifmo.se.service.user;
 
+import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -13,13 +14,13 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.ifmo.se.dto.user.*;
-import ru.ifmo.se.entity.data.Worker;
 import ru.ifmo.se.entity.data.enumerated.AdminRequestStatus;
 import ru.ifmo.se.entity.data.enumerated.UserRole;
 import ru.ifmo.se.entity.user.User;
 import ru.ifmo.se.exception.UserAlreadyExistsException;
 import ru.ifmo.se.repository.user.UserRepository;
 import ru.ifmo.se.status.AdminRequestStatusHandler;
+import ru.ifmo.se.entity.data.Creatable;
 import ru.ifmo.se.util.EntityMapper;
 
 import java.util.List;
@@ -37,6 +38,8 @@ public class UserService implements UserDetailsService {
     private EntityMapper entityMapper;
     private Map<String, AdminRequestStatusHandler> statusHandlerMap;
 
+    @Resource
+    private UserService userServiceResource;
     @Autowired
     public void setAuthenticationManager(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
@@ -124,8 +127,8 @@ public class UserService implements UserDetailsService {
     @Transactional(readOnly = true)
     public String getAdminRequestStatus(Long userId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new UsernameNotFoundException("User has not been found."));
-
-        AdminRequestStatusHandler adminRequestStatusHandler = statusHandlerMap.get(user.getRole().toString());
+        String userRole = user.getRole().name();
+        AdminRequestStatusHandler adminRequestStatusHandler = statusHandlerMap.get(userRole);
         if (adminRequestStatusHandler == null) {
             throw new IllegalStateException("Handler for the following status: " + user.getAdminRequestStatus().toString() + " has not been found.");
         }
@@ -171,14 +174,14 @@ public class UserService implements UserDetailsService {
     }
 
     @Transactional
-    public boolean canModifyWorker(Worker worker) {
-        User currentUser = getCurrentUser();
-        return !Objects.equals(worker.getCreatedBy().getUsername(), currentUser.getUsername()) && currentUser.getRole() != UserRole.ADMIN;
+    public <T extends Creatable> boolean cantModifyEntity(T entity) {
+        User currentUser = userServiceResource.getCurrentUser();
+        return !Objects.equals(entity.getCreatedBy().getUsername(), currentUser.getUsername()) && currentUser.getRole() != UserRole.ADMIN;
     }
 
     @Transactional
     public UserUpdateResponseDTO updateCurrentUser(UserUpdateDTO userUpdateDTO) {
-        User currentUser = getCurrentUser();
+        User currentUser = userServiceResource.getCurrentUser();
         if (userUpdateDTO.getUsername() != null && !userUpdateDTO.getUsername().isEmpty()) {
             if (userRepository.findByUsername(userUpdateDTO.getUsername()).isPresent()) {
                 throw new UserAlreadyExistsException("Username is already taken.");

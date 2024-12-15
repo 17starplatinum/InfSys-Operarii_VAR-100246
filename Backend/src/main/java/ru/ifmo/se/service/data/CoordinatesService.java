@@ -75,7 +75,9 @@ public class CoordinatesService {
     @Transactional
     public CoordinatesDTO updateCoordinates(Long id, CoordinatesDTO coordinatesDTO) {
         Coordinates coordinates = coordinatesRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
-
+        if (userService.cantModifyEntity(coordinates)) {
+            throw new IllegalArgumentException("You are not allowed to modify these Coordinates.");
+        }
         coordinates.setX(coordinatesDTO.getX());
         coordinates.setY(coordinatesDTO.getY());
 
@@ -88,7 +90,9 @@ public class CoordinatesService {
     public Coordinates createOrUpdateCoordinatesForWorker(CoordinatesDTO coordinatesDTO) {
         if (coordinatesDTO.getId() != null) {
             Coordinates coordinates = coordinatesRepository.findById(coordinatesDTO.getId()).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
-
+            if (userService.cantModifyEntity(coordinates)) {
+                throw new IllegalArgumentException("You are not allowed to modify these Coordinates.");
+            }
             coordinates.setX(coordinatesDTO.getX());
             coordinates.setY(coordinatesDTO.getY());
             Coordinates savedCoordinates = coordinatesRepository.save(coordinates);
@@ -106,6 +110,9 @@ public class CoordinatesService {
     @Transactional
     public void deleteCoordinates(Long id) {
         Coordinates coordinates = coordinatesRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
+        if (userService.cantModifyEntity(coordinates)) {
+            throw new IllegalArgumentException("You are not allowed to delete these Coordinates.");
+        }
         if (!coordinates.getWorkers().isEmpty()) {
             throw new EntityDeletionException("Cannot delete Coordinates since it is linked to one or more Workers.");
         }

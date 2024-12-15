@@ -17,7 +17,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Coordinates {
+public class Coordinates implements Creatable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -26,7 +26,7 @@ public class Coordinates {
     @Column(name = "x")
     private double x;
 
-    @Max(value = 12)
+    @Max(value = 27)
     @Column(name = "y")
     private int y;
 

@@ -72,7 +72,7 @@ public class WorkerService {
     @Transactional
     public WorkerDTO updateWorker(Long id, WorkerDTO workerDTO) {
         Worker worker = workerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
-        if (userService.canModifyWorker(worker)) {
+        if (userService.cantModifyEntity(worker)) {
             throw new IllegalArgumentException("You are not allowed to modify this Worker.");
         }
 
@@ -94,7 +94,7 @@ public class WorkerService {
     @Transactional
     public void deleteWorker(Long id) {
         Worker worker = workerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
-        if (userService.canModifyWorker(worker)) {
+        if (userService.cantModifyEntity(worker)) {
             throw new IllegalArgumentException("You are not allowed to delete this Worker.");
         }
         auditService.deleteWorkerAudits(worker.getId());
@@ -104,7 +104,7 @@ public class WorkerService {
     @Transactional
     public void deleteWorkerByPerson(Long personId) {
         Worker worker = workerRepository.findWorkerByPersonId(personId).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
-        if (userService.canModifyWorker(worker)) {
+        if (userService.cantModifyEntity(worker)) {
             throw new IllegalArgumentException("You are not allowed to delete this Worker.");
         }
         auditService.deleteWorkerAudits(worker.getId());

@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.lang.Nullable;
 import ru.ifmo.se.entity.data.audit.AddressAudit;
 import ru.ifmo.se.entity.user.User;
 
@@ -18,19 +17,17 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Address {
+public class Address implements Creatable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false, unique = true)
     private long id;
 
     @NotNull
     @Column(name = "zip_code", nullable = false)
     private String zipCode;
 
-    @OneToOne
-    @Nullable
-    @JoinColumn(name = "location_id")
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "town_id")
     private Location town;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})

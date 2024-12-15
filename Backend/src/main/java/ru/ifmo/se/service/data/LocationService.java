@@ -75,7 +75,9 @@ public class LocationService {
     @Transactional
     public LocationDTO updateLocation(Long id, LocationDTO locationDTO) {
         Location location = locationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
-
+        if (userService.cantModifyEntity(location)) {
+            throw new IllegalArgumentException("You are not allowed to modify this Location.");
+        }
         location.setX(locationDTO.getX());
         location.setY(locationDTO.getY());
         location.setZ(locationDTO.getZ());
@@ -94,7 +96,9 @@ public class LocationService {
         }
         if (locationDTO.getId() != null) {
             Location location = locationRepository.findById(locationDTO.getId()).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
-
+            if (userService.cantModifyEntity(location)) {
+                throw new IllegalArgumentException("You are not allowed to modify this Location.");
+            }
             location.setX(locationDTO.getX());
             location.setY(locationDTO.getY());
             location.setZ(locationDTO.getZ());
@@ -113,6 +117,9 @@ public class LocationService {
     @Transactional
     public void deleteLocation(Long id) {
         Location location = locationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
+        if (userService.cantModifyEntity(location)) {
+            throw new IllegalArgumentException("You are not allowed to delete this Location.");
+        }
         if (location.getPerson() != null) {
             throw new EntityDeletionException("Cannot delete this Location since it is linked to a Person.");
         }

@@ -12,7 +12,7 @@ export const AccessManagement = ({ setPage }) => {
     },
     {
       name: "Username",
-      selector: (item) => item.x,
+      selector: (item) => item.username,
     },
     {
       name: "Actions",
@@ -40,15 +40,16 @@ export const AccessManagement = ({ setPage }) => {
 
   const loadItems = async () => {
     try {
-      const res = await axios.get(
-          `${V1APIURL}/auth/admin-requests`,
-          getAxios()
-      );
+      let token = localStorage.getItem("token");
+      axios.defaults.headers.common = {
+        "Authorization": `Bearer ${token}`
+      }
+      const res = await axios.get(`${V1APIURL}/auth/admin-requests`, getAxios());
       if (res.status !== 200) {
         alert(`Error: ${res.statusText}`);
         return false;
       }
-      setItems(res.data?.content || []);
+      setItems(res.data || []);
     } catch (error) {
       alert(`Error!`);
     }
@@ -56,6 +57,10 @@ export const AccessManagement = ({ setPage }) => {
 
   const reject = async (item) => {
     try {
+      const token = localStorage.getItem("token");
+      axios.defaults.headers.common = {
+        "Authorization": `Bearer ${token}`
+      };
       const res = await axios.post(
         `${V1APIURL}/auth/reject-admin/${item.id}`,
         getAxios()
@@ -73,6 +78,10 @@ export const AccessManagement = ({ setPage }) => {
 
   const approve = async (item) => {
     try {
+      const token = localStorage.getItem("token");
+      axios.defaults.headers.common = {
+        "Authorization": `Bearer ${token}`
+      };
       const res = await axios.post(
         `${V1APIURL}/auth/approve-admin/${item.id}`,
         getAxios()

@@ -2,7 +2,9 @@ import { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import { V1APIURL } from "../shared/constants";
 import axios from "axios";
-import { getAxios } from "../shared/utils";
+import {getAxios} from "../shared/utils";
+import {locationSchema} from "./validation/ValidationSchemas";
+import {validateFields} from "./validation/Validation";
 
 export const LocationsComponent = ({ setPage }) => {
   const columns = [
@@ -40,6 +42,7 @@ export const LocationsComponent = ({ setPage }) => {
       ),
     },
   ];
+
   const [items, setItems] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [item, setItem] = useState();
@@ -121,93 +124,135 @@ export const LocationsComponent = ({ setPage }) => {
 };
 
 export const LocationsFormComponent = ({ closeForm, item }) => {
-  const [formData, setFormData] = useState({ x: 0, y: null, z: 0 });
+  let [formData, setFormData] = useState({x: 0, y: 0, z: 0});
+  const [errors, setErrors] = useState([]);
+
+  let Validator = require('jsonschema').Validator;
+  let v = new Validator();
+  v.addSchema(locationSchema, locationSchema.id);
+
+  useEffect(() => {
+  }, []);
 
   useEffect(() => {
     if (item) {
-      setFormData({ ...item });
+      setFormData({...item});
     }
   }, [item]);
 
-  const updateForm = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
-
-  const submitForm = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await axios.post(
-        `${V1APIURL}/locations${item ? `/${item.id}` : ""}`,
-        formData,
-        getAxios()
-      );
-      if (res.status !== 200 || res.status !== 201) {
-        alert(`Error: ${res.statusText}`);
-        return false;
-      }
-      alert(`Item ${item ? "Updated" : "Deleted"}`);
-      closeForm(true);
-    } catch (error) {
-      alert(`Error!`);
+  const validateLocation = () => {
+    let errorMsg = validateFields(v, formData,  locationSchema, true);
+    if(errorMsg.length === 0) {
+      return true;
     }
+    setErrors(prevState => ({
+      ...prevState,
+      [errorMsg]: errorMsg
+    }))
+    console.log(errorMsg);
     return false;
-  };
+  }
 
-  return (
-    <div className="container py-5">
-      <div className="row">
-        <div className="col-12">
-          <h2>{item ? "Edit Item" : "Add Item"}</h2>
+  const updateForm = (field, value, schema) => {
+    value = Number(value);
+    setFormData({...formData, [field]: value});
+    let errorMsg = validateFields(v, value, schema).toString();
+    if (errorMsg !== '') {
+      setErrors(prevErrors => ({
+        ...prevErrors,
+        [`$location_${field}`]: errorMsg
+      }));
+    }
+  }
+
+    const submitForm = async (e) => {
+      e.preventDefault();
+      const isValid = validateLocation();
+      if (!isValid) {
+        alert('Не получилось создать Location.');
+        return;
+      }
+      try {
+        const token = localStorage.getItem("token");
+        axios.defaults.headers.common = {
+          'Authorization': `Bearer ${token}`
+        };
+        delete formData.createdBy;
+        const res = await axios[item? "put" : "post"](
+            `${V1APIURL}/locations${item ?`/${item.id} `: ""}`,
+            formData.createdBy.authorities,
+            getAxios()
+        );
+        if (!(res.status === 200 || res.status === 201)) {
+          alert(`Error: ${res.statusText}`);
+          return false;
+        }
+        alert(`Item ${item ? "Updated" : "Created"}`);
+        closeForm(true);
+      } catch (error) {
+        alert(`Error!`);
+      }
+      return false;
+    };
+
+    return (
+        <div className="container py-5">
+          <div className="row">
+            <h2>{item ? "Edit Location" : "Add Location"}</h2>
+            <div className="col-12">
+              <form onSubmit={(e) => submitForm(e)}>
+                <div className="py-5">
+                  <label htmlFor="location_x">
+                    X
+                    <input
+                        className="form-control"
+                        name="location_x"
+                        type="number"
+                        onChange={(e) => updateForm("x", e.target.value, locationSchema.properties.x)}
+                        value={formData.x}
+                    />
+                    {errors.location_x && <span className="error">{errors.location_x}</span>}
+                  </label>
+                  <label htmlFor="location_y">
+                    Y
+                    <input
+                        className="form-control"
+                        name="location_y"
+                        type="number"
+                        onChange={(e) => updateForm("y", e.target.value, locationSchema.properties.y)}
+                        value={formData.y}
+                    />
+                    {errors.location_y && <span className="error">{errors.location_y}</span>}
+                  </label>
+                  <label htmlFor="location_z">
+                    Z
+                    <input
+                        className="form-control"
+                        name="location_z"
+                        type="number"
+                        onChange={(e) => updateForm("z", e.target.value, locationSchema.properties.z)}
+                        value={formData.z}
+                    />
+                    {errors.location_z && <span className="error">{errors.location_z}</span>}
+                  </label>
+                </div>
+                <div className="mb-4">
+                  <div className="mb-4">
+                    <button className="btn btn-primary" type="submit">
+                      <i className="fa fa-send"></i>&nbsp;Submit
+                    </button>
+                    <button
+                        className="btn btn-secondary mz-2"
+                        type="button"
+                        onClick={() => closeForm(null)}
+                    >
+                      <i className="fa fa-cancel"></i>&nbsp;Cancel
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
         </div>
-      </div>
-      <div className="row">
-        <div className="col-12">
-          <form onSubmit={submitForm}>
-            <div className="mb-4">
-              <label htmlFor="name">X</label>
-              <input
-                className="form-control"
-                name="x"
-                type="text"
-                onChange={updateForm}
-                value={formData.x}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="password">Y</label>
-              <input
-                className="form-control"
-                name="y"
-                type="text"
-                onChange={updateForm}
-                value={formData.y}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="password">Z</label>
-              <input
-                className="form-control"
-                name="z"
-                type="text"
-                onChange={updateForm}
-                value={formData.z}
-              />
-            </div>
-            <div className="mb-4">
-              <button className="btn btn-primary" type="submit">
-                <i className="fa fa-send"></i>&nbsp;Submit
-              </button>
-              <button
-                className="btn btn-secondary mx-2"
-                type="button"
-                onClick={() => closeForm(null)}
-              >
-                <i className="fa fa-cancel"></i>&nbsp;Cancel
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
-    </div>
-  );
-};
+    );
+}

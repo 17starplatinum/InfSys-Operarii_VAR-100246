@@ -23,7 +23,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Worker {
+public class Worker implements Creatable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

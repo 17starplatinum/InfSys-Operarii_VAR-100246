@@ -15,7 +15,6 @@ public class LocationDTO {
     @NotNull
     private Float x;
 
-    @Nullable
     private long y;
 
     @NotNull

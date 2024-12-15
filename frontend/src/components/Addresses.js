@@ -2,8 +2,12 @@ import {useEffect, useState} from "react";
 import DataTable from "react-data-table-component";
 import {V1APIURL} from "../shared/constants";
 import axios from "axios";
-import {getAxios} from "../shared/utils";
-
+import {getAxios, removeKey} from "../shared/utils";
+import {
+  addressSchema,
+  locationSchema,
+} from "./validation/ValidationSchemas";
+import {validateFields} from "./validation/Validation";
 
 export const AddressesComponent = ({ setPage }) => {
   const columns = [
@@ -33,7 +37,7 @@ export const AddressesComponent = ({ setPage }) => {
       ),
     },
   ];
-  const [items, setItems] = useState(Array.from({length: 100}, (_, i) => ({zipCode: i, y: i, id: i})));
+  const [items, setItems] = useState([]);
   const [showForm, setShowForm] = useState(false);
   const [item, setItem] = useState();
 
@@ -114,12 +118,22 @@ export const AddressesComponent = ({ setPage }) => {
 };
 
 export const AddressesFormComponent = ({ closeForm, item }) => {
-  const [formData, setFormData] = useState({
+  let [formData, setFormData] = useState({
     zipCode: "",
-    town: { x: 0, y: null, z: 0 }
+    town: { x: 0, y: 0, z: 0 },
+    useExistingTown: false
   });
 
-  useEffect(() => {}, []);
+  const [errors, setErrors] = useState([]);
+  let Validator = require('jsonschema').Validator;
+  let v = new Validator();
+  let schemas = [locationSchema, addressSchema];
+  schemas.forEach(schema => v.addSchema(schema, schema.id));
+
+  const [locationsList, setLocationsList] = useState([]);
+
+  useEffect(() => {
+  }, []);
 
   useEffect(() => {
     if (item) {
@@ -127,46 +141,100 @@ export const AddressesFormComponent = ({ closeForm, item }) => {
     }
   }, [item]);
 
-  const updateForm = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  useEffect(() => {
+    if (formData.useExistingTown && locationsList.length === 0) {
+      getLocations();
+    }
+  }, [formData.useExistingTown, locationsList.length]);
+
+  const getLocations = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      axios.defaults.headers.common = {
+        "Authorization": `Bearer ${token}`
+      };
+      const response = await axios.get(`${V1APIURL}/locations`, getAxios());
+      setLocationsList(response.data.content || []);
+    } catch (error) {
+      alert("An error occurred while retrieving locations: ", error);
+    }
   };
+
+  const handleObjectSelect = (objectProperty, value, list) => {
+    const focusedObject = list.find(obj => obj.id === Number(value));
+    setFormData(prevState => ({
+      ...prevState,
+      town: focusedObject
+    }));
+    setErrors(prevErrors => ({...prevErrors, town: ""}))
+  };
+
+  const validateAddress = () => {
+    let errorMsg = validateFields(v, formData,  schemas[1], true);
+    if(errorMsg.length === 0) {
+      return true;
+    }
+    setErrors(prevState => ({
+      ...prevState,
+      [errorMsg]: errorMsg
+    }))
+    console.log(errorMsg);
+    return false;
+  }
+
+  const updateForm = (field, value, schema) => {
+    setFormData({ ...formData, [field]: value });
+    let errorMsg = validateFields(v, value, schema).toString();
+    if (errorMsg !== '') {
+      setErrors(prevErrors => ({
+        ...prevErrors,
+        [`$address_${field}`]: errorMsg
+      }));
+    }
+  };
+
+  const updateObjects = (objectProperty, field, value, schema) => {
+    value = Number(value);
+    setFormData(prevState => ({
+      ...prevState,
+      town: {
+        ...prevState.town,
+        [field]: value
+      }
+    }));
+    let errorMsg = validateFields(v, value, schema).toString();
+    if(errorMsg !== '') {
+      setErrors(prevErrors => ({
+        ...prevErrors,
+        [`${objectProperty}_${field}`]: errorMsg
+      }));
+    }
+  }
 
   const submitForm = async (e) => {
     e.preventDefault();
-    try {
-      let res;
-        res = await axios.post(
-            `${V1APIURL}/addresses${item}`,
-            formData,
-            getAxios()
-        );
-
-      if (res.status !== 201) {
-        alert(`Error: ${res.statusText}`);
-        return false;
-      }
-      alert(`Item ${item ? "Updated" : "Deleted"}`);
-      closeForm(true);
-    } catch (error) {
-      alert(`Error!`);
+    const isValid = validateAddress();
+    if (!isValid) {
+      alert('Не получилось создать Address.');
+      return;
     }
-    return false;
-  };
-
-  const submitUpdate = async (e) => {
-    e.preventDefault();
     try {
-      const res = await axios.put(
-          `${V1APIURL}/addresses${item}/${item.id}`,
+      const token = localStorage.getItem("token");
+      axios.defaults.headers.common = {
+        'Authorization': `Bearer ${token}`
+      };
+      formData = removeKey(formData, "authorities");
+      const res = await axios[item? "put" : "post"](
+          `${V1APIURL}/addresses${item ?`/${item.id} `: ""}`,
           formData,
           getAxios()
       );
 
-      if (res.status !== 200) {
+      if (!(res.status === 200 || res.status === 201)) {
         alert(`Error: ${res.statusText}`);
         return false;
       }
-      alert(`Item ${item ? "Updated" : "Deleted"}`);
+      alert(`Item ${item ? "Updated" : "Created"}`);
       closeForm(true);
     } catch (error) {
       alert(`Error!`);
@@ -185,71 +253,103 @@ export const AddressesFormComponent = ({ closeForm, item }) => {
         <div className="col-12">
           <form onSubmit={submitForm}>
             <div className="mb-4">
-              <label htmlFor="zipCode">ZIP Code</label>
-              <input
-                className="form-control"
-                name="zipCode"
-                type="text"
-                onChange={updateForm}
-                value={formData.zipCode}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="x">Town (X)</label>
-              <input
-                className="form-control"
-                name="x"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    town: { ...formData.town, x: e.target.value },
-                  })
-                }
-                value={formData.town.x}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="y">Town (Y)</label>
-              <input
-                className="form-control"
-                name="y"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    town: { ...formData.town, y: e.target.value },
-                  })
-                }
-                value={formData.town.y}
-              />
-            </div>
-            <div className="mb-4">
-              <label htmlFor="z">Town (Z)</label>
-              <input
-                className="form-control"
-                name="z"
-                type="number"
-                onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    town: { ...formData.town, z: e.target.value },
-                  })
-                }
-                value={formData.town.z}
-              />
-            </div>
-            <div className="mb-4">
-              <button className="btn btn-primary" type="submit">
-                <i className="fa fa-send"></i>&nbsp;Submit
-              </button>
-              <button
-                className="btn btn-secondary mx-2"
-                type="button"
-                onClick={() => closeForm(null)}
-              >
-                <i className="fa fa-cancel"></i>&nbsp;Cancel
-              </button>
+              <label htmlFor="organization_postalAddress">
+                ZipCode
+                <input
+                    className="form-control"
+                    name="organization_postalAddress_zipCode"
+                    type="text"
+                    onChange={(e) => updateForm("zipCode", e.target.value, schemas[1].properties.zipCode)}
+                    value={formData.zipCode}
+                />
+                {errors.address_zipCode &&
+                    <span className="error">{errors.address_zipCode}</span>}
+              </label>
+              <fieldset>
+                <legend>Address Town</legend>
+                <label className="radio-label">
+                  <span>Создать новую</span>
+                  <input
+                      type="radio"
+                      name="addressTownOption"
+                      checked={!formData.useExistingTown}
+                      onChange={() => updateForm('useExistingTown', false, schemas[1].properties.useExistingTown)}
+                  />
+                </label>
+                {!formData.useExistingTown && (
+                    <div className="mb-4">
+                      <label htmlFor="x">Town (X)
+                        <input
+                            className="form-control"
+                            name="x"
+                            type="number"
+                            onChange={(e) => updateObjects("town", 'x', e.target.value, schemas[0].properties.x)}
+                            value={formData.town.x}
+                        />
+                        {errors.town_x && <span className="error">{errors.town_x}</span>}
+                      </label>
+                      <label htmlFor="y">Town (Y)
+                        <input
+                            className="form-control"
+                            name="y"
+                            type="number"
+                            onChange={(e) => updateObjects("town", 'y', e.target.value, schemas[0].properties.y)}
+                            value={formData.town.y}
+                        />
+                        {errors.town_y && <span className="error">{errors.town_y}</span>}
+                        <label htmlFor="x">Town (Z)
+                          <input
+                              className="form-control"
+                              name="z"
+                              type="number"
+                              onChange={(e) => updateObjects("town", 'z', e.target.value, schemas[0].properties.z)}
+                              value={formData.town.z}
+                          />
+                          {errors.town_z &&
+                              <span className="error">{errors.town_z}</span>}
+                        </label>
+                      </label>
+                    </div>
+                )}
+                <label className="radio-label">
+                  <span>Выбрать существующие</span>
+                  <input
+                      type="radio"
+                      name="addressTownOption"
+                      checked={formData.useExistingTown}
+                      onChange={() => updateForm('useExistingTown', true, schemas[1].properties.useExistingTown)}
+                  />
+                </label>
+                {formData.useExistingTown && (
+                    <select
+                        onChange={(e) => handleObjectSelect("town", e.target.value, locationsList)}
+                        required
+                    >
+                      <option value="">Available Towns</option>
+                      {locationsList.map((location) => (
+                          <option key={location.id} value={location.id}>
+                            X: {location.x}, Y: {location.y}, Z: {location.z}
+                          </option>
+                      ))}
+                    </select>
+                )}
+                {errors.town && <span className="error">{errors.town}</span>}
+              </fieldset>
+              <hr></hr>
+              <div className="mb-4">
+                <div className="mb-4">
+                  <button className="btn btn-primary" type="submit">
+                    <i className="fa fa-send"></i>&nbsp;Submit
+                  </button>
+                  <button
+                      className="btn btn-secondary mz-2"
+                      type="button"
+                      onClick={() => closeForm(null)}
+                  >
+                    <i className="fa fa-cancel"></i>&nbsp;Cancel
+                  </button>
+                </div>
+              </div>
             </div>
           </form>
         </div>

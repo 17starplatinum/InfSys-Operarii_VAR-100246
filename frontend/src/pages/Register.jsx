@@ -11,7 +11,6 @@ export const RegisterPage = ({ setPage, setUser }) => {
 
   const submitForm = async (e) => {
     e.preventDefault();
-    console.log(formData);
     try {
       const res = await axios.post(`${V1APIURL}/auth/register`, formData);
       if (res.status !== 200) {

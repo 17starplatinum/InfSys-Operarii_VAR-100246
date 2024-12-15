@@ -1,5 +1,6 @@
 package ru.ifmo.se.dto.data;
 
+import jakarta.annotation.Nullable;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -15,6 +16,7 @@ public class AddressDTO {
     @NotNull
     private String zipCode;
 
+    @Nullable
     private LocationDTO town;
 
     private User createdBy;

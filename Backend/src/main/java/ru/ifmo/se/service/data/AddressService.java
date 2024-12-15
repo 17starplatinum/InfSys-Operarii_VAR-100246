@@ -94,14 +94,14 @@ public class AddressService {
     public AddressDTO updateAddress(Long id, AddressDTO addressDTO) {
         Address address = addressRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
 
-        Location savedLocation = locationService.createOrUpdateLocationForObjects(addressDTO.getTown());
+        if (userService.cantModifyEntity(address)) {
+            throw new IllegalArgumentException("You are not allowed to modify this Address.");
+        }
 
-        Address updatedAddress = entityMapper.toAddressEntity(addressDTO, savedLocation);
         address.setZipCode(addressDTO.getZipCode());
-        address.setTown(savedLocation);
-        address.setCreatedBy(address.getCreatedBy());
+        address.setTown(locationService.createOrUpdateLocationForObjects(addressDTO.getTown()));
 
-        Address savedAddress = addressRepository.save(updatedAddress);
+        Address savedAddress = addressRepository.save(address);
         auditService.auditAddress(savedAddress, AuditOperation.UPDATE);
         return entityMapper.toAddressDTO(savedAddress);
     }
@@ -109,7 +109,9 @@ public class AddressService {
     @Transactional
     public void deleteAddress(Long id) {
         Address address = addressRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
-
+        if (userService.cantModifyEntity(address)) {
+            throw new IllegalArgumentException("You are not allowed to delete this Address.");
+        }
         auditService.deleteAddressAudits(address.getId());
         addressRepository.delete(address);
     }
@@ -121,7 +123,9 @@ public class AddressService {
                 locationService.createOrUpdateLocationForObjects(addressDTO.getTown());
         if (addressDTO.getId() != null) {
             Address existingAddress = addressRepository.findById(addressDTO.getId()).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
-
+            if (userService.cantModifyEntity(existingAddress)) {
+                throw new IllegalArgumentException("You are not allowed to modify this Address.");
+            }
             existingAddress.setZipCode(addressDTO.getZipCode());
             existingAddress.setTown(town);
 

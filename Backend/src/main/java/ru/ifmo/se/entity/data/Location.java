@@ -17,7 +17,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Location {
+public class Location implements Creatable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;

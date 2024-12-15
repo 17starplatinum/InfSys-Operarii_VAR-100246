@@ -58,6 +58,9 @@ public class OrganizationService {
     @Transactional
     public OrganizationDTO updateOrganization(Long id, OrganizationDTO organizationDTO) {
         Organization organization = organizationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
+        if (userService.cantModifyEntity(organization)) {
+            throw new IllegalArgumentException("You are not allowed to modify this Organization.");
+        }
         Address officialAddress = addressService.createOrUpdateAddressForOrganization(organizationDTO.getOfficialAddress());
         Address postalAddress = addressService.createOrUpdateAddressForOrganization(organizationDTO.getPostalAddress());
         organization.setOfficialAddress(officialAddress);
@@ -78,6 +81,9 @@ public class OrganizationService {
         Address postalAddress = addressService.createOrUpdateAddressForOrganization(organizationDTO.getPostalAddress());
         if (organizationDTO.getId() != null) {
             Organization organization = organizationRepository.findById(organizationDTO.getId()).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
+            if (userService.cantModifyEntity(organization)) {
+                throw new IllegalArgumentException("You are not allowed to modify this Organization.");
+            }
             organization.setOfficialAddress(officialAddress);
             organization.setAnnualTurnover(organizationDTO.getAnnualTurnover());
             organization.setEmployeesCount(organizationDTO.getEmployeesCount());
@@ -100,6 +106,9 @@ public class OrganizationService {
     @Transactional
     public void deleteOrganization(Long id) {
         Organization organization = organizationRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
+        if (userService.cantModifyEntity(organization)) {
+            throw new IllegalArgumentException("You are not allowed to delete this Organization.");
+        }
         auditService.deleteOrganizationAudits(id);
         organizationRepository.delete(organization);
     }

@@ -2,8 +2,8 @@ import {ColorEnum, CountryEnum, OrganizationEnum, PositionEnum, StatusEnum} from
 
 export const locationSchema = {
     $schema: "https://json-schema.org/draft/2020-12/schema",
-    $id: "/Location",
-    type: "object",
+    "id": "/Location",
+    "type": "object",
     "properties": {
         "x": {"type": "number"},
         "y": {"type": "integer"},
@@ -24,9 +24,10 @@ export const addressSchema = {
                 {"$ref": "/Location"},
                 {"type": "null"}
             ]
-        }
+        },
+        "useExistingTown": {"type": "boolean"},
     },
-    "required": ["zipCode"]
+    "required": ["zipCode"],
 };
 export const coordinatesSchema = {
     $schema: "https://json-schema.org/draft/2020-12/schema",
@@ -35,11 +36,11 @@ export const coordinatesSchema = {
     "properties": {
         "x": {
             "type": "number",
-            "maximum": 960
+            "maximum": 990
         },
         "y": {
             "type": "integer",
-            "maximum": 12
+            "maximum": 27
         }
     }
 };
@@ -69,8 +70,9 @@ export const personSchema = {
             "type": "string",
             "enum": [`${CountryEnum.UNITED_KINGDOM}`, `${CountryEnum.FRANCE}`, `${CountryEnum.NORTH_KOREA}`]
         },
-        "required": ["eyeColor", "location", "weight", "nationality"]
-    }
+        "useExistingLocation": {"type": "boolean"}
+    },
+    "required": ["eyeColor", "location", "weight", "nationality"]
 };
 export const organizationSchema = {
     $schema: "https://json-schema.org/draft/2020-12/schema",
@@ -95,7 +97,11 @@ export const organizationSchema = {
             "type": ["string", "null"],
             "enum": [null, `${OrganizationEnum.COMMERCIAL}`, `${OrganizationEnum.PUBLIC}`, `${OrganizationEnum.GOVERNMENT}`, `${OrganizationEnum.TRUST}`, `${OrganizationEnum.PRIVATE_LIMITED_COMPANY}`]
         },
-        "postalAddress": {"$ref": "/Address"}
+        "postalAddress": {"$ref": "/Address"},
+        "useExistingOfficialAddress": {"type": "boolean"},
+        "useExistingPostalAddress": {"type": "boolean"},
+        "useExistingOfficialTown": {"type": "boolean"},
+        "useExistingPostalTown": {"type": "boolean"}
     },
     "required": ["officialAddress", "annualTurnover", "fullName", "postalAddress"]
 };

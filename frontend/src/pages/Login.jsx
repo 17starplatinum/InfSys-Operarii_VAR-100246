@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useState } from "react";
 import {V1APIURL} from "../shared/constants"
+import {getAxios} from "../shared/utils";
 
 export const LoginPage = ({setPage, setUser}) => {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -11,9 +12,8 @@ export const LoginPage = ({setPage, setUser}) => {
 
   const submitForm = async (e) => {
     e.preventDefault();
-    console.log(formData)
     try {
-      let res = await axios.post(`${V1APIURL}/auth/login`, formData)
+      let res = await axios.post(`${V1APIURL}/auth/login`, formData, getAxios())
       if (res.status !== 200) {
         alert("Wrong creds")
         return false
@@ -27,11 +27,7 @@ export const LoginPage = ({setPage, setUser}) => {
       setUser({...res.data, ...data})
     } catch (error) {
       console.log(error)
-      alert("Error, please try again.")
-      alert(
-        "Your login failed, you will be redirected to the dashboard, this is a development mode feature since we assume the backend is down or not ready."
-      );
-      setUser({ token: "###", expiration: 7000, username: formData.username });
+      alert("Error, please try again.");
     }
     return false;
   };

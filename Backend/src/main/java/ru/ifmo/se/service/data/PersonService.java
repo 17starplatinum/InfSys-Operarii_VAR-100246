@@ -53,6 +53,9 @@ public class PersonService {
     @Transactional
     public PersonDTO updatePerson(Long id, PersonDTO personDTO) {
         Person person = personRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
+        if (userService.cantModifyEntity(person)) {
+            throw new IllegalArgumentException("You are not allowed to modify this Person.");
+        }
         person.setEyeColor(personDTO.getEyeColor());
         person.setHairColor(personDTO.getHairColor());
         person.setBirthday(personDTO.getBirthday());
@@ -70,6 +73,9 @@ public class PersonService {
         Location location = locationService.createOrUpdateLocationForObjects(personDTO.getLocation());
         if (personDTO.getId() != null) {
             Person person = personRepository.findById(personDTO.getId()).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
+            if (userService.cantModifyEntity(person)) {
+                throw new IllegalArgumentException("You are not allowed to modify this Person.");
+            }
             person.setEyeColor(personDTO.getEyeColor());
             person.setHairColor(personDTO.getHairColor());
             person.setBirthday(personDTO.getBirthday());
@@ -92,7 +98,9 @@ public class PersonService {
     @Transactional
     public void deletePerson(Long id) {
         Person person = personRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
-
+        if (userService.cantModifyEntity(person)) {
+            throw new IllegalArgumentException("You are not allowed to delete this Person.");
+        }
         if (person.getWorker() != null) {
             throw new EntityDeletionException("Cannot delete this Person since it is linked to a Worker.");
         }

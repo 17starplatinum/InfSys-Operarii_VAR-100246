@@ -13,7 +13,7 @@ import ru.ifmo.se.entity.user.User;
 public class CoordinatesDTO {
     private Long id;
 
-    @Max(920)
+    @Max(990)
     private double x;
 
     @Max(27)
