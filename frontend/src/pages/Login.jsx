@@ -19,11 +19,12 @@ export const LoginPage = ({setPage, setUser}) => {
         return false
       }
       const data = {...res.data, username: formData.username}
-      res = await axios.get(`${V1APIURL}/auth/current`, { headers: { Authorization: `Bearer ${data.token}` }})
+      res = await axios.get(`${V1APIURL}/auth/current`, {headers: { Authorization: `Bearer ${data.token}` }})
       if (res.status !== 200) {
         alert("Failed to fetch user")
         return false
       }
+      localStorage.setItem("token", res.data.token)
       setUser({...res.data, ...data})
     } catch (error) {
       console.log(error)

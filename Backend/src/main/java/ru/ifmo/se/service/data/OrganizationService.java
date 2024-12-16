@@ -77,6 +77,9 @@ public class OrganizationService {
 
     @Transactional
     public Organization createOrUpdateOrganizationForWorker(OrganizationDTO organizationDTO) {
+        if(organizationDTO == null) {
+            return null;
+        }
         Address officialAddress = addressService.createOrUpdateAddressForOrganization(organizationDTO.getOfficialAddress());
         Address postalAddress = addressService.createOrUpdateAddressForOrganization(organizationDTO.getPostalAddress());
         if (organizationDTO.getId() != null) {

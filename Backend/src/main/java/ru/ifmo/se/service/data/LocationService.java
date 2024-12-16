@@ -90,9 +90,7 @@ public class LocationService {
     @Transactional
     public Location createOrUpdateLocationForObjects(LocationDTO locationDTO) {
         if(locationDTO == null) {
-            Location location = locationRepository.save(null);
-            auditService.auditLocation(location, AuditOperation.CREATE);
-            return location;
+            return null;
         }
         if (locationDTO.getId() != null) {
             Location location = locationRepository.findById(locationDTO.getId()).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
