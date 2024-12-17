@@ -644,7 +644,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
     <div className="container py-5">
       <div className="row">
         <div className="col-12">
-          <h2>{item ? "Edit Item" : "Add Item"}</h2>
+          <h2>{item ? "Редактировать" : "Добавить"}{" работника"}</h2>
         </div>
       </div>
       <div className="row">
@@ -694,9 +694,9 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                 onChange={(e) => updateFields('position', e.target.value, schemas[5].properties.position)}
                 value={formData.position}
               >
-                <option className="dropdown-item" value={PositionEnum.DIRECTOR}>Director</option>
-                <option className="dropdown-item" value={PositionEnum.LABORER}>Laborer</option>
-                <option className="dropdown-item" value={PositionEnum.BAKER}>Baker</option>
+                <option className="dropdown-item" value={PositionEnum.DIRECTOR}>Директор</option>
+                <option className="dropdown-item" value={PositionEnum.LABORER}>Пролетариат</option>
+                <option className="dropdown-item" value={PositionEnum.BAKER}>Пекарь</option>
               </select>
               {errors.position && <span className="error">{errors.position}</span>}
             </div>
@@ -709,12 +709,11 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                 value={formData.status ?? ''}
               >
                 <option className="dropdown-item" value=''>Выбрать...</option>
-                <option className="dropdown-item" value={StatusEnum.FIRED}>Fired</option>
-                <option className="dropdown-item" value={StatusEnum.HIRED}>Hired</option>
-                <option className="dropdown-item" value={StatusEnum.RECOMMENDED_FOR_PROMOTION}>Recommended For
-                  Promotion
+                <option className="dropdown-item" value={StatusEnum.FIRED}>Уволенный</option>
+                <option className="dropdown-item" value={StatusEnum.HIRED}>Нанятый</option>
+                <option className="dropdown-item" value={StatusEnum.RECOMMENDED_FOR_PROMOTION}>Рекомендован для повышения
                 </option>
-                <option className="dropdown-item" value={StatusEnum.REGULAR}>Regular</option>
+                <option className="dropdown-item" value={StatusEnum.REGULAR}>Постоянный</option>
               </select>
               {errors.status && <span className="error">{errors.status}</span>}
             </div>

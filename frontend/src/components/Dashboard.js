@@ -39,7 +39,7 @@ export const DashboardComponent = ({ setPage }) => {
             icon: "fa-solid fa-unlock",
           },
           {
-            page: "special operations",
+            page: "special",
             title: "Специальные операции",
             icon: "fa-solid fa-toolbox",
           },

@@ -19,7 +19,7 @@ export const RegisterPage = ({ setPage, setUser }) => {
       }
       alert("Регистрация произошла успешно.");
       setPage("login")
-      setUser({ ...res.data, username: formData.username });
+      return true;
     } catch (error) {
       alert(`Ошибка. ${error.status}: ${error.message}`);
     }
@@ -32,7 +32,7 @@ export const RegisterPage = ({ setPage, setUser }) => {
         <div className="col-md-6 col-lg-4 offset-lg-4 offset-md-3 py-5">
           <form onSubmit={submitForm}>
             <div className="mb-4">
-              <h2>Register</h2>
+              <h2>Регистрация</h2>
             </div>
             <div className="mb-4">
               <label htmlFor="username">Имя пользователя</label>

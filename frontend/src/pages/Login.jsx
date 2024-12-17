@@ -1,7 +1,6 @@
 import axios from "axios";
 import { useState } from "react";
 import {V1APIURL} from "../shared/constants"
-import {getAxios} from "../shared/utils";
 
 export const LoginPage = ({setPage, setUser}) => {
   const [formData, setFormData] = useState({ username: "", password: "" });
@@ -13,19 +12,20 @@ export const LoginPage = ({setPage, setUser}) => {
   const submitForm = async (e) => {
     e.preventDefault();
     try {
-      let res = await axios.post(`${V1APIURL}/auth/login`, formData, getAxios())
+      let res = await axios.post(`${V1APIURL}/auth/login`, formData)
       if (res.status !== 200) {
         alert("Неправильные данные.")
-        return false
+        return false;
       }
       const data = {...res.data, username: formData.username}
       res = await axios.get(`${V1APIURL}/auth/current`, {headers: { Authorization: `Bearer ${data.token}` }})
       if (res.status !== 200) {
         alert("Возникла ошибка при получении пользователя.")
-        return false
+        return false;
       }
       localStorage.setItem("token", res.data.token)
       setUser({...res.data, ...data})
+      return true;
     } catch (error) {
       console.log(error)
       alert(`Ошибка. ${error.status}: ${error.message}`);
@@ -39,7 +39,7 @@ export const LoginPage = ({setPage, setUser}) => {
         <div className="col-md-6 col-lg-4 offset-lg-4 offset-md-3 py-5">
           <form onSubmit={submitForm}>
             <div className="mb-4">
-              <h2>Login</h2>
+              <h2>Логин</h2>
             </div>
             <div className="mb-4">
               <label htmlFor="username">Логин</label>

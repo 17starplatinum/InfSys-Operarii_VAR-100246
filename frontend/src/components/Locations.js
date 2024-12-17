@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import { V1APIURL } from "../shared/constants";
 import axios from "axios";
-import {getAxios} from "../shared/utils";
+import {getAxios, removeKey} from "../shared/utils";
 import {locationSchema} from "./validation/ValidationSchemas";
 import {validateFields} from "./validation/Validation";
 
@@ -177,7 +177,7 @@ export const LocationsFormComponent = ({ closeForm, item }) => {
         axios.defaults.headers.common = {
           'Authorization': `Bearer ${token}`
         };
-        delete formData.createdBy.authorities;
+        formData = removeKey(formData, "authorities");
         const res = await axios[item? "put" : "post"](
             `${V1APIURL}/locations${item ?`/${item.id} `: ""}`,
             formData,

@@ -65,7 +65,7 @@ export const AccessManagement = ({ setPage }) => {
         `${V1APIURL}/auth/reject-admin/${item.id}`,
         getAxios()
       );
-      if (res.status !== 204) {
+      if (res.status !== 200) {
         alert(`Ошибка: ${res.statusText}`);
         return false;
       }
@@ -86,7 +86,7 @@ export const AccessManagement = ({ setPage }) => {
         `${V1APIURL}/auth/approve-admin/${item.id}`,
         getAxios()
       );
-      if (res.status !== 204) {
+      if (res.status !== 200) {
         alert(`Ошибка: ${res.statusText}`);
         return false;
       }
@@ -125,7 +125,7 @@ export const RequestAdminAccess = ({ setPage }) => {
         `${V1APIURL}/auth/request-admin`,
         getAxios()
       );
-      if (res.status !== 200 || res.status !== 201) {
+      if (!(res.status === 200 || res.status === 201)) {
         alert(`Ошибка: ${res.statusText}`);
         return false;
       }
@@ -141,7 +141,7 @@ export const RequestAdminAccess = ({ setPage }) => {
     <div className="container py-5">
       <div className="row">
         <div className="col-12">
-          <h2>Request Admin Access</h2>
+          <h2>Запрос для прав админа</h2>
         </div>
       </div>
       <div className="row">
