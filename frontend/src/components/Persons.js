@@ -2,38 +2,38 @@ import { useEffect, useState } from "react";
 import DataTable from "react-data-table-component";
 import {ColorEnum, CountryEnum, V1APIURL} from "../shared/constants";
 import axios from "axios";
-import {getAxios, removeKey} from "../shared/utils";
+import {getAxios, removeKey, removeKeyContains} from "../shared/utils";
 import {personSchema, locationSchema} from "./validation/ValidationSchemas";
 import {validateFields} from "./validation/Validation";
 
 export const PersonsComponent = ({ setPage }) => {
   const columns = [
     {
-      name: "id",
+      name: "ID",
       selector: (item) => item.id,
     },
     {
-      name: "eyeColor",
+      name: "Цвет глаз",
       selector: (item) => item.eyeColor,
     },
     {
-      name: "hairColor",
+      name: "Цвет волос",
       selector: (item) => item.hairColor,
     },
     {
-      name: "birthday",
+      name: "День рождения",
       selector: (item) => item.birthday,
     },
     {
-      name: "weight",
+      name: "Вес",
       selector: (item) => item.weight,
     },
     {
-      name: "nationality",
+      name: "Национальность",
       selector: (item) => item.nationality,
     },
     {
-      name: "Actions",
+      name: "Действия",
       grow: 1,
       cell: (item) => (
         <>
@@ -62,12 +62,12 @@ export const PersonsComponent = ({ setPage }) => {
     try {
       const res = await axios.get(`${V1APIURL}/people`, getAxios());
       if (res.status !== 200) {
-        alert(`Error: ${res.statusText}`);
+        alert(`Ошибка: ${res.statusText}`);
         return false;
       }
       setItems(res.data?.content || []);
     } catch (error) {
-      alert(`Error!`);
+      alert(`Ошибка! ${error.status}: ${error.message}`);
     }
   };
 
@@ -90,13 +90,13 @@ export const PersonsComponent = ({ setPage }) => {
         getAxios()
       );
       if (res.status !== 204) {
-        alert(`Error: ${res.statusText}`);
+        alert(`Ошибка: ${res.statusText}`);
         return false;
       }
-      alert("Item deleted.");
-      loadItems();
+      alert("Человек успешно удален.");
+      await loadItems();
     } catch (error) {
-      alert(`Error!`);
+      alert(`Ошибка! ${error.status}: ${error.message}`);
     }
   };
 
@@ -114,9 +114,9 @@ export const PersonsComponent = ({ setPage }) => {
       <div className="row">
         <div className="col-12">
           <h2>
-            Persons{" "}
+            Человеки{" "}
             <button className="btn btn-primary float-end" onClick={addItem}>
-              <i className="fa fa-add"></i>&nbsp;Add
+              <i className="fa fa-add"></i>&nbsp;Добавлять
             </button>
           </h2>
         </div>
@@ -171,7 +171,7 @@ export const PersonsFormComponent = ({ closeForm, item }) => {
       const response = await axios.get(`${V1APIURL}/locations`, getAxios());
       setLocationsList(response.data.content || []);
     } catch (error) {
-      alert("An error occurred while retrieving locations: ", error);
+      alert("Возникла ошибка при получении локации: ", error);
     }
   };
 
@@ -230,7 +230,7 @@ export const PersonsFormComponent = ({ closeForm, item }) => {
     e.preventDefault();
     const isValid = validatePerson();
     if (!isValid) {
-      alert('Не получилось создать Person.');
+      alert('Не получилось создать человека.');
       return;
     }
     try {
@@ -239,19 +239,20 @@ export const PersonsFormComponent = ({ closeForm, item }) => {
         'Authorization': `Bearer ${token}`
       };
       formData = removeKey(formData, "authorities");
+      removeKeyContains("useExisting");
       const res = await axios[item? "put" : "post"](
         `${V1APIURL}/people${item ? `/${item.id}` : ""}`,
         formData,
         getAxios()
       );
       if (!(res.status === 200 || res.status === 201)) {
-        alert(`Error: ${res.statusText}`);
+        alert(`Ошибка: ${res.statusText}`);
         return false;
       }
-      alert(`Item ${item ? "Updated" : "Created"}`);
+      alert(`Человек успешно ${item ? "обновлен" : "создан"}.`);
       closeForm(true);
     } catch (error) {
-      alert(`Error!`);
+      alert(`Ошибка! ${error.status}: ${error.message}`);
     }
     return false;
   };
@@ -259,37 +260,39 @@ export const PersonsFormComponent = ({ closeForm, item }) => {
   return (
     <div className="container py-5">
       <div className="row">
-        <h2>{item ? "Edit Person" : "Add Person"}</h2>
+        <h2>{item ? "Редактировать" : "Создать"}{" человека"}</h2>
         <div className="col-12">
             <form onSubmit={(e) => submitForm(e)}>
               <div className="py-5">
-                <label htmlFor="person_eyeColor">Eye Color
+                <label htmlFor="person_eyeColor">
+                  Цвет глаз
                   <select className="dropdown-menu-dark"
                           name="person_eyeColor"
                           onChange={(e) => updateFields("eyeColor", e.target.value, schemas[1].properties.eyeColor)}
                           value={formData.eyeColor}>
-                    <option className="dropdown-item" value={ColorEnum.GREEN}>Green</option>
-                    <option className="dropdown-item" value={ColorEnum.BLACK}>Black</option>
-                    <option className="dropdown-item" value={ColorEnum.BLUE}>Blue</option>
-                    <option className="dropdown-item" value={ColorEnum.ORANGE}>Orange</option>
+                    <option className="dropdown-item" value={ColorEnum.GREEN}>Зеленый</option>
+                    <option className="dropdown-item" value={ColorEnum.BLACK}>Черный</option>
+                    <option className="dropdown-item" value={ColorEnum.BLUE}>Синий</option>
+                    <option className="dropdown-item" value={ColorEnum.ORANGE}>Оранжевый</option>
                   </select>
                 </label>
                 {errors.person_eyeColor && <span className="error">{errors.person_eyeColor}</span>}
-                <label htmlFor="person_hairColor">Hair Color
+                <label htmlFor="person_hairColor">
+                  Цвет волос
                   <select className="dropdown-menu-dark"
                           name="person_hairColor"
                           onChange={(e) => updateFields("hairColor", e.target.value, schemas[1].properties.hairColor)}
                           value={formData.hairColor ?? ''}>
-                    <option className="dropdown-item" value={''}>Choose...</option>
-                    <option className="dropdown-item" value={ColorEnum.GREEN}>Green</option>
-                    <option className="dropdown-item" value={ColorEnum.BLACK}>Black</option>
-                    <option className="dropdown-item" value={ColorEnum.BLUE}>Blue</option>
-                    <option className="dropdown-item" value={ColorEnum.ORANGE}>Orange</option>
+                    <option className="dropdown-item" value={''}>Выбрать...</option>
+                    <option className="dropdown-item" value={ColorEnum.GREEN}>Зеленый</option>
+                    <option className="dropdown-item" value={ColorEnum.BLACK}>Черный</option>
+                    <option className="dropdown-item" value={ColorEnum.BLUE}>Синий</option>
+                    <option className="dropdown-item" value={ColorEnum.ORANGE}>Оранжевый</option>
                   </select>
                 </label>
                 {errors.person_hairColor && <span className="error">{errors.person_hairColor}</span>}
                 <fieldset>
-                  <legend>Location</legend>
+                  <h4>Локация</h4>
                   <label className="radio-label">
                     <span>Создать новую</span>
                     <input
@@ -302,7 +305,7 @@ export const PersonsFormComponent = ({ closeForm, item }) => {
                   {!formData.useExistingLocation && (
                       <div className="mb-4">
                         <label htmlFor="person_location_x">
-                          Location (X)
+                          X
                           <input
                               className="form-control"
                               name="person_location_x"
@@ -313,7 +316,7 @@ export const PersonsFormComponent = ({ closeForm, item }) => {
                           {errors.location_x && <span className="error">{errors.location_x}</span>}
                         </label>
                         <label htmlFor="person_location_y">
-                          Location (Y)
+                          Y
                           <input
                               className="form-control"
                               name="person_location_y"
@@ -324,7 +327,7 @@ export const PersonsFormComponent = ({ closeForm, item }) => {
                           {errors.location_y && <span className="error">{errors.location_y}</span>}
                         </label>
                         <label htmlFor="person_location_z">
-                          Location (Z)
+                          Z
                           <input
                               className="form-control"
                               name="person_location_z"
@@ -350,17 +353,18 @@ export const PersonsFormComponent = ({ closeForm, item }) => {
                           onChange={(e) => handleObjectSelect("location", e.target.value, locationsList)}
                           required
                       >
-                        <option value={null}>Choose...</option>
+                        Доступные локации
                         {locationsList.map((location) => (
                             <option key={location.id} value={location.id}>
-                              X: {location.x}, Y: {location.y}, Z: {location.z}
+                              ID: {location.id}, X: {location.x}, Y: {location.y}, Z: {location.z}
                             </option>
                         ))}
                       </select>
                   )}
                   {errors.location && <span className="error">{errors.location}</span>}
                 </fieldset>
-                <label htmlFor="person_birthday">Birthday
+                <label htmlFor="person_birthday">
+                  День рождения
                   <input
                       className="form-control"
                       name="person_birthday"
@@ -370,7 +374,8 @@ export const PersonsFormComponent = ({ closeForm, item }) => {
                   />
                   {errors.person_birthday && <span className="error">{errors.person_birthday}</span>}
                 </label>
-                <label htmlFor="person_weight">Weight
+                <label htmlFor="person_weight">
+                  Вес
                   <input
                       className="form-control"
                       name="person_weight"
@@ -381,28 +386,29 @@ export const PersonsFormComponent = ({ closeForm, item }) => {
                   />
                   {errors.person_weight && <span className="error">{errors.person_weight}</span>}
                 </label>
-                <label htmlFor="person_nationality">Nationality
+                <label htmlFor="person_nationality">
+                  Национальность
                   <select className="dropdown-menu-dark"
                           name="person_nationality"
                           onChange={(e) => updateFields("nationality", e.target.value, schemas[1].properties.nationality)}
                           value={formData.nationality}>
-                    <option className="dropdown-item" value={CountryEnum.UNITED_KINGDOM}>United Kingdom
+                    <option className="dropdown-item" value={CountryEnum.UNITED_KINGDOM}>Великобритания
                     </option>
-                    <option className="dropdown-item" value={CountryEnum.FRANCE}>France</option>
-                    <option className="dropdown-item" value={CountryEnum.NORTH_KOREA}>North Korea</option>
+                    <option className="dropdown-item" value={CountryEnum.FRANCE}>Франция</option>
+                    <option className="dropdown-item" value={CountryEnum.NORTH_KOREA}>Северная Корея</option>
                   </select>
                   {errors.person_nationality && <span className="error">{errors.person_nationality}</span>}
                 </label>
                 <div className="mb-4">
                   <button className="btn btn-primary" type="submit">
-                    <i className="fa fa-send"></i>&nbsp;Submit
+                    <i className="fa fa-send"></i>&nbsp;Отправить
                   </button>
                   <button
                       className="btn btn-secondary mx-2"
                       type="button"
                       onClick={() => closeForm(null)}
                   >
-                    <i className="fa fa-cancel"></i>&nbsp;Cancel
+                    <i className="fa fa-cancel"></i>&nbsp;Отменить
                   </button>
                 </div>
               </div>

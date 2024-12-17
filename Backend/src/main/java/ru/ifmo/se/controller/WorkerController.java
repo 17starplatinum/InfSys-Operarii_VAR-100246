@@ -65,26 +65,26 @@ public class WorkerController {
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/delete-by-person/{personId}")
-    public ResponseEntity<WorkerDTO> deleteWorkerByPerson(@PathVariable Long personId) {
+    @DeleteMapping("/delete-by-person")
+    public ResponseEntity<WorkerDTO> deleteWorkerByPerson(@RequestParam Long personId) {
         workerService.deleteWorkerByPerson(personId);
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/count-by-people/{personId}")
-    public ResponseEntity<Long> countByPeople(@PathVariable Long personId) {
+    @GetMapping("/count-by-people")
+    public ResponseEntity<Long> countByPeople(@RequestParam Long personId) {
         Long count = workerService.countWorkersByPerson(personId);
         return ResponseEntity.ok(count);
     }
 
-    @GetMapping("/count-by-less-than-rating/{rating}")
-    public ResponseEntity<Long> countByLessThanRating(@PathVariable int rating) {
+    @GetMapping("/count-by-less-than-rating")
+    public ResponseEntity<Long> countByLessThanRating(@RequestParam int rating) {
         Long count = workerService.countWorkersWithLessRating(rating);
         return ResponseEntity.ok(count);
     }
 
-    @PutMapping("/fire-worker-from-org/{workerId}")
-    public ResponseEntity<WorkerDTO> fireWorkerFromOrg(@PathVariable Long workerId) {
+    @PutMapping("/fire-worker-from-org")
+    public ResponseEntity<WorkerDTO> fireWorkerFromOrg(@RequestParam Long workerId) {
         int code = workerService.fireWorkerFromOrganization(workerId);
         if (code != 0) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
@@ -92,9 +92,9 @@ public class WorkerController {
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/transfer-worker-to-another-organization/worker={workerId}&org={organizationId}")
-    public ResponseEntity<WorkerDTO> transferWorkerToAnotherOrganization(@PathVariable Long organizationId, @PathVariable Long workerId) {
-        int code = workerService.transferWorkerToAnotherOrganization(organizationId, workerId);
+    @PutMapping("/transfer-worker-to-another-organization")
+    public ResponseEntity<WorkerDTO> transferWorkerToAnotherOrganization(@RequestParam Long orgId, @RequestParam Long workerId) {
+        int code = workerService.transferWorkerToAnotherOrganization(orgId, workerId);
         if (code != 0) {
             return ResponseEntity.status(HttpStatus.CONFLICT).build();
         }

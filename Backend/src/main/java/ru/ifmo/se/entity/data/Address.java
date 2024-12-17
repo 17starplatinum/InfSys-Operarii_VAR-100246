@@ -26,7 +26,7 @@ public class Address implements Creatable {
     @Column(name = "zip_code", nullable = false)
     private String zipCode;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "town_id")
     private Location town;
 

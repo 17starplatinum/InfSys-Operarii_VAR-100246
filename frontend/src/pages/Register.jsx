@@ -14,20 +14,14 @@ export const RegisterPage = ({ setPage, setUser }) => {
     try {
       const res = await axios.post(`${V1APIURL}/auth/register`, formData);
       if (res.status !== 200) {
-        alert("Failed to register");
+        alert(`Ошибка при регистрации: ${res.statusText}`);
         return false;
       }
-      alert("Registration successful")
+      alert("Регистрация произошла успешно.");
       setPage("login")
-
-      // setUser({ ...res.data, username: formData.username });
+      setUser({ ...res.data, username: formData.username });
     } catch (error) {
-      console.log(error);
-      alert("Error, please try again.");
-      // alert(
-      //   "Your registration failed, you will be redirected to the dashboard, this is a development mode feature since we assume the backend is down or not ready."
-      // );
-      // setUser({ token: "###", expiration: 7000, username: formData.username });
+      alert(`Ошибка. ${error.status}: ${error.message}`);
     }
     return false;
   };
@@ -41,7 +35,7 @@ export const RegisterPage = ({ setPage, setUser }) => {
               <h2>Register</h2>
             </div>
             <div className="mb-4">
-              <label htmlFor="username">Username</label>
+              <label htmlFor="username">Имя пользователя</label>
               <input
                 className="form-control"
                 name="username"
@@ -51,7 +45,7 @@ export const RegisterPage = ({ setPage, setUser }) => {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">Пароль</label>
               <input
                 className="form-control"
                 name="password"
@@ -62,13 +56,13 @@ export const RegisterPage = ({ setPage, setUser }) => {
             </div>
             <div className="mb-4 text-center">
               <button className="btn btn-primary" type="submit">
-                <i className="fa fa-sign-in"></i>&nbsp;Register
+                <i className="fa fa-sign-in"></i>&nbsp;Зарегистрироваться
               </button>
             </div>
           </form>
           <div className="mb-4 text-center">
             <button className="btn btn-link" onClick={() => setPage("login")}>
-              <i className="fa fa-user"></i>&nbsp;Login
+              <i className="fa fa-user"></i>&nbsp;Войти
             </button>
           </div>
         </div>

@@ -5,42 +5,42 @@ export const DashboardComponent = ({ setPage }) => {
         {[
           {
             page: "organizations",
-            title: "Organizations",
+            title: "Организации",
             icon: "fa fa-building",
           },
           {
             page: "workers",
-            title: "Workers",
+            title: "Работники",
             icon: "fa fa-person-digging",
           },
           {
             page: "persons",
-            title: "Persons",
+            title: "Человеки",
             icon: "fa fa-people-group",
           },
           {
             page: "addresses",
-            title: "Addresses",
+            title: "Адреса",
             icon: "fa-solid fa-map",
           },
           {
             page: "coordinates",
-            title: "Coordinates",
+            title: "Координаты",
             icon: "fa-solid fa-location-dot",
           },
           {
             page: "locations",
-            title: "Locations",
+            title: "Локации",
             icon: "fa-solid fa-location-pin",
           },
           {
             page: "access-management",
-            title: "Access Management",
+            title: "Управление правами",
             icon: "fa-solid fa-unlock",
           },
           {
             page: "special operations",
-            title: "Special Operations",
+            title: "Специальные операции",
             icon: "fa-solid fa-toolbox",
           },
         ].map((item, index) => (

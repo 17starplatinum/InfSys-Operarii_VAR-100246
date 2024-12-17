@@ -31,7 +31,6 @@ public class JWTAuthFilter extends OncePerRequestFilter {
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) {
         final String authHeader = request.getHeader("Authorization");
 
-
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -39,17 +38,13 @@ public class JWTAuthFilter extends OncePerRequestFilter {
         try {
             String jwt = authHeader.substring(7);
             String username = jwtService.extractUsername(jwt);
-
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (username != null && authentication == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
-
                 if (jwtService.validateToken(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken =
-                            new UsernamePasswordAuthenticationToken(userDetails,
-                                    null,
+                            new UsernamePasswordAuthenticationToken(userDetails, null,
                                     userDetails.getAuthorities());
-
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
                 }
@@ -60,5 +55,4 @@ public class JWTAuthFilter extends OncePerRequestFilter {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
         }
     }
-
 }

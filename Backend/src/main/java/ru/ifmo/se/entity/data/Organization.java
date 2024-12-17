@@ -26,7 +26,7 @@ public class Organization implements Creatable {
     private long id;
 
     @NotNull
-    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "legal_id", referencedColumnName = "id", nullable = false)
     private Address officialAddress;
 
@@ -47,7 +47,7 @@ public class Organization implements Creatable {
     private OrganizationType organizationType;
 
     @NotNull
-    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "postal_id", nullable = false)
     private Address postalAddress;
 

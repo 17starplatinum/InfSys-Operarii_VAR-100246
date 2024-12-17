@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import DataTable from "react-data-table-component";
 import {V1APIURL} from "../shared/constants";
 import axios from "axios";
-import {getAxios, removeKey} from "../shared/utils";
+import {getAxios, removeKey, removeKeyContains} from "../shared/utils";
 import {
   addressSchema,
   locationSchema,
@@ -16,11 +16,11 @@ export const AddressesComponent = ({ setPage }) => {
       selector: (item) => item.id,
     },
     {
-      name: "ZIP Code",
+      name: "Индекс",
       selector: (item) => item.zipCode,
     },
     {
-      name: "Actions",
+      name: "Действия",
       grow: 1,
       cell: (item) => (
         <>
@@ -49,12 +49,12 @@ export const AddressesComponent = ({ setPage }) => {
     try {
       const res = await axios.get(`${V1APIURL}/addresses`, getAxios());
       if (res.status !== 200) {
-        alert(`Error: ${res.statusText}`);
+        alert(`Ошибка: ${res.statusText}`);
         return false;
       }
       setItems((res.data?.content || []));
     } catch (error) {
-      alert(`Error!`);
+      alert(`Ошибка! ${error.status}: ${error.message}`);
     }
   };
 
@@ -77,13 +77,13 @@ export const AddressesComponent = ({ setPage }) => {
         getAxios()
       );
       if (res.status !== 204) {
-        alert(`Error: ${res.statusText}`);
+        alert(`Ошибка: ${res.statusText}`);
         return false;
       }
-      alert("Item deleted.");
-      loadItems();
+      alert("Адрес успешно удален.");
+      await loadItems();
     } catch (error) {
-      alert(`Error!`);
+      alert(`Ошибка! ${error.status}: ${error.message}`);
     }
   };
 
@@ -101,9 +101,9 @@ export const AddressesComponent = ({ setPage }) => {
       <div className="row">
         <div className="col-12">
           <h2>
-            Addresses{" "}
+            Адреса{" "}
             <button className="btn btn-primary float-end" onClick={addItem}>
-              <i className="fa fa-add"></i>&nbsp;Add
+              <i className="fa fa-add"></i>&nbsp;Добавлять
             </button>
           </h2>
         </div>
@@ -120,10 +120,11 @@ export const AddressesComponent = ({ setPage }) => {
 export const AddressesFormComponent = ({ closeForm, item }) => {
   let [formData, setFormData] = useState({
     zipCode: "",
-    town: { x: 0, y: 0, z: 0 },
+    town: null,
     useExistingTown: false
   });
 
+  const [useTown, setUseTown] = useState(false);
   const [errors, setErrors] = useState([]);
   let Validator = require('jsonschema').Validator;
   let v = new Validator();
@@ -156,8 +157,16 @@ export const AddressesFormComponent = ({ closeForm, item }) => {
       const response = await axios.get(`${V1APIURL}/locations`, getAxios());
       setLocationsList(response.data.content || []);
     } catch (error) {
-      alert("An error occurred while retrieving locations: ", error);
+      alert("Возникла ошибка при получении городков: ", error);
     }
+  };
+  const changeTownState = (e, state) => {
+    e.preventDefault();
+    setUseTown((state !== null));
+    setFormData(prevState => ({
+      ...prevState,
+      town: state
+    }))
   };
 
   const handleObjectSelect = (objectProperty, value, list) => {
@@ -166,6 +175,13 @@ export const AddressesFormComponent = ({ closeForm, item }) => {
       ...prevState,
       town: focusedObject
     }));
+    setFormData(prevState => ({
+      ...prevState,
+      town: {
+        ...prevState.town,
+        id: focusedObject.id
+      }
+    }))
     setErrors(prevErrors => ({...prevErrors, town: ""}))
   };
 
@@ -215,7 +231,7 @@ export const AddressesFormComponent = ({ closeForm, item }) => {
     e.preventDefault();
     const isValid = validateAddress();
     if (!isValid) {
-      alert('Не получилось создать Address.');
+      alert('Не получилось создать адрес.');
       return;
     }
     try {
@@ -223,7 +239,9 @@ export const AddressesFormComponent = ({ closeForm, item }) => {
       axios.defaults.headers.common = {
         'Authorization': `Bearer ${token}`
       };
+
       formData = removeKey(formData, "authorities");
+      removeKeyContains(formData, "useExisting");
       const res = await axios[item? "put" : "post"](
           `${V1APIURL}/addresses${item ?`/${item.id} `: ""}`,
           formData,
@@ -231,13 +249,13 @@ export const AddressesFormComponent = ({ closeForm, item }) => {
       );
 
       if (!(res.status === 200 || res.status === 201)) {
-        alert(`Error: ${res.statusText}`);
+        alert(`Ошибка: ${res.statusText}`);
         return false;
       }
-      alert(`Item ${item ? "Updated" : "Created"}`);
+      alert(`Адрес успешно ${item ? "обновлен" : "создан"}.`);
       closeForm(true);
     } catch (error) {
-      alert(`Error!`);
+      alert(`Ошибка! ${error.status}: ${error.message}`);
     }
     return false;
   };
@@ -246,7 +264,7 @@ export const AddressesFormComponent = ({ closeForm, item }) => {
     <div className="container py-5">
       <div className="row">
         <div className="col-12">
-          <h2>{item ? "Edit Item" : "Add Item"}</h2>
+          <h2>{item ? "Редактировать" : "Создать"}{" адрес"}</h2>
         </div>
       </div>
       <div className="row">
@@ -254,7 +272,7 @@ export const AddressesFormComponent = ({ closeForm, item }) => {
           <form onSubmit={submitForm}>
             <div className="mb-4">
               <label htmlFor="organization_postalAddress">
-                ZipCode
+                Почтовый индекс
                 <input
                     className="form-control"
                     name="organization_postalAddress_zipCode"
@@ -265,88 +283,106 @@ export const AddressesFormComponent = ({ closeForm, item }) => {
                 {errors.address_zipCode &&
                     <span className="error">{errors.address_zipCode}</span>}
               </label>
-              <fieldset>
-                <legend>Address Town</legend>
-                <label className="radio-label">
-                  <span>Создать новую</span>
-                  <input
-                      type="radio"
-                      name="addressTownOption"
-                      checked={!formData.useExistingTown}
-                      onChange={() => updateForm('useExistingTown', false, schemas[1].properties.useExistingTown)}
-                  />
-                </label>
-                {!formData.useExistingTown && (
-                    <div className="mb-4">
-                      <label htmlFor="x">Town (X)
-                        <input
+              <div className="mb-4">
+                <h3>Городок адреса</h3>
+                {useTown ? null :
+                  <button
+                    className="btn btn-primary" onClick={(e) =>
+                  changeTownState(e, { id: "", x: 0, y: 0, z: 0 })}>Добавить
+                  </button>
+                }
+                {useTown && (
+                  <fieldset>
+                    <label className="radio-label">
+                      <span>Создать новую</span>
+                      <input
+                        type="radio"
+                        name="addressTownOption"
+                        checked={!formData.useExistingTown}
+                        onChange={() => updateForm('useExistingTown', false, schemas[1].properties.useExistingTown)}
+                      />
+                      {
+                        useTown ? <button
+                          className="btn btn-danger" onClick={(e) =>
+                          changeTownState(e, null)}>Закрыть
+                        </button> : null
+                      }
+                    </label>
+                    {!formData.useExistingTown && (
+                      <div className="mb-4">
+                        <label htmlFor="x">X
+                          <input
                             className="form-control"
                             name="x"
                             type="number"
                             onChange={(e) => updateObjects("town", 'x', e.target.value, schemas[0].properties.x)}
                             value={formData.town.x}
-                        />
-                        {errors.town_x && <span className="error">{errors.town_x}</span>}
-                      </label>
-                      <label htmlFor="y">Town (Y)
-                        <input
+                          />
+                          {errors.town_x && <span className="error">{errors.town_x}</span>}
+                        </label>
+                        <label htmlFor="y">Y
+                          <input
                             className="form-control"
                             name="y"
                             type="number"
                             onChange={(e) => updateObjects("town", 'y', e.target.value, schemas[0].properties.y)}
                             value={formData.town.y}
-                        />
-                        {errors.town_y && <span className="error">{errors.town_y}</span>}
-                        <label htmlFor="x">Town (Z)
-                          <input
+                          />
+                          {errors.town_y && <span className="error">{errors.town_y}</span>}
+                          <label htmlFor="z">Z
+                            <input
                               className="form-control"
                               name="z"
                               type="number"
                               onChange={(e) => updateObjects("town", 'z', e.target.value, schemas[0].properties.z)}
                               value={formData.town.z}
-                          />
-                          {errors.town_z &&
+                            />
+                            {errors.town_z &&
                               <span className="error">{errors.town_z}</span>}
+                          </label>
                         </label>
-                      </label>
-                    </div>
-                )}
-                <label className="radio-label">
-                  <span>Выбрать существующие</span>
-                  <input
-                      type="radio"
-                      name="addressTownOption"
-                      checked={formData.useExistingTown}
-                      onChange={() => updateForm('useExistingTown', true, schemas[1].properties.useExistingTown)}
-                  />
-                </label>
-                {formData.useExistingTown && (
-                    <select
+                      </div>
+                    )}
+                    <label className="radio-label">
+                      <span>Выбрать существующего</span>
+                      <input
+                        type="radio"
+                        name="addressTownOption"
+                        checked={formData.useExistingTown}
+                        onChange={() => updateForm('useExistingTown', true, schemas[1].properties.useExistingTown)}
+                      />
+                    </label>
+                    {formData.useExistingTown && (
+                      <select
                         onChange={(e) => handleObjectSelect("town", e.target.value, locationsList)}
                         required
-                    >
-                      <option value="">Available Towns</option>
-                      {locationsList.map((location) => (
+                      >
+                        Доступные городки
+                        <option value="">Выбрать...</option>
+                        {locationsList.map((location) => (
                           <option key={location.id} value={location.id}>
-                            X: {location.x}, Y: {location.y}, Z: {location.z}
+                            ID: {location.id}, X: {location.x}, Y: {location.y}, Z: {location.z}
                           </option>
-                      ))}
-                    </select>
+                        ))}
+                      </select>
+                    )}
+                    {errors.town && <span className="error">{errors.town}</span>}
+                  </fieldset>
                 )}
-                {errors.town && <span className="error">{errors.town}</span>}
-              </fieldset>
+              </div>
+
               <hr></hr>
               <div className="mb-4">
                 <div className="mb-4">
                   <button className="btn btn-primary" type="submit">
-                    <i className="fa fa-send"></i>&nbsp;Submit
+                    <i className="fa fa-send"></i>&nbsp;Отправить
                   </button>
                   <button
-                      className="btn btn-secondary mz-2"
-                      type="button"
-                      onClick={() => closeForm(null)}
+                    className="btn btn-secondary mz-2"
+                    type="button"
+                    onClick={() => closeForm(null)}
                   >
-                    <i className="fa fa-cancel"></i>&nbsp;Cancel
+                    <i className="fa fa-cancel"></i>&nbsp;Отменить
                   </button>
                 </div>
               </div>

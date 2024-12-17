@@ -101,7 +101,7 @@ public class PersonService {
         if (userService.cantModifyEntity(person)) {
             throw new IllegalArgumentException("You are not allowed to delete this Person.");
         }
-        if (person.getWorker() != null) {
+        if (!person.getWorkers().isEmpty()) {
             throw new EntityDeletionException("Cannot delete this Person since it is linked to a Worker.");
         }
 

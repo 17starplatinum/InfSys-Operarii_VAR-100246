@@ -15,20 +15,20 @@ export const LoginPage = ({setPage, setUser}) => {
     try {
       let res = await axios.post(`${V1APIURL}/auth/login`, formData, getAxios())
       if (res.status !== 200) {
-        alert("Wrong creds")
+        alert("Неправильные данные.")
         return false
       }
       const data = {...res.data, username: formData.username}
       res = await axios.get(`${V1APIURL}/auth/current`, {headers: { Authorization: `Bearer ${data.token}` }})
       if (res.status !== 200) {
-        alert("Failed to fetch user")
+        alert("Возникла ошибка при получении пользователя.")
         return false
       }
       localStorage.setItem("token", res.data.token)
       setUser({...res.data, ...data})
     } catch (error) {
       console.log(error)
-      alert("Error, please try again.");
+      alert(`Ошибка. ${error.status}: ${error.message}`);
     }
     return false;
   };
@@ -42,22 +42,22 @@ export const LoginPage = ({setPage, setUser}) => {
               <h2>Login</h2>
             </div>
             <div className="mb-4">
-              <label htmlFor="username">Username</label>
+              <label htmlFor="username">Логин</label>
               <input className="form-control" name="username" type="text" onChange={updateForm} required={true} />
             </div>
             <div className="mb-4">
-              <label htmlFor="password">Password</label>
+              <label htmlFor="password">Пароль</label>
               <input className="form-control" name="password" type="password" onChange={updateForm} required={true} />
             </div>
             <div className="mb-4 text-center">
               <button className="btn btn-primary" type="submit">
-                <i className="fa fa-sign-in"></i>&nbsp;Login
+                <i className="fa fa-sign-in"></i>&nbsp;Войти
               </button>
             </div>
           </form>
             <div className="mb-4 text-center">
               <button className="btn btn-link" onClick={() => setPage("register")}>
-                <i className="fa fa-user"></i>&nbsp;Register
+                <i className="fa fa-user"></i>&nbsp;Зарегистрироваться
               </button>
             </div>
         </div>

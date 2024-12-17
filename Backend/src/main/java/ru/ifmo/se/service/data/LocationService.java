@@ -118,7 +118,7 @@ public class LocationService {
         if (userService.cantModifyEntity(location)) {
             throw new IllegalArgumentException("You are not allowed to delete this Location.");
         }
-        if (location.getPerson() != null) {
+        if (!location.getPeople().isEmpty()) {
             throw new EntityDeletionException("Cannot delete this Location since it is linked to a Person.");
         }
         auditService.deleteLocationAudits(location.getId());

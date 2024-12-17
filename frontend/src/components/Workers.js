@@ -2,7 +2,7 @@ import {useEffect, useState} from "react";
 import DataTable from "react-data-table-component";
 import {ColorEnum, CountryEnum, OrganizationEnum, PositionEnum, StatusEnum, V1APIURL} from "../shared/constants";
 import axios from "axios";
-import {getAxios, removeKey} from "../shared/utils";
+import {getAxios, removeKey, removeKeyContains} from "../shared/utils";
 import {
   addressSchema,
   coordinatesSchema,
@@ -16,31 +16,31 @@ import {validateFields} from "./validation/Validation";
 export const WorkersComponent = ({setPage}) => {
   const columns = [
     {
-      name: "id",
+      name: "ID",
       selector: (item) => item.id
     },
     {
-      name: "name",
+      name: "Имя",
       selector: (item) => item.name
     },
     {
-      name: "salary",
+      name: "Зарплата",
       selector: (item) => item.salary
     },
     {
-      name: "rating",
+      name: "Рейтинг",
       selector: (item) => item.rating
     },
     {
-      name: "position",
+      name: "Позиция",
       selector: (item) => item.position
     },
     {
-      name: "status",
+      name: "Статус",
       selector: (item) => item.status
     },
     {
-      name: "Actions",
+      name: "Действия",
       grow: 1,
       cell: (item) => (
         <>
@@ -69,12 +69,12 @@ export const WorkersComponent = ({setPage}) => {
     try {
       const res = await axios.get(`${V1APIURL}/workers`, getAxios());
       if (res.status !== 200) {
-        alert(`Error: ${res.statusText}`);
+        alert(`Ошибка: ${res.statusText}`);
         return false;
       }
       setItems((res.data?.content || []));
     } catch (error) {
-      alert(`Error!`);
+      alert(`Ошибка! ${error.status}: ${error.message}`);
     }
   };
 
@@ -94,13 +94,13 @@ export const WorkersComponent = ({setPage}) => {
     try {
       const res = await axios.delete(`${V1APIURL}/workers/${item.id}`, getAxios());
       if (res.status !== 204) {
-        alert(`Error: ${res.statusText}`);
+        alert(`Ошибка: ${res.statusText}`);
         return false;
       }
-      alert("Item deleted.");
+      alert("Работник удален.");
       loadItems();
     } catch (error) {
-      alert(`Error!`);
+      alert(`Ошибка! ${error.status}: ${error.message}`);
     }
   };
 
@@ -120,7 +120,7 @@ export const WorkersComponent = ({setPage}) => {
           <h2>
             Workers{" "}
             <button className="btn btn-primary float-end" onClick={addItem}>
-              <i className="fa fa-add"></i>&nbsp;Add
+              <i className="fa fa-add"></i>&nbsp;Добавлять
             </button>
           </h2>
         </div>
@@ -142,15 +142,16 @@ export const WorkersFormComponent = ({closeForm, item}) => {
     rating: 1,
     position: "LABORER",
     status: null,
-    coordinates: {x: 0, y: 0},
+    coordinates: {id: "", x: 0, y: 0},
     organization: null,
     person: {
+      id: "",
       eyeColor: "BLACK",
       hairColor: null,
       birthday: null,
       weight: 1,
       nationality: "UNITED_KINGDOM",
-      location: {x: 0, y: 0, z: 0},
+      location: {id: "", x: 0, y: 0, z: 0}
     },
     useExistingCoordinates: false,
     useExistingOrganization: false,
@@ -163,12 +164,13 @@ export const WorkersFormComponent = ({closeForm, item}) => {
   });
 
   let organization = {
+    id: "",
     annualTurnover: 1,
     employeesCount: 1,
     fullName: null,
     organizationType: null,
-    postalAddress: {zipCode: "g684grer", town: null},
-    officialAddress: {zipCode: "6weg8we5", town: null},
+    postalAddress: {id: "", zipCode: "g684grer", town: null},
+    officialAddress: {id: "", zipCode: "6weg8we5", town: null},
   };
 
   const [useOrganization, setUseOrganization] = useState(false);
@@ -251,45 +253,6 @@ export const WorkersFormComponent = ({closeForm, item}) => {
     }
   };
 
-  const changeOrganizationState = (e, state) => {
-    e.preventDefault();
-    setUseOrganization((state !== null));
-    setFormData(prevState => ({
-      ...prevState,
-      organization: state
-    }));
-  }
-
-  const changeOfficialTownState = (e, state) => {
-    e.preventDefault();
-    setUseOfficialTown((state !== null));
-    setFormData(prevState => ({
-      ...prevState,
-      organization: {
-        ...prevState.organization,
-        officialAddress: {
-          ...prevState.organization.officialAddress,
-          town: state
-        }
-      }
-    }));
-  }
-
-  const changePostalTownState = (e, state) => {
-    e.preventDefault();
-    setUsePostalTown((state !== null));
-    setFormData(prevState => ({
-      ...prevState,
-      organization: {
-        ...prevState.organization,
-        postalAddress: {
-          ...prevState.organization.postalAddress,
-          town: state
-        }
-      }
-    }));
-  }
-
   const getPeople = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -329,13 +292,59 @@ export const WorkersFormComponent = ({closeForm, item}) => {
     }
   };
 
+  const changeOrganizationState = (e, state) => {
+    e.preventDefault();
+    setUseOrganization((state !== null));
+    setFormData(prevState => ({
+      ...prevState,
+      organization: state
+    }));
+  }
+
+  const changeOfficialTownState = (e, state) => {
+    e.preventDefault();
+    setUseOfficialTown((state !== null));
+    setFormData(prevState => ({
+      ...prevState,
+      organization: {
+        ...prevState.organization,
+        officialAddress: {
+          ...prevState.organization.officialAddress,
+          town: state
+        }
+      }
+    }));
+  }
+
+  const changePostalTownState = (e, state) => {
+    e.preventDefault();
+    setUsePostalTown((state !== null));
+    setFormData(prevState => ({
+      ...prevState,
+      organization: {
+        ...prevState.organization,
+        postalAddress: {
+          ...prevState.organization.postalAddress,
+          town: state
+        }
+      }
+    }));
+  }
+
   const handleObjectSelect = (objectProperty, value, list) => {
     const focusedObject = list.find(obj => obj.id === Number(value));
     switch (objectProperty) {
       case "person":
         setFormData(prevState => ({
           ...prevState,
-          person: focusedObject
+          person: focusedObject,
+        }));
+        setFormData(prevState => ({
+          ...prevState,
+          person: {
+            ...prevState.person,
+            id: focusedObject.id
+          }
         }));
         setErrors(prevErrors => ({...prevErrors, person: ""}))
         break;
@@ -344,12 +353,26 @@ export const WorkersFormComponent = ({closeForm, item}) => {
           ...prevState,
           organization: focusedObject
         }));
+        setFormData(prevState => ({
+          ...prevState,
+          organization: {
+            ...prevState.organization,
+            id: focusedObject.id
+          }
+        }));
         setErrors(prevErrors => ({...prevErrors, organization: ""}))
         break;
       case "coordinates":
         setFormData(prevState => ({
           ...prevState,
           coordinates: focusedObject
+        }));
+        setFormData(prevState => ({
+          ...prevState,
+          coordinates: {
+            ...prevState.coordinates,
+            id: focusedObject.id
+          }
         }));
         setErrors(prevErrors => ({...prevErrors, coordinates: ""}))
         break;
@@ -360,6 +383,16 @@ export const WorkersFormComponent = ({closeForm, item}) => {
             officialAddress: focusedObject
           }
         }));
+        setFormData(prevState => ({
+          ...prevState,
+          organization: {
+            ...prevState.organization,
+            officialAddress: {
+              ...prevState.organization.officialAddress,
+              id: focusedObject.id
+            }
+          }
+        }));
         setErrors(prevErrors => ({...prevErrors, officialAddress: ""}))
         break;
       case "postalAddress":
@@ -367,6 +400,16 @@ export const WorkersFormComponent = ({closeForm, item}) => {
           ...prevState,
           organization: {
             postalAddress: focusedObject
+          }
+        }));
+        setFormData(prevState => ({
+          ...prevState,
+          organization: {
+            ...prevState.organization,
+            officialAddress: {
+              ...prevState.organization.postalAddress,
+              id: focusedObject.id
+            }
           }
         }));
         setErrors(prevErrors => ({...prevErrors, postalAddress: ""}))
@@ -380,6 +423,19 @@ export const WorkersFormComponent = ({closeForm, item}) => {
             }
           }
         }));
+        setFormData(prevState => ({
+          ...prevState,
+          organization: {
+            ...prevState.organization,
+            officialAddress: {
+              ...prevState.organization.officialAddress,
+              town: {
+                ...prevState.organization.officialAddress.town,
+                id: focusedObject.id
+              }
+            }
+          }
+        }));
         setErrors(prevErrors => ({...prevErrors, officialTown: ""}))
         break;
       case "postalTown":
@@ -388,6 +444,19 @@ export const WorkersFormComponent = ({closeForm, item}) => {
           organization: {
             postalAddress: {
               town: focusedObject
+            }
+          }
+        }));
+        setFormData(prevState => ({
+          ...prevState,
+          organization: {
+            ...prevState.organization,
+            officialAddress: {
+              ...prevState.organization.officialAddress,
+              town: {
+                ...prevState.organization.officialAddress.town,
+                id: focusedObject.id
+              }
             }
           }
         }));
@@ -419,20 +488,23 @@ export const WorkersFormComponent = ({closeForm, item}) => {
       axios.defaults.headers.common = {
         'Authorization': `Bearer ${token}`
       };
+      // Request body cleanup
       formData = removeKey(formData, "authorities");
+      removeKeyContains(formData, "useExisting");
+
       const res = await axios[item ? "put" : "post"](
         `${V1APIURL}/workers${item ? `/${item.id} ` : ""}`,
         formData,
         getAxios()
       );
       if (!(res.status === 200 || res.status === 201)) {
-        alert(`Error: ${res.statusText}`);
+        alert(`Ошибка: ${res.statusText}`);
         return false;
       }
-      alert(`Item ${item ? "Updated" : "Created"}`);
+      alert(`Работник ${item ? "обновлен" : "создан"}.`);
       closeForm(true);
     } catch (error) {
-      alert(`Error!`);
+      alert(`Ошибка! ${error.status}: ${error.message}`);
     }
     return false;
   };
@@ -579,7 +651,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
         <div className="col-12">
           <form onSubmit={(e) => submitForm(e)}>
             <div className="mb-4">
-              <label htmlFor="Name">name</label>
+              <label htmlFor="Name">Имя</label>
               <input
                 className="form-control"
                 name="name"
@@ -591,7 +663,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
               {errors.name && <span className="Error">{errors.name}</span>}
             </div>
             <div className="mb-4">
-              <label htmlFor="Salary">salary</label>
+              <label htmlFor="Salary">Зарплата</label>
               <input
                 className="form-control"
                 name="salary"
@@ -602,7 +674,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="Rating">rating</label>
+              <label htmlFor="Rating">Рейтинг</label>
               <input
                 className="form-control"
                 name="rating"
@@ -615,7 +687,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
               {errors.rating && <span className="error">{errors.rating}</span>}
             </div>
             <div className="mb-4 dropdown">
-              <label htmlFor="Position">Position</label>
+              <label htmlFor="Position">Позиция</label>
               <select
                 className="dropdown-menu-dark"
                 name="position"
@@ -629,14 +701,14 @@ export const WorkersFormComponent = ({closeForm, item}) => {
               {errors.position && <span className="error">{errors.position}</span>}
             </div>
             <div className="mb-4 dropdown">
-              <label htmlFor="Status">Status</label>
+              <label htmlFor="Status">Статус</label>
               <select
                 className="dropdown-menu-dark"
                 name="status"
                 onChange={(e) => updateFields('status', e.target.value, schemas[5].properties.status)}
                 value={formData.status ?? ''}
               >
-                <option className="dropdown-item" value=''>Choose...</option>
+                <option className="dropdown-item" value=''>Выбрать...</option>
                 <option className="dropdown-item" value={StatusEnum.FIRED}>Fired</option>
                 <option className="dropdown-item" value={StatusEnum.HIRED}>Hired</option>
                 <option className="dropdown-item" value={StatusEnum.RECOMMENDED_FOR_PROMOTION}>Recommended For
@@ -648,9 +720,9 @@ export const WorkersFormComponent = ({closeForm, item}) => {
             </div>
             <hr></hr>
             <fieldset>
-              <legend>Coordinates</legend>
+              <h4>Координаты</h4>
               <label className="radio-label">
-                <span>Create new</span>
+                <span>Создать новую</span>
                 <input
                   type="radio"
                   name="coordinatesOption"
@@ -660,7 +732,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
               </label>
               {!formData.useExistingCoordinates && (
                 <div className="mb-4">
-                  <label htmlFor="x">Coordinates (X)
+                  <label htmlFor="x">X
                     <input
                       className="form-control"
                       name="x"
@@ -672,7 +744,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                     />
                     {errors.coordinates_x && <span className="error">{errors.coordinates_x}</span>}
                   </label>
-                  <label htmlFor="y">Coordinates (Y)
+                  <label htmlFor="y">Y
                     <input
                       className="form-control"
                       name="y"
@@ -686,7 +758,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                 </div>
               )}
               <label className="radio-label">
-                <span>Выбрать существующие</span>
+                <span>Выбрать существующего</span>
                 <input
                   type="radio"
                   name="coordinatesOption"
@@ -699,10 +771,10 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                   onChange={(e) => handleObjectSelect("coordinates", e.target.value, coordinatesList)}
                   required
                 >
-                  <option value="">Available Coordinates</option>
+                  Доступные координаты
                   {coordinatesList.map((coords) => (
                     <option key={coords.id} value={coords.id}>
-                      X: {coords.x}, Y: {coords.y}
+                      ID: {coords.id}, X: {coords.x}, Y: {coords.y}
                     </option>
                   ))}
                 </select>
@@ -736,7 +808,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                   {!formData.useExistingOrganization && (
                     <div className="mb-4">
                       <fieldset>
-                        <legend>Official Address</legend>
+                        <legend>Юридический адрес</legend>
                         <label className="radio-label">
                           <span>Создать новую</span>
                           <input
@@ -749,7 +821,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                         {!formData.useExistingOfficialAddress && (
                           <div className="mb-4">
                             <label htmlFor="organization_officialAddress">
-                              ZipCode
+                              Почтовый индекс
                               <input
                                 className="form-control"
                                 name="organization_officialAddress_zipCode"
@@ -787,7 +859,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                                   </label>
                                   {!formData.useExistingOfficialTown && (
                                     <div className="mb-4">
-                                      <label htmlFor="x">Town (X)
+                                      <label htmlFor="x">X
                                         <input
                                           className="form-control"
                                           name="x"
@@ -798,7 +870,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                                         {errors.officialTown_x &&
                                           <span className="error">{errors.officialTown_x}</span>}
                                       </label>
-                                      <label htmlFor="y">Town (Y)
+                                      <label htmlFor="y">Y
                                         <input
                                           className="form-control"
                                           name="y"
@@ -808,7 +880,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                                         />
                                         {errors.officialTown_y &&
                                           <span className="error">{errors.officialTown_y}</span>}
-                                        <label htmlFor="x">Town (Z)
+                                        <label htmlFor="z">Z
                                           <input
                                             className="form-control"
                                             name="z"
@@ -823,7 +895,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                                     </div>
                                   )}
                                   <label className="radio-label">
-                                    <span>Выбрать существующие</span>
+                                    <span>Выбрать существующего</span>
                                     <input
                                       type="radio"
                                       name="officialAddressTownOption"
@@ -836,10 +908,11 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                                       onChange={(e) => handleObjectSelect("officialTown", e.target.value, locationsList)}
                                       required
                                     >
-                                      <option value="">Available Towns</option>
+                                      Доступные городки
+                                      <option value="">Выбрать...</option>
                                       {locationsList.map((location) => (
                                         <option key={location.id} value={location.id}>
-                                          X: {location.x}, Y: {location.y}, Z: {location.z}
+                                          ID: {location.id}, X: {location.x}, Y: {location.y}, Z: {location.z}
                                         </option>
                                       ))}
                                     </select>
@@ -864,9 +937,10 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                             onChange={(e) => handleObjectSelect("officialAddress", e.target.value, addressesList)}
                             required
                           >
+                            Доступные адреса
                             {addressesList.map((address) => (
                               <option key={address.id} value={address.id}>
-                                ZipCode: {address.zipCode}
+                                ID: {address.id}, Почтовый индекс: {address.zipCode}
                               </option>
                             ))}
                           </select>
@@ -874,7 +948,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                         {errors.officialAddress && <span className="error">{errors.officialAddress}</span>}
                       </fieldset>
                       <label htmlFor="organization_annualTurnover">
-                        Annual Turnover
+                        Годовой оборот
                         <input
                           className="form-control"
                           name="organization_annualTurnover"
@@ -886,7 +960,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                           <span className="error">{errors.organization_annualTurnover}</span>}
                       </label>
                       <label htmlFor="organization_employeesCount">
-                        Employees Count
+                        Количество работников
                         <input
                           className="form-control"
                           name="organization_employeesCount"
@@ -899,7 +973,8 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                         {errors.organization_employeesCount &&
                           <span className="error">{errors.organization_employeesCount}</span>}
                       </label>
-                      <label htmlFor="organization_fullName">Full Name
+                      <label htmlFor="organization_fullName">
+                        Полное название
                         <input
                           className="form-control"
                           name="organization_fullName"
@@ -911,21 +986,22 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                         {errors.organization_fullName &&
                           <span className="error">{errors.organization_fullName}</span>}
                       </label>
-                      <label htmlFor="organization_type">Organization Type
+                      <label htmlFor="organization_type">
+                        Тип организации
                         <select
                           className="dropdown-menu-dark"
                           name="organization_type"
                           onChange={(e) => updateObjects("organization", "organizationType", e.target.value, schemas[4].properties.organizationType)}
                           value={formData.organization.organizationType ?? ''}
                         >
-                          <option className="dropdown-item" value={null}>Choose...</option>
-                          <option className="dropdown-item" value={OrganizationEnum.COMMERCIAL}>Commercial</option>
-                          <option className="dropdown-item" value={OrganizationEnum.PUBLIC}>Public</option>
-                          <option className="dropdown-item" value={OrganizationEnum.GOVERNMENT}>Government</option>
-                          <option className="dropdown-item" value={OrganizationEnum.TRUST}>Trust</option>
-                          <option className="dropdown-item" value={OrganizationEnum.PRIVATE_LIMITED_COMPANY}>Private
-                            Limited
-                            Company
+                          <option className="dropdown-item" value={OrganizationEnum.COMMERCIAL}>Коммерческий
+                          </option>
+                          <option className="dropdown-item" value={OrganizationEnum.PUBLIC}>Госсектор</option>
+                          <option className="dropdown-item" value={OrganizationEnum.GOVERNMENT}>Власть
+                          </option>
+                          <option className="dropdown-item" value={OrganizationEnum.TRUST}>Трест</option>
+                          <option className="dropdown-item"
+                                  value={OrganizationEnum.PRIVATE_LIMITED_COMPANY}>ООО
                           </option>
                         </select>
                         {errors.organization_organizationType &&
@@ -933,7 +1009,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                       </label>
                       <hr></hr>
                       <fieldset>
-                        <legend>Postal Address</legend>
+                        <legend>Почтовый адрес</legend>
                         <label className="radio-label">
                           <span>Создать новую</span>
                           <input
@@ -946,7 +1022,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                         {!formData.useExistingPostalAddress && (
                           <div className="mb-4">
                             <label htmlFor="organization_postalAddress">
-                              ZipCode
+                              Почтовый индекс
                               <input
                                 className="form-control"
                                 name="organization_postalAddress_zipCode"
@@ -983,7 +1059,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                                   </label>
                                   {!formData.useExistingPostalTown && (
                                     <div className="mb-4">
-                                      <label htmlFor="x">Town (X)
+                                      <label htmlFor="x">X
                                         <input
                                           className="form-control"
                                           name="x"
@@ -993,7 +1069,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                                         />
                                         {errors.postalTown_x && <span className="error">{errors.postalTown_x}</span>}
                                       </label>
-                                      <label htmlFor="y">Town (Y)
+                                      <label htmlFor="y">Y
                                         <input
                                           className="form-control"
                                           name="y"
@@ -1002,7 +1078,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                                           value={formData.organization.postalAddress.town.y}
                                         />
                                         {errors.postalTown_y && <span className="error">{errors.postalTown_y}</span>}
-                                        <label htmlFor="x">Town (Z)
+                                        <label htmlFor="z">Z
                                           <input
                                             className="form-control"
                                             name="z"
@@ -1017,7 +1093,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                                     </div>
                                   )}
                                   <label className="radio-label">
-                                    <span>Выбрать существующие</span>
+                                    <span>Выбрать существующего</span>
                                     <input
                                       type="radio"
                                       name="postalAddressTownOption"
@@ -1030,10 +1106,11 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                                       onChange={(e) => handleObjectSelect("postalTown", e.target.value, locationsList)}
                                       required
                                     >
-                                      <option value="">Available Towns</option>
+                                      Доступные городки
+                                      <option value="">Выбрать...</option>
                                       {locationsList.map((location) => (
                                         <option key={location.id} value={location.id}>
-                                          X: {location.x}, Y: {location.y}, Z: {location.z}
+                                          ID: {location.id}, X: {location.x}, Y: {location.y}, Z: {location.z}
                                         </option>
                                       ))}
                                     </select>
@@ -1057,9 +1134,10 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                                   onChange={(e) => handleObjectSelect("postalAddress", e.target.value, addressesList)}
                                   required
                                 >
+                                  Доступные адреса
                                   {addressesList.map((address) => (
                                     <option key={address.id} value={address.id}>
-                                      ZipCode: {address.zipCode}
+                                      ID: {address.id}, Почтовый индекс: {address.zipCode}
                                     </option>
                                   ))}
                                 </select>
@@ -1068,7 +1146,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                             </fieldset>
                           </div>)}
                         <label className="radio-label">
-                          <span>Выбрать существующие</span>
+                          <span>Выбрать существующего</span>
                           <input
                             type="radio"
                             name="organizationOption"
@@ -1079,14 +1157,14 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                         {formData.useExistingOrganization && (
                           <select
                             onChange={(e) => handleObjectSelect("organization", e.target.value, organizationsList)}>
-                            <option value="">Выберите организацию</option>
+                            Доступные организации
+                            <option value="">Выбрать...</option>
                             {organizationsList.map((org) => (
                               <option key={org.id} value={org.id}>
-                                officialAddress: {org.officialAddress.id}
-                                annualTurnover: {org.annualTurnover},
-                                employeesCount: {org.employeesCount},
-                                fullName: {org.fullName},
-                                organizationType: {org.organizationType},
+                                ID: {org.id}, 
+                                officialAddress: {org.officialAddress.id}, 
+                                annualTurnover: {org.annualTurnover}, 
+                                employeesCount: {org.employeesCount}, 
                                 postalAddress: {org.postalAddress.id}
                               </option>
                             ))}
@@ -1098,7 +1176,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                     </div>
                     <hr></hr>
                     <fieldset>
-                    <legend>Person Data</legend>
+                    <h4>Человек</h4>
                     <label className="radio-label">
                     <span>Создать новую</span>
                     <input
@@ -1110,33 +1188,35 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                 </label>
               {!formData.useExistingPerson && (
                 <div className="mb-4">
-                <label htmlFor="person_eyeColor">Eye Color
+                <label htmlFor="person_eyeColor">
+                  Цвет глаз
                 <select className="dropdown-menu-dark"
                 name="person_eyeColor"
                 onChange={(e) => updateObjects("person", "eyeColor", e.target.value, schemas[3].properties.eyeColor)}
                  value={formData.person.eyeColor}>
-              <option className="dropdown-item" value={ColorEnum.GREEN}>Green</option>
-              <option className="dropdown-item" value={ColorEnum.BLACK}>Black</option>
-              <option className="dropdown-item" value={ColorEnum.BLUE}>Blue</option>
-              <option className="dropdown-item" value={ColorEnum.ORANGE}>Orange</option>
-            </select>
-          </label>
-          {errors.person_eyeColor && <span className="error">{errors.person_eyeColor}</span>}
-          <label htmlFor="person_hairColor">Hair Color
+                  <option className="dropdown-item" value={ColorEnum.GREEN}>Зеленый</option>
+                  <option className="dropdown-item" value={ColorEnum.BLACK}>Черный</option>
+                  <option className="dropdown-item" value={ColorEnum.BLUE}>Синий</option>
+                  <option className="dropdown-item" value={ColorEnum.ORANGE}>Оранжевый</option>
+                </select>
+                </label>
+                  {errors.person_eyeColor && <span className="error">{errors.person_eyeColor}</span>}
+          <label htmlFor="person_hairColor">
+            Цвет волос
             <select className="dropdown-menu-dark"
                     name="person_hairColor"
                     onChange={(e) => updateObjects("person", "hairColor", e.target.value, schemas[3].properties.hairColor)}
                     value={formData.person.hairColor ?? ''}>
-              <option className="dropdown-item" value={''}>Choose...</option>
-              <option className="dropdown-item" value={ColorEnum.GREEN}>Green</option>
-              <option className="dropdown-item" value={ColorEnum.BLACK}>Black</option>
-              <option className="dropdown-item" value={ColorEnum.BLUE}>Blue</option>
-              <option className="dropdown-item" value={ColorEnum.ORANGE}>Orange</option>
+              <option className="dropdown-item" value={''}>Выбрать...</option>
+              <option className="dropdown-item" value={ColorEnum.GREEN}>Зеленый</option>
+              <option className="dropdown-item" value={ColorEnum.BLACK}>Черный</option>
+              <option className="dropdown-item" value={ColorEnum.BLUE}>Синий</option>
+              <option className="dropdown-item" value={ColorEnum.ORANGE}>Оранжевый</option>
             </select>
           </label>
-          {errors.person_hairColor && <span className="error">{errors.person_hairColor}</span>}
+                  {errors.person_hairColor && <span className="error">{errors.person_hairColor}</span>}
           <fieldset>
-            <legend>Location</legend>
+            <legend>Локация</legend>
             <label className="radio-label">
               <span>Создать новую</span>
               <input
@@ -1149,7 +1229,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
             {!formData.useExistingLocation && (
               <div className="mb-4">
                 <label htmlFor="person_location_x">
-                  Location (X)
+                  X
                   <input
                     className="form-control"
                     name="person_location_x"
@@ -1160,7 +1240,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                   {errors.location_x && <span className="error">{errors.location_x}</span>}
                 </label>
                 <label htmlFor="person_location_y">
-                  Location (Y)
+                  Y
                   <input
                     className="form-control"
                     name="person_location_y"
@@ -1171,7 +1251,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                   {errors.location_y && <span className="error">{errors.location_y}</span>}
                 </label>
                 <label htmlFor="person_location_z">
-                  Location (Z)
+                  Z
                   <input
                     className="form-control"
                     name="person_location_z"
@@ -1197,7 +1277,7 @@ export const WorkersFormComponent = ({closeForm, item}) => {
                 onChange={(e) => handleObjectSelect("location", e.target.value, locationsList)}
                 required
               >
-                <option value={null}>Choose...</option>
+                Доступные локации
                 {locationsList.map((location) => (
                   <option key={location.id} value={location.id}>
                     X: {location.x}, Y: {location.y}, Z: {location.z}
@@ -1207,7 +1287,8 @@ export const WorkersFormComponent = ({closeForm, item}) => {
             )}
             {errors.location && <span className="error">{errors.location}</span>}
           </fieldset>
-          <label htmlFor="person_birthday">Birthday
+          <label htmlFor="person_birthday">
+            День рождения
             <input
               className="form-control"
               name="person_birthday"
@@ -1217,7 +1298,8 @@ export const WorkersFormComponent = ({closeForm, item}) => {
             />
             {errors.person_birthday && <span className="error">{errors.person_birthday}</span>}
           </label>
-          <label htmlFor="person_weight">Weight
+          <label htmlFor="person_weight">
+            Вес
             <input
               className="form-control"
               name="person_weight"
@@ -1228,15 +1310,16 @@ export const WorkersFormComponent = ({closeForm, item}) => {
             />
             {errors.person_weight && <span className="error">{errors.person_weight}</span>}
           </label>
-          <label htmlFor="person_nationality">Nationality
+          <label htmlFor="person_nationality">
+            Национальность
             <select className="dropdown-menu-dark"
                     name="person_nationality"
                     onChange={(e) => updateObjects("person", "nationality", e.target.value, schemas[3].properties.nationality)}
                     value={formData.person.nationality}>
-              <option className="dropdown-item" value={CountryEnum.UNITED_KINGDOM}>United Kingdom
+              <option className="dropdown-item" value={CountryEnum.UNITED_KINGDOM}>Великобритания
               </option>
-              <option className="dropdown-item" value={CountryEnum.FRANCE}>France</option>
-              <option className="dropdown-item" value={CountryEnum.NORTH_KOREA}>North Korea</option>
+              <option className="dropdown-item" value={CountryEnum.FRANCE}>Франция</option>
+              <option className="dropdown-item" value={CountryEnum.NORTH_KOREA}>Северная Корея</option>
             </select>
             {errors.person_nationality && <span className="error">{errors.person_nationality}</span>}
           </label>
@@ -1256,32 +1339,33 @@ export const WorkersFormComponent = ({closeForm, item}) => {
             onChange={(e) => handleObjectSelect("person", e.target.value, peopleList)}
             required
           >
+            Доступные человеки
             {peopleList.map((person) => (
               <option key={person.id} value={person.id}>
-                EyeColor: {person.eyeColor}
-                HairColor: {person.hairColor}
-                Location: {person.location.id}
-                Birthday: {person.birthday}
-                Weight: {person.weight}
+                ID: {person.id},
+                EyeColor: {person.eyeColor},
+                HairColor: {person.hairColor},
+                Location: {person.location.id},
+                Birthday: {person.birthday},
+                Weight: {person.weight},
                 Nationality: {person.nationality}
               </option>
             ))}
           </select>
         )}{errors.person && <span className="error">{errors.person}</span>}
       </fieldset>
-
       <hr></hr>
       <div className="mb-4">
         <div className="mb-4">
           <button className="btn btn-primary" type="submit">
-            <i className="fa fa-send"></i>&nbsp;Submit
+            <i className="fa fa-send"></i>&nbsp;Отправить
           </button>
           <button
             className="btn btn-secondary mz-2"
             type="button"
             onClick={() => closeForm(null)}
           >
-            <i className="fa fa-cancel"></i>&nbsp;Cancel
+            <i className="fa fa-cancel"></i>&nbsp;Отменить
           </button>
         </div>
       </div>
@@ -1297,7 +1381,9 @@ export const SpecialComponent = () => {
   const [countByPeopleId, setCountByPeopleId] = useState(1);
   const [rating, setRating] = useState(1);
   const [fireByWorkerId, setFireByWorkerId] = useState(1);
-  const [transferWorkerIds, setTransferWorkerIds] = useState({workerId: 1, orgId: 1});
+  const [transferWorkerIds, setTransferWorkerIds] = useState({orgId: 1, workerId: 1});
+  const [workersByPerson, setWorkersByPerson] = useState(0);
+  const [workersByRating, setWorkersByRating] = useState(0);
 
   useEffect(() => {
   }, []);
@@ -1335,26 +1421,62 @@ export const SpecialComponent = () => {
   const updateTransferWorkerIds = (e) => {
     setTransferWorkerIds({...transferWorkerIds, [e.target.name]: e.target.value});
   };
+  const apiDict = {
+    "delete-by-person": deleteByPersonId,
+    "count-by-people": countByPeopleId,
+    "count-by-less-than-rating": rating,
+    "fire-worker-from-org": fireByWorkerId,
+    "transfer-worker-to-another-organization": transferWorkerIds
+  };
 
-  const submitForm = async (e, apiString) => {
+  const paramDict = {
+    "delete-by-person": "personId",
+    "count-by-people": "personId",
+    "count-by-less-than-rating": "rating",
+    "fire-worker-from-org": "workerId",
+    "transfer-worker-to-another-organization": "orgId"
+  };
+
+  const submitForm = async (e, apiStr: string) => {
     e.preventDefault();
-    let res, url = `${V1APIURL}/workers/${apiString`/${e.target.value}`}`;
+    let res;
+    let url = `${V1APIURL}/workers/`;
     try {
-      if (apiString === "count-by-people" || apiString === "count-by-less-than-rating") {
-        res = await axios.get(url, getAxios());
-      } else if (apiString !== "delete-by-person") {
-        res = await axios.put(url, getAxios());
-      } else {
-        res = await axios.delete(url, getAxios());
-      }
+      const token = localStorage.getItem("token");
+      axios.defaults.headers.common = {
+        "Authorization": `Bearer ${token}`
+      };
 
-      if (res.status !== 200 || res.status !== 204) {
-        alert(`Error: ${res.statusText}`);
+      url += (apiStr === "transfer-worker-to-another-organization") ?
+        `${apiStr}?${paramDict[apiStr]}=${apiDict[apiStr].orgId}&${paramDict["fire-worker-from-org"]}=${apiDict[apiStr].workerId}`
+        : `${apiStr}?${paramDict[apiStr]}=${apiDict[apiStr]}`
+
+      switch (apiStr) {
+        case "transfer-worker-to-another-organization":
+        case "fire-worker-from-org":
+          res = await axios.put(url, getAxios());
+          break;
+        case "count-by-people" || "count-by-less-than-rating":
+          res = await axios.get(url, getAxios());
+          if(apiStr === "count-by-people") {
+            setWorkersByPerson(res.data);
+          } else {
+            setWorkersByRating(res.data);
+          }
+          break;
+        case "delete-by-person":
+          res = await axios.delete(url, getAxios());
+          break;
+        default:
+          break;
+      }
+      if (!(res.status === 200 || res.status === 204)) {
+        alert(`Ошибка: ${res.statusText}`);
         return false;
       }
-
+      alert("Операция проведена успешно. Проверьте соответствующие объекты.")
     } catch (error) {
-      alert(`Error!`);
+      alert(`Ошибка! ${error.status}: ${error.message}`);
     }
     return false;
   };
@@ -1362,7 +1484,100 @@ export const SpecialComponent = () => {
   return (
     <div className="container py-5">
       <div className="row">
-
+        <h3>Специальные ??????? операции</h3>
+        <br/>
+        <h4>
+          Удалить рабочего через ID человека
+        </h4>
+        <form className="special" onSubmit={(e) => submitForm(e, "delete-by-person")}>
+          <input
+            className="form-control"
+            name="delete_by_person_id"
+            type="number"
+            min={1}
+            onChange={(e) => updateDeleteByPersonId(e)}
+            value={deleteByPersonId}
+          />
+          <button className="btn btn-danger" type="submit">
+            <i className="fa fa-send"></i>&nbsp;Удалить
+          </button>
+        </form>
+        <h4>
+          Считать количество рабочих по человеку
+        </h4>
+        <form className="special" onSubmit={(e) => submitForm(e, "count-by-people")}>
+          <input
+            className="form-control"
+            name="count_by_people_id"
+            type="number"
+            min={1}
+            onChange={(e) => updateCountByPeopleId(e)}
+            value={countByPeopleId}
+          />
+          <button className="btn btn-primary" type="submit">
+            <i className="fa fa-send"></i>&nbsp;Считать
+          </button>
+          <label>Количество работников: {workersByPerson}</label>
+        </form>
+        <h4>
+          Считать количество рабочих с зарплатой меньше, чем указанного
+        </h4>
+        <form className="special" onSubmit={(e) => submitForm(e, "count-by-less-than-rating")}>
+          <input
+            className="form-control"
+            name="count_by_rating"
+            type="number"
+            min={1}
+            onChange={(e) => updateRating(e)}
+            value={rating}
+          />
+          <button className="btn btn-primary" type="submit">
+            <i className="fa fa-send"></i>&nbsp;Считать
+          </button>
+          <label>Количество работников: {workersByRating}</label>
+        </form>
+        <h4>
+          Уволить работника по его ID
+        </h4>
+        <form className="special" onSubmit={(e) => submitForm(e, "fire-worker-from-org")}>
+          <input
+            className="form-control"
+            name="fire_worker_by_id"
+            type="number"
+            min={1}
+            onChange={(e) => updateFireByWorkerId(e)}
+            value={fireByWorkerId}
+          />
+          <button className="btn btn-secondary" type="submit">
+            <i className="fa fa-send"></i>&nbsp;Уволить
+          </button>
+        </form>
+        <h4>
+          Перевести работника (по ID) с текущей организации в другую (по ID)
+        </h4>
+        <form className="special" onSubmit={(e) => submitForm(e, "transfer-worker-to-another-organization")}>
+          <label>Работник</label>
+          <input
+            className="form-control"
+            name="transfer_worker_organization_dest"
+            type="number"
+            min={1}
+            onChange={(e) => updateTransferWorkerIds(e)}
+            value={transferWorkerIds.orgId}
+          />
+          <label>Организация, к которому вы хотите перевести работника</label>
+          <input
+            className="form-control"
+            name="transfer_worker"
+            type="number"
+            min={1}
+            onChange={(e) => updateTransferWorkerIds(e)}
+            value={transferWorkerIds.workerId}
+          />
+          <button className="btn btn-primary" type="submit">
+            <i className="fa fa-send"></i>&nbsp;Перевести
+          </button>
+        </form>
       </div>
     </div>
   );

@@ -14,6 +14,7 @@ import ru.ifmo.se.entity.data.enumerated.Country;
 import ru.ifmo.se.entity.user.User;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -36,7 +37,7 @@ public class Person implements Creatable {
     private Color hairColor;
 
     @NotNull
-    @OneToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "location_id")
     private Location location;
 
@@ -50,8 +51,8 @@ public class Person implements Creatable {
     @Enumerated(EnumType.STRING)
     private Country nationality;
 
-    @OneToOne(mappedBy = "person")
-    private Worker worker;
+    @OneToMany(mappedBy = "person")
+    private List<Worker> workers = new ArrayList<>();
 
     @ManyToOne
     @JoinColumn(name = "created_by")

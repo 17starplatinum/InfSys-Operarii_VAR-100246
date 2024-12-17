@@ -11,11 +11,11 @@ export const AccessManagement = ({ setPage }) => {
       selector: (item) => item.id,
     },
     {
-      name: "Username",
+      name: "Пользователь",
       selector: (item) => item.username,
     },
     {
-      name: "Actions",
+      name: "Действия",
       grow: 1,
       cell: (item) => (
         <div className="">
@@ -46,12 +46,12 @@ export const AccessManagement = ({ setPage }) => {
       }
       const res = await axios.get(`${V1APIURL}/auth/admin-requests`, getAxios());
       if (res.status !== 200) {
-        alert(`Error: ${res.statusText}`);
+        alert(`Ошибка: ${res.statusText}`);
         return false;
       }
       setItems(res.data || []);
     } catch (error) {
-      alert(`Error!`);
+      alert(`Ошибка! ${error.status}: ${error.message}`);
     }
   };
 
@@ -66,13 +66,13 @@ export const AccessManagement = ({ setPage }) => {
         getAxios()
       );
       if (res.status !== 204) {
-        alert(`Error: ${res.statusText}`);
+        alert(`Ошибка: ${res.statusText}`);
         return false;
       }
-      alert("Item rejected.");
+      alert("Пользователь успешно отклонен.");
       loadItems();
     } catch (error) {
-      alert(`Error!`);
+      alert(`Ошибка! ${error.status}: ${error.message}`);
     }
   };
 
@@ -87,13 +87,13 @@ export const AccessManagement = ({ setPage }) => {
         getAxios()
       );
       if (res.status !== 204) {
-        alert(`Error: ${res.statusText}`);
+        alert(`Ошибка: ${res.statusText}`);
         return false;
       }
-      alert("Item rejected.");
+      alert("Пользователь успешно допущен.");
       loadItems();
     } catch (error) {
-      alert(`Error!`);
+      alert(`Ошибка! ${error.status}: ${error.message}`);
     }
   };
 
@@ -126,13 +126,13 @@ export const RequestAdminAccess = ({ setPage }) => {
         getAxios()
       );
       if (res.status !== 200 || res.status !== 201) {
-        alert(`Error: ${res.statusText}`);
+        alert(`Ошибка: ${res.statusText}`);
         return false;
       }
-      alert(`Request sent!`);
+      alert(`Запрос успешно отправлен. Дождитесь отмашки админа.`);
       setPage(true);
     } catch (error) {
-      alert(`Error!`);
+      alert(`Ошибка! ${error.status}: ${error.message}`);
     }
     return false;
   };
@@ -149,14 +149,14 @@ export const RequestAdminAccess = ({ setPage }) => {
           <form onSubmit={submitForm}>
             <div className="mb-4">
               <button className="btn btn-primary" type="submit">
-                <i className="fa fa-send"></i>&nbsp;Request Access
+                <i className="fa fa-send"></i>&nbsp;Спросить за доступ
               </button>
               <button
                 className="btn btn-secondary mx-2"
                 type="button"
                 onClick={() => setPage("dashboard")}
               >
-                <i className="fa fa-cancel"></i>&nbsp;Cancel
+                <i className="fa fa-cancel"></i>&nbsp;Отменить
               </button>
             </div>
           </form>

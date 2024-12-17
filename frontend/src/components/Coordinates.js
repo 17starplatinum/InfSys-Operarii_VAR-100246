@@ -21,7 +21,7 @@ export const CoordinatesComponent = ({ setPage }) => {
       selector: (item) => item.y,
     },
     {
-      name: "Actions",
+      name: "Действия",
       grow: 1,
       cell: (item) => (
         <div className="">
@@ -50,12 +50,12 @@ export const CoordinatesComponent = ({ setPage }) => {
     try {
       const res = await axios.get(`${V1APIURL}/coordinates`, getAxios());
       if (res.status !== 200) {
-        alert(`Error: ${res.statusText}`);
+        alert(`Ошибка: ${res.statusText}`);
         return false;
       }
       setItems((res.data?.content || []));
     } catch (error) {
-      alert(`Error!`);
+      alert(`Ошибка! ${error.status}: ${error.message}`);
     }
   };
 
@@ -78,13 +78,13 @@ export const CoordinatesComponent = ({ setPage }) => {
         getAxios()
       );
       if (res.status !== 204) {
-        alert(`Error: ${res.statusText}`);
+        alert(`Ошибка: ${res.statusText}`);
         return false;
       }
-      alert("Item deleted.");
-      loadItems();
+      alert("Координаты успешно удалены.");
+      await loadItems();
     } catch (error) {
-      alert(`Error!`);
+      alert(`Ошибка! ${error.status}: ${error.message}`);
     }
   };
 
@@ -178,13 +178,13 @@ export const CoordinatesFormComponent = ({ closeForm, item }) => {
         getAxios()
       );
       if (!(res.status === 200 || res.status === 201)) {
-        alert(`Error: ${res.statusText}`);
+        alert(`Ошибка: ${res.statusText}`);
         return false;
       }
-      alert(`Item ${item ? "Updated" : "Created"}`);
+      alert(`Координаты ${item ? "обновлены" : "созданы"}.`);
       closeForm(true);
     } catch (error) {
-      alert(`Error!`);
+      alert(`Ошибка! ${error.status}: ${error.message}`);
     }
     return false;
   };
@@ -192,7 +192,7 @@ export const CoordinatesFormComponent = ({ closeForm, item }) => {
   return (
     <div className="container py-5">
       <div className="row">
-        <h2>{item ? "Edit Coordinates" : "Add Coordinates"}</h2>
+        <h2>{item ? "Редактировать" : "Добавить"}{" координат"}</h2>
         <div className="col-12">
           <form onSubmit={(e) => submitForm(e)}>
             <div className="py-5">
@@ -221,14 +221,14 @@ export const CoordinatesFormComponent = ({ closeForm, item }) => {
               </label>
               <div className="mb-4">
                 <button className="btn btn-primary" type="submit">
-                  <i className="fa fa-send"></i>&nbsp;Submit
+                  <i className="fa fa-send"></i>&nbsp;Отправить
                 </button>
                 <button
                     className="btn btn-secondary mx-2"
                     type="button"
                     onClick={() => closeForm(null)}
                 >
-                    <i className="fa fa-cancel"></i>&nbsp;Cancel
+                    <i className="fa fa-cancel"></i>&nbsp;Отменить
                   </button>
                 </div>
             </div>

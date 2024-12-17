@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
-import org.springframework.lang.Nullable;
 import ru.ifmo.se.entity.data.audit.WorkerAudit;
 import ru.ifmo.se.entity.data.enumerated.Position;
 import ru.ifmo.se.entity.data.enumerated.Status;
@@ -40,7 +39,6 @@ public class Worker implements Creatable {
     @Column(name = "creation_date", nullable = false)
     private LocalDateTime creationDate = LocalDateTime.now();
 
-    @Nullable
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "organization_id")
     private Organization organization;
@@ -55,13 +53,12 @@ public class Worker implements Creatable {
     @Enumerated(EnumType.STRING)
     private Position position;
 
-    @Nullable
     @Enumerated(EnumType.STRING)
     private Status status;
 
     @NotNull
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "person_id", referencedColumnName = "id")
+    @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @JoinColumn(name = "person_id")
     private Person person;
 
     @ManyToOne

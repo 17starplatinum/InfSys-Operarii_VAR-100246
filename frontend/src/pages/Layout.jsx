@@ -15,37 +15,37 @@ export const LayoutPage = ({ setPage, user, content, setUser }) => {
                 className="btn btn-primary mx-1"
                 onClick={() => setPage("organizations")}
               >
-                <i className="fa fa-building"></i>&nbsp; Organizations
+                <i className="fa fa-building"></i>&nbsp; Организации
               </button>
               <button
                 className="btn btn-primary mx-1"
                 onClick={() => setPage("workers")}
               >
-                <i className="fa fa-person-digging"></i>&nbsp; Workers
+                <i className="fa fa-person-digging"></i>&nbsp; Работники
               </button>
               <button
                 className="btn btn-primary mx-1"
                 onClick={() => setPage("persons")}
               >
-                <i className="fa fa-people-group"></i>&nbsp; Persons
+                <i className="fa fa-people-group"></i>&nbsp; Человеки
               </button>
               <button
                 className="btn btn-primary mx-1"
                 onClick={() => setPage("special")}
                 >
-                <i className="fa fa-toolbox"></i>&nbsp; Special
+                <i className="fa fa-toolbox"></i>&nbsp; Спецы
               </button>
               <button
                 className="btn btn-primary mx-1"
                 onClick={() => setPage("dashboard")}
               >
-                <i className="fa fa-home"></i>&nbsp; Dashboard
+                <i className="fa fa-home"></i>&nbsp; Главная
               </button>
               <button
                 className="btn btn-primary mx-1"
                 onClick={() => setUser(null)}
               >
-                <i className="fa fa-sign-out"></i>&nbsp; Logout
+                <i className="fa fa-sign-out"></i>&nbsp; Выйти
               </button>
             </span>
           </div>

@@ -25,7 +25,7 @@ export const LocationsComponent = ({ setPage }) => {
       selector: (item) => item.z,
     },
     {
-      name: "Actions",
+      name: "Действия",
       grow: 1,
       cell: (item) => (
         <>
@@ -55,12 +55,12 @@ export const LocationsComponent = ({ setPage }) => {
     try {
       const res = await axios.get(`${V1APIURL}/locations`, getAxios());
       if (res.status !== 200) {
-        alert(`Error: ${res.statusText}`);
+        alert(`Ошибка: ${res.statusText}`);
         return false;
       }
       setItems((res.data?.content || []));
     } catch (error) {
-      alert(`Error!`);
+      alert(`Ошибка! ${error.status}: ${error.message}`);
     }
   };
 
@@ -83,13 +83,13 @@ export const LocationsComponent = ({ setPage }) => {
         getAxios()
       );
       if (res.status !== 204) {
-        alert(`Error: ${res.statusText}`);
+        alert(`Ошибка: ${res.statusText}`);
         return false;
       }
-      alert("Item deleted.");
-      loadItems();
+      alert("Локация успешно удалена.");
+      await loadItems();
     } catch (error) {
-      alert(`Error!`);
+      alert(`Ошибка! ${error.status}: ${error.message}`);
     }
   };
 
@@ -109,7 +109,7 @@ export const LocationsComponent = ({ setPage }) => {
           <h2>
             Locations{" "}
             <button className="btn btn-primary float-end" onClick={addItem}>
-              <i className="fa fa-add"></i>&nbsp;Add
+              <i className="fa fa-add"></i>&nbsp;Добавлять
             </button>
           </h2>
         </div>
@@ -169,7 +169,7 @@ export const LocationsFormComponent = ({ closeForm, item }) => {
       e.preventDefault();
       const isValid = validateLocation();
       if (!isValid) {
-        alert('Не получилось создать Location.');
+        alert('Не получилось создать локацию.');
         return;
       }
       try {
@@ -177,20 +177,20 @@ export const LocationsFormComponent = ({ closeForm, item }) => {
         axios.defaults.headers.common = {
           'Authorization': `Bearer ${token}`
         };
-        delete formData.createdBy;
+        delete formData.createdBy.authorities;
         const res = await axios[item? "put" : "post"](
             `${V1APIURL}/locations${item ?`/${item.id} `: ""}`,
-            formData.createdBy.authorities,
+            formData,
             getAxios()
         );
         if (!(res.status === 200 || res.status === 201)) {
-          alert(`Error: ${res.statusText}`);
+          alert(`Ошибка: ${res.statusText}`);
           return false;
         }
-        alert(`Item ${item ? "Updated" : "Created"}`);
+        alert(`Локация ${item ? "обновлена" : "удалена"}.`);
         closeForm(true);
       } catch (error) {
-        alert(`Error!`);
+        alert(`Ошибка! ${error.status}: ${error.message}`);
       }
       return false;
     };

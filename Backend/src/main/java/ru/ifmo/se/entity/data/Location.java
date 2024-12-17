@@ -33,11 +33,11 @@ public class Location implements Creatable {
     @Column(name = "z", nullable = false)
     private Long z;
 
-    @OneToOne(mappedBy = "location")
-    private Person person;
+    @OneToMany(mappedBy = "location")
+    private List<Person> people;
 
-    @OneToOne(mappedBy = "town")
-    private Address address;
+    @OneToMany(mappedBy = "town")
+    private List<Address> addresses;
 
     @ManyToOne
     @JoinColumn(name = "created_by")
