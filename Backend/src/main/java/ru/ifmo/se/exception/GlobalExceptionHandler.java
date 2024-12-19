@@ -1,5 +1,6 @@
 package ru.ifmo.se.exception;
 
+import com.fasterxml.jackson.core.JsonParseException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,10 +12,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.dao.DataIntegrityViolationException;
 import ru.ifmo.se.dto.ErrorResponseDTO;
-import ru.ifmo.se.exception.entity.APIError;
 
 import java.util.Arrays;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -136,11 +135,33 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(errorResponse, HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(DataIntegrityViolationException.class)
-    public ResponseEntity<APIError> handleUniqueConstraintException(DataIntegrityViolationException e) {
-        String message = "Повторяющееся значение ключа. Возможно, объект с таким именем уже существует.";
-        String details = e.getMostSpecificCause().getMessage();
-        APIError apiError = new APIError(HttpStatus.CONFLICT.value(), message, details);
-        return new ResponseEntity<>(apiError, HttpStatus.CONFLICT);
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponseDTO> handleEventNotFoundException(ResourceNotFoundException ex) {
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(
+                HttpStatus.NOT_FOUND.value(), // 404
+                ex.getMessage(),
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(JSONParsingException.class)
+    public ResponseEntity<ErrorResponseDTO> handleJsonParseException(JSONParsingException ex) {
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(
+                HttpStatus.BAD_REQUEST.value(), // 400
+                ex.getMessage(),
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(FileReadException.class)
+    public ResponseEntity<ErrorResponseDTO> handleFileReadException(FileReadException ex) {
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO(
+                HttpStatus.BAD_REQUEST.value(), // 400
+                ex.getMessage(),
+                System.currentTimeMillis()
+        );
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 }

@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import ru.ifmo.se.entity.user.User;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "import_history", schema = "s372799")
 @Getter
@@ -18,13 +20,13 @@ public class ImportHistory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String status;
+    private ImportStatus status;
+
+    private LocalDateTime timestamp;
+
+    private Integer addedObjectsCount;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
-
-    private Integer totalObjectsCount;
-
-    private Integer addedObjectsCount;
 }

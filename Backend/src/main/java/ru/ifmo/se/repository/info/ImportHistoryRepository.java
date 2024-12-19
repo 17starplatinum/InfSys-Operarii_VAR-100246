@@ -4,13 +4,14 @@ import lombok.NonNull;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 import ru.ifmo.se.entity.info.ImportHistory;
+import ru.ifmo.se.entity.info.ImportStatus;
+import ru.ifmo.se.entity.user.User;
 
 import java.util.List;
 
 @Repository
 public interface ImportHistoryRepository extends CrudRepository<ImportHistory, Long> {
-    List<ImportHistory> findByUserId(Long userId);
+    List<ImportHistory> findByUser(User user);
 
-    @NonNull
-    List<ImportHistory> findAll();
+    List<ImportHistory> findByStatus(ImportStatus status);
 }

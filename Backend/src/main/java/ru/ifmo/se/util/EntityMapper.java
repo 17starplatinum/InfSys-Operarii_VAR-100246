@@ -9,6 +9,7 @@ import ru.ifmo.se.dto.user.UserDTO;
 import ru.ifmo.se.entity.data.*;
 import ru.ifmo.se.entity.data.audit.*;
 import ru.ifmo.se.entity.info.ImportHistory;
+import ru.ifmo.se.entity.info.ImportStatus;
 import ru.ifmo.se.entity.user.User;
 import ru.ifmo.se.service.data.*;
 import ru.ifmo.se.service.user.UserService;
@@ -252,13 +253,22 @@ public class EntityMapper {
         return addressAudit;
     }
 
-    public ImportHistoryDTO fromEntity(ImportHistory importHistory) {
-        ImportHistoryDTO dto = new ImportHistoryDTO();
-        dto.setId(importHistory.getId());
-        dto.setStatus(importHistory.getStatus());
-        dto.setUsername(importHistory.getUser().getUsername());
-        dto.setAddedObjectsCount(importHistory.getAddedObjectsCount());
-        dto.setTotalObjectsCount(importHistory.getTotalObjectsCount());
-        return dto;
+    public ImportHistoryDTO toImportHistoryDTO(ImportHistory importHistory) {
+        ImportHistoryDTO importOperationDTO = new ImportHistoryDTO();
+        importOperationDTO.setId(importHistory.getId());
+        importOperationDTO.setStatus(importHistory.getStatus());
+        importOperationDTO.setTimestamp(importHistory.getTimestamp());
+        importOperationDTO.setAddedObjectsCount(importHistory.getAddedObjectsCount());
+        importOperationDTO.setAddedObjectsCount(importHistory.getAddedObjectsCount());
+        return importOperationDTO;
+    }
+
+    public ImportHistory toImportHistoryEntity(User user, ImportStatus status, int addedObjects) {
+        ImportHistory importHistory = new ImportHistory();
+        importHistory.setStatus(status);
+        importHistory.setUser(user);
+        importHistory.setTimestamp(LocalDateTime.now());
+        importHistory.setAddedObjectsCount(addedObjects);
+        return importHistory;
     }
 }
