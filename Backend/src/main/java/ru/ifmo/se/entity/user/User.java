@@ -41,9 +41,6 @@ public class User implements UserDetails {
     @Column(name = "admin_request_status", nullable = false, length = 20)
     private AdminRequestStatus adminRequestStatus = AdminRequestStatus.NONE;
 
-    @OneToMany(mappedBy = "user")
-    private List<ImportHistory> historyList;
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));

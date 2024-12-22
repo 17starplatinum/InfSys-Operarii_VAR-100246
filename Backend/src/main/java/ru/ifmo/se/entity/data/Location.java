@@ -11,6 +11,7 @@ import ru.ifmo.se.entity.data.audit.LocationAudit;
 import ru.ifmo.se.entity.user.User;
 
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "location", schema = "s372799")
@@ -20,17 +21,17 @@ import java.util.List;
 public class Location implements Creatable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotNull
-    @Column(name = "x", nullable = false)
+    @Column(nullable = false)
     private Float x;
 
-    @Column(name = "y")
+    @Column
     private long y;
 
     @NotNull
-    @Column(name = "z", nullable = false)
+    @Column(nullable = false)
     private Long z;
 
     @OneToMany(mappedBy = "location")
@@ -40,10 +41,25 @@ public class Location implements Creatable {
     private List<Address> addresses;
 
     @ManyToOne
-    @JoinColumn(name = "created_by")
+    @JoinColumn
     private User createdBy;
 
     @OneToMany(mappedBy = "location")
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<LocationAudit> audits;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Location location = (Location) o;
+        return x.equals(location.x) &&
+                y == location.y &&
+                z.equals(location.z);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(x, y ,z);
+    }
 }

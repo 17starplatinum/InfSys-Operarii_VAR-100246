@@ -29,4 +29,6 @@ public class ImportHistory {
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
     private User user;
+
+    private String fileName;
 }

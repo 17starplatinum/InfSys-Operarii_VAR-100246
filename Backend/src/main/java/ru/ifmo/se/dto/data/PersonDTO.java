@@ -2,19 +2,19 @@ package ru.ifmo.se.dto.data;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ru.ifmo.se.entity.data.enumerated.Color;
 import ru.ifmo.se.entity.data.enumerated.Country;
 import ru.ifmo.se.entity.user.User;
 
 import java.time.LocalDate;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PersonDTO {
+
     private Long id;
 
     @NotNull

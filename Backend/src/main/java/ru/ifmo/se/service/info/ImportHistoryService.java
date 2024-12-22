@@ -1,11 +1,15 @@
 package ru.ifmo.se.service.info;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 import ru.ifmo.se.dto.info.ImportHistoryDTO;
 import ru.ifmo.se.entity.info.ImportHistory;
 import ru.ifmo.se.entity.info.ImportStatus;
@@ -32,10 +36,7 @@ public class ImportHistoryService {
     private final EntityMapper entityMapper;
     private final UserService userService;
 
-    @Resource
-    private final ImportHistoryService importHistoryServiceResource;
-
-    public ImportHistoryDTO importWorkers(String jsonData) {
+    public ImportHistoryDTO importWorkers(MultipartFile file, String jsonData) {
         User currentUser = userService.getCurrentUser();
         ImportHistory importHistory = new ImportHistory();
         importHistory.setStatus(ImportStatus.IN_PROGRESS);
@@ -44,7 +45,7 @@ public class ImportHistoryService {
         log.info("Импортируется объекты со статусом: В ПРОЦЕССЕ для пользователя: {}", currentUser.getUsername());
 
         try {
-            List<WorkerDTO> workers = importHistoryServiceResource.parseJSONToWorkerList(jsonData);
+            List<WorkerDTO> workers = parseJSONToWorkerList(jsonData);
             log.info("Обработал {} работников из данных JSON.", workers.size());
 
             for (WorkerDTO workerDTO : workers) {
@@ -79,6 +80,9 @@ public class ImportHistoryService {
     private List<WorkerDTO> parseJSONToWorkerList(String jsonData) {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+            objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
             List<WorkerDTO> workers = objectMapper.readValue(jsonData, new TypeReference<>() {});
             log.debug("Обработал данных JSON в {} объектов.", workers.size());
             return workers;

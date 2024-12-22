@@ -1,9 +1,12 @@
 package ru.ifmo.se.service.data;
 
+import jakarta.annotation.Resource;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.ifmo.se.dto.data.WorkerDTO;
 import ru.ifmo.se.dto.data.filter.WorkerFilterCriteria;
@@ -21,6 +24,7 @@ import ru.ifmo.se.util.filter.FilterProcessor;
 import ru.ifmo.se.util.pagination.PaginationHandler;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -57,40 +61,78 @@ public class WorkerService {
 
     @Transactional
     public WorkerDTO createWorker(WorkerDTO workerDTO) {
-        Coordinates coordinates = coordinatesService.createOrUpdateCoordinatesForWorker(workerDTO.getCoordinates());
-        Organization organization = organizationService.createOrUpdateOrganizationForWorker(workerDTO.getOrganization());
-        Person person = personService.createOrUpdatePersonForWorker(workerDTO.getPerson());
-        Worker worker = entityMapper.toWorkerEntity(workerDTO, coordinates, organization, person);
-        worker.setCreatedBy(userService.getCurrentUser());
-        worker.setCreationDate(LocalDateTime.now());
+        try {
+            validateWorkerUniqueness(workerDTO);
+            Coordinates coordinates = coordinatesService.createOrUpdateCoordinatesForWorker(workerDTO.getCoordinates());
+            Organization organization = organizationService.createOrUpdateOrganizationForWorker(workerDTO.getOrganization());
+            Person person = personService.createOrUpdatePersonForWorker(workerDTO.getPerson());
+            Worker worker = entityMapper.toWorkerEntity(workerDTO, coordinates, organization, person);
+            worker.setCreatedBy(userService.getCurrentUser());
+            worker.setCreationDate(LocalDateTime.now());
 
-        Worker savedWorker = workerRepository.save(worker);
-        auditService.auditWorker(savedWorker, AuditOperation.CREATE);
-        return entityMapper.toWorkerDTO(savedWorker);
+            Worker savedWorker = workerRepository.save(worker);
+            auditService.auditWorker(savedWorker, AuditOperation.CREATE);
+            return entityMapper.toWorkerDTO(savedWorker);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
     }
 
     @Transactional
     public WorkerDTO updateWorker(Long id, WorkerDTO workerDTO) {
-        Worker worker = workerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
-        if (userService.cantModifyEntity(worker)) {
-            throw new IllegalArgumentException("You are not allowed to modify this Worker.");
+        try {
+            Worker worker = workerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));
+            validateWorkerUniqueness(workerDTO);
+            if (userService.cantModifyEntity(worker)) {
+                throw new IllegalArgumentException("You are not allowed to modify this Worker.");
+            }
+
+            Coordinates coordinates = coordinatesService.createOrUpdateCoordinatesForWorker(workerDTO.getCoordinates());
+            Organization organization = organizationService.createOrUpdateOrganizationForWorker(workerDTO.getOrganization());
+            Person person = personService.createOrUpdatePersonForWorker(workerDTO.getPerson());
+            Worker updatedWorker = entityMapper.toWorkerEntity(workerDTO, coordinates, organization, person);
+
+            updatedWorker.setId(id);
+            updatedWorker.setCreatedBy(worker.getCreatedBy());
+            updatedWorker.setCreationDate(worker.getCreationDate());
+
+            Worker savedWorker = workerRepository.save(updatedWorker);
+            auditService.auditWorker(savedWorker, AuditOperation.UPDATE);
+
+            return entityMapper.toWorkerDTO(worker);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
         }
-
-        Coordinates coordinates = coordinatesService.createOrUpdateCoordinatesForWorker(workerDTO.getCoordinates());
-        Organization organization = organizationService.createOrUpdateOrganizationForWorker(workerDTO.getOrganization());
-        Person person = personService.createOrUpdatePersonForWorker(workerDTO.getPerson());
-        Worker updatedWorker = entityMapper.toWorkerEntity(workerDTO, coordinates, organization, person);
-
-        updatedWorker.setId(workerDTO.getId());
-        updatedWorker.setCreatedBy(workerDTO.getCreatedBy());
-        updatedWorker.setCreationDate(workerDTO.getCreationDate());
-
-        Worker savedWorker = workerRepository.save(updatedWorker);
-        auditService.auditWorker(savedWorker, AuditOperation.UPDATE);
-
-        return entityMapper.toWorkerDTO(worker);
     }
 
+    private void validateWorkerUniqueness(WorkerDTO workerDTO) {
+        List<Worker> workersByNameAndCoordinates = workerRepository.findByNameAndCoordinatesForUpdate(
+                workerDTO.getName(),
+                workerDTO.getCoordinates().getX(),
+                workerDTO.getCoordinates().getY()
+        );
+
+        if(!workersByNameAndCoordinates.isEmpty()) {
+            throw new IllegalArgumentException("Работник с таким именем и координатами уже существует.");
+        }
+
+        List<Worker> workersByNameAndPerson = workerRepository.findByNameAndPersonForUpdate(
+                workerDTO.getName(),
+                workerDTO.getPerson().getEyeColor(),
+                workerDTO.getPerson().getHairColor(),
+                workerDTO.getPerson().getLocation().getX(),
+                workerDTO.getPerson().getLocation().getY(),
+                workerDTO.getPerson().getLocation().getZ(),
+                workerDTO.getPerson().getBirthday(),
+                workerDTO.getPerson().getWeight(),
+                workerDTO.getPerson().getNationality()
+        );
+        if(!workersByNameAndPerson.isEmpty()) {
+            throw new IllegalArgumentException("Работник с таким именем и как человек уже существует.");
+        }
+    }
     @Transactional
     public void deleteWorker(Long id) {
         Worker worker = workerRepository.findById(id).orElseThrow(() -> new IllegalArgumentException(NOT_FOUND_MESSAGE));

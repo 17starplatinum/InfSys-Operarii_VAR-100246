@@ -40,10 +40,10 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<ErrorResponseDTO> handleUsernameNotFoundException(UsernameNotFoundException ex) {
+    public ResponseEntity<ErrorResponseDTO> handleUserNotFoundException(UsernameNotFoundException ex) {
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(
                 HttpStatus.NOT_FOUND.value(), // 404
-                "Пользователь не найден",
+                ex.getMessage(),
                 System.currentTimeMillis()
         );
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);

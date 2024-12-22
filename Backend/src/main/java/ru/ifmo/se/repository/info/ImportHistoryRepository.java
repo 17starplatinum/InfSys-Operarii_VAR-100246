@@ -11,7 +11,5 @@ import java.util.List;
 
 @Repository
 public interface ImportHistoryRepository extends CrudRepository<ImportHistory, Long> {
-    List<ImportHistory> findByUser(User user);
-
     List<ImportHistory> findByStatus(ImportStatus status);
 }

@@ -1,0 +1,192 @@
+[{
+  "name": "Veronika",
+  "coordinates": {
+    "x": 428.069,
+    "y": 27
+  },
+  "organization": {
+    "officialAddress": {
+      "zipCode": "(ﾉಥ益ಥ）ﾉ﻿ ┻━┻",
+      "town": null
+    },
+    "annualTurnover": 674426.1,
+    "employeesCount": 385,
+    "fullName": "NRG Yield, Inc.",
+    "type": "PUBLIC",
+    "postalAddress": {
+      "zipCode": "␣",
+      "town": {
+        "x": 105.48,
+        "y": 6290,
+        "z": 770
+      }
+    }
+  },
+  "salary": null,
+  "rating": 247299.13,
+  "position": "BAKER",
+  "status": "HIRED",
+  "person": {
+    "eyeColor": "BLACK",
+    "hairColor": null,
+    "location": {
+      "x": 24545.51,
+      "y": 25260,
+      "z": 61374
+    },
+    "birthday": null,
+    "weight": 1352,
+    "nationality": "UNITED_KINGDOM"
+  }
+}, {
+  "name": "Salmon",
+  "coordinates": {
+    "x": 829.801,
+    "y": 16
+  },
+  "organization": {
+    "officialAddress": {
+      "zipCode": "🐵 🙈 🙉 🙊",
+      "town": {
+        "x": 76831.18,
+        "y": 1379,
+        "z": 387
+      }
+    },
+    "annualTurnover": 481434.18,
+    "employeesCount": 212,
+    "fullName": null,
+    "type": "PUBLIC",
+    "postalAddress": {
+      "zipCode": "$1.00",
+      "town": null
+    }
+  },
+  "salary": 237479.78,
+  "rating": 816687.17,
+  "position": "BAKER",
+  "status": "FIRED",
+  "person": {
+    "eyeColor": "ORANGE",
+    "hairColor": null,
+    "location": {
+      "x": 18637.69,
+      "y": 73711,
+      "z": 83887
+    },
+    "birthday": null,
+    "weight": 5159.55,
+    "nationality": "FRANCE"
+  }
+}, {
+  "name": "Katrina",
+  "coordinates": {
+    "x": 679.505,
+    "y": 4
+  },
+  "organization": null,
+  "salary": 169278.44,
+  "rating": 914603.52,
+  "position": "LABORER",
+  "status": "FIRED",
+  "person": {
+    "eyeColor": "GREEN",
+    "hairColor": "BLUE",
+    "location": {
+      "x": 23924.77,
+      "y": 10937,
+      "z": 14835
+    },
+    "birthday": null,
+    "weight": 5938.53,
+    "nationality": "FRANCE"
+  }
+}, {
+  "name": "Silvie",
+  "coordinates": {
+    "x": 519.632,
+    "y": 10
+  },
+  "organization": {
+    "officialAddress": {
+      "zipCode": "<img src=x onerror=alert('hi') />",
+      "town": {
+        "x": 87645.19,
+        "y": 1606,
+        "z": 1166
+      }
+    },
+    "annualTurnover": 226355.13,
+    "employeesCount": 247,
+    "fullName": "El Paso Corporation",
+    "type": "COMMERCIAL",
+    "postalAddress": {
+      "zipCode": "`⁄€‹›ﬁﬂ‡°·‚—±",
+      "town": {
+        "x": 416.59,
+        "y": 2819,
+        "z": 116
+      }
+    }
+  },
+  "salary": null,
+  "rating": 961924.49,
+  "position": "BAKER",
+  "status": null,
+  "person": {
+    "eyeColor": "GREEN",
+    "hairColor": null,
+    "location": {
+      "x": 24051.56,
+      "y": 40572,
+      "z": 21513
+    },
+    "birthday": "2022-01-15",
+    "weight": 2135,
+    "nationality": "UNITED_KINGDOM"
+  }
+}, {
+  "name": "Filippa",
+  "coordinates": {
+    "x": 244.791,
+    "y": 21
+  },
+  "organization": {
+    "officialAddress": {
+      "zipCode": "'",
+      "town": {
+        "x": 66840.01,
+        "y": 1827,
+        "z": 470
+      }
+    },
+    "annualTurnover": 7332.95,
+    "employeesCount": 245,
+    "fullName": "Bellicum Pharmaceuticals, Inc.",
+    "type": null,
+    "postalAddress": {
+      "zipCode": "社會科學院語學研究所",
+      "town": {
+        "x": 390.66,
+        "y": 165,
+        "z": 1071
+      }
+    }
+  },
+  "salary": 443576.94,
+  "rating": 374289.66,
+  "position": "BAKER",
+  "status": null,
+  "person": {
+    "eyeColor": "ORANGE",
+    "hairColor": "BLUE",
+    "location": {
+      "x": 1118.6,
+      "y": 25353,
+      "z": 85582
+    },
+    "birthday": null,
+    "weight": 6863.06,
+    "nationality": "UNITED_KINGDOM"
+  }
+}]

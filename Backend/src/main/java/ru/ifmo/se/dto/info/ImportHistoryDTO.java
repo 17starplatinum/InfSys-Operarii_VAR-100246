@@ -17,4 +17,5 @@ public class ImportHistoryDTO {
     private String username;
     private Integer addedObjectsCount;
     private LocalDateTime timestamp;
+    private String downloadUrl;
 }

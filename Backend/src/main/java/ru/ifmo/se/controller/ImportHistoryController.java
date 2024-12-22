@@ -34,7 +34,7 @@ public class ImportHistoryController {
                 throw new FileReadException("Ошибка чтения файла: пусто");
             }
             String jsonData = new String(file.getBytes(), StandardCharsets.UTF_8);
-            ImportHistoryDTO importHistoryDTO = importHistoryService.importWorkers(jsonData);
+            ImportHistoryDTO importHistoryDTO = importHistoryService.importWorkers(file, jsonData);
             return ResponseEntity.ok(importHistoryDTO);
         } catch (IOException e) {
             throw new FileReadException("Ошибка чтения файла: " + e.getMessage());

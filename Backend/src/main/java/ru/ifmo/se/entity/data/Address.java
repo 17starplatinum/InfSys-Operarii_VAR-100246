@@ -20,10 +20,10 @@ import java.util.List;
 public class Address implements Creatable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotNull
-    @Column(name = "zip_code", nullable = false)
+    @Column(nullable = false)
     private String zipCode;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -31,7 +31,7 @@ public class Address implements Creatable {
     private Location town;
 
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "created_by")
+    @JoinColumn
     private User createdBy;
 
     @OneToMany(mappedBy = "address")

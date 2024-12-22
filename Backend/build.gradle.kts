@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "ru.ifmo.se"
-description = "IS-Lab1"
+description = "IS-Lab2"
 java.sourceCompatibility = JavaVersion.VERSION_17
 
 java {
@@ -45,6 +45,7 @@ dependencies {
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0")
 	implementation("org.hibernate.orm:hibernate-core:6.6.1.Final")
 	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
+//	implementation("io.minio:minio:8.5.4")
 	implementation("com.google.code.findbugs:jsr305:3.0.2")
 	implementation("jakarta.persistence:jakarta.persistence-api:3.2.0")
 	implementation("jakarta.validation:jakarta.validation-api:3.1.0")

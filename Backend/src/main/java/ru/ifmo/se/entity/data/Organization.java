@@ -23,24 +23,22 @@ import java.util.List;
 public class Organization implements Creatable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotNull
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
-    @JoinColumn(name = "legal_id", referencedColumnName = "id", nullable = false)
+    @JoinColumn(name = "legal_id", nullable = false)
     private Address officialAddress;
 
     @NotNull
     @Positive
-    @Column(name = "annual_turnover", nullable = false)
+    @Column(nullable = false)
     private Float annualTurnover;
 
     @Positive
-    @Column(name = "employees_count")
     private int employeesCount;
 
-    @Size(min = 1, max = 1576, message = "The full name of an organization must have from 1 to 1576 characters")
-    @Column(name = "full_name")
+    @Size(min = 1, max = 1576)
     private String fullName;
 
     @Enumerated(EnumType.STRING)
@@ -55,7 +53,7 @@ public class Organization implements Creatable {
     private List<Worker> workers;
 
     @ManyToOne
-    @JoinColumn(name = "created_by")
+    @JoinColumn
     private User createdBy;
 
     @OneToMany(mappedBy = "organization")

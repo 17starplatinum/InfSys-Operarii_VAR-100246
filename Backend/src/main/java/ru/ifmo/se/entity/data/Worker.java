@@ -25,10 +25,10 @@ import java.util.List;
 public class Worker implements Creatable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @NotNull
-    @Size(min = 1, message = "Name CANNOT be blank")
+    @Size(min = 1)
     private String name;
 
     @NotNull
@@ -36,8 +36,8 @@ public class Worker implements Creatable {
     @JoinColumn(name = "coordinates_id", nullable = false)
     private Coordinates coordinates;
 
-    @Column(name = "creation_date", nullable = false)
-    private LocalDateTime creationDate = LocalDateTime.now();
+    @Column
+    private LocalDateTime creationDate;
 
     @ManyToOne(cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     @JoinColumn(name = "organization_id")
@@ -50,6 +50,7 @@ public class Worker implements Creatable {
     private int rating;
 
     @NotNull
+    @Column(nullable = false)
     @Enumerated(EnumType.STRING)
     private Position position;
 
@@ -58,11 +59,11 @@ public class Worker implements Creatable {
 
     @NotNull
     @ManyToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinColumn(name = "person_id")
+    @JoinColumn(name = "person_id", nullable = false)
     private Person person;
 
     @ManyToOne
-    @JoinColumn(name = "created_by", nullable = false)
+    @JoinColumn
     private User createdBy;
 
     @OneToMany(mappedBy = "worker")

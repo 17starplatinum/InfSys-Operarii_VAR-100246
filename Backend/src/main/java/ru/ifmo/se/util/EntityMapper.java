@@ -61,11 +61,7 @@ public class EntityMapper {
         workerDTO.setName(worker.getName());
         workerDTO.setCoordinates(toCoordinatesDTO(worker.getCoordinates()));
         workerDTO.setCreationDate(worker.getCreationDate());
-        if(worker.getOrganization() == null){
-            workerDTO.setOrganization(null);
-        } else {
-            workerDTO.setOrganization(toOrganizationDTO(worker.getOrganization()));
-        }
+        workerDTO.setOrganization((worker.getOrganization() == null) ? null : toOrganizationDTO(worker.getOrganization()));
         workerDTO.setRating(worker.getRating());
         workerDTO.setSalary(worker.getSalary());
         workerDTO.setPosition(worker.getPosition());
@@ -152,6 +148,7 @@ public class EntityMapper {
         worker.setPosition(workerDTO.getPosition());
         worker.setStatus(workerDTO.getStatus());
         worker.setPerson(person);
+        worker.setCreationDate(workerDTO.getCreationDate() != null ? workerDTO.getCreationDate() : LocalDateTime.now());
         return worker;
     }
 

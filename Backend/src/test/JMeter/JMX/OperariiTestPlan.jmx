@@ -1,0 +1,824 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jmeterTestPlan version="1.2" properties="5.0" jmeter="5.6.3">
+  <hashTree>
+    <TestPlan guiclass="TestPlanGui" testclass="TestPlan" testname="Operarii">
+      <elementProp name="TestPlan.user_defined_variables" elementType="Arguments" guiclass="ArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+        <collectionProp name="Arguments.arguments"/>
+      </elementProp>
+    </TestPlan>
+    <hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Create Workers" enabled="false">
+        <intProp name="ThreadGroup.num_threads">5</intProp>
+        <intProp name="ThreadGroup.ramp_time">5</intProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
+          <stringProp name="LoopController.loops">1</stringProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create Worker #1">
+          <intProp name="HTTPSampler.connect_timeout">20000</intProp>
+          <intProp name="HTTPSampler.response_timeout">20000</intProp>
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">21861</stringProp>
+          <stringProp name="HTTPSampler.protocol">HTTP</stringProp>
+          <stringProp name="HTTPSampler.path">/api/workers</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{&#xd;
+  &quot;name&quot;: &quot;Ring&quot;,&#xd;
+  &quot;coordinates&quot;: {&#xd;
+    &quot;x&quot;: 697.727,&#xd;
+    &quot;y&quot;: 17&#xd;
+  },&#xd;
+  &quot;organization&quot;: {&#xd;
+    &quot;officialAddress&quot;: {&#xd;
+      &quot;zipCode&quot;: &quot;ÅÍÎÏ˝ÓÔÒÚÆ☃&quot;,&#xd;
+      &quot;town&quot;: null&#xd;
+    },&#xd;
+    &quot;annualTurnover&quot;: 417947.65,&#xd;
+    &quot;employeesCount&quot;: 646,&#xd;
+    &quot;fullName&quot;: &quot;Aetna Inc.&quot;,&#xd;
+    &quot;type&quot;: null,&#xd;
+    &quot;postalAddress&quot;: {&#xd;
+      &quot;zipCode&quot;: &quot;𠜎𠜱𠝹𠱓𠱸𠲖𠳏&quot;,&#xd;
+      &quot;town&quot;: {&#xd;
+        &quot;x&quot;: 583.99,&#xd;
+        &quot;y&quot;: 615,&#xd;
+        &quot;z&quot;: 428&#xd;
+      }&#xd;
+    }&#xd;
+  },&#xd;
+  &quot;salary&quot;: null,&#xd;
+  &quot;rating&quot;: 471659.59,&#xd;
+  &quot;position&quot;: &quot;DIRECTOR&quot;,&#xd;
+  &quot;status&quot;: &quot;HIRED&quot;,&#xd;
+  &quot;person&quot;: {&#xd;
+    &quot;eyeColor&quot;: &quot;ORANGE&quot;,&#xd;
+    &quot;hairColor&quot;: null,&#xd;
+    &quot;location&quot;: {&#xd;
+      &quot;x&quot;: 15273.29,&#xd;
+      &quot;y&quot;: 92410,&#xd;
+      &quot;z&quot;: 84971&#xd;
+    },&#xd;
+    &quot;birthday&quot;: &quot;2020-08-01&quot;,&#xd;
+    &quot;weight&quot;: 2054.37,&#xd;
+    &quot;nationality&quot;: &quot;UNITED_KINGDOM&quot;&#xd;
+  }&#xd;
+}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create Worker #2">
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">21861</stringProp>
+          <stringProp name="HTTPSampler.path">/api/workers</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{&#xd;
+  &quot;name&quot;: &quot;Keir&quot;,&#xd;
+  &quot;coordinates&quot;: {&#xd;
+    &quot;x&quot;: 100.87,&#xd;
+    &quot;y&quot;: 12&#xd;
+  },&#xd;
+  &quot;organization&quot;: {&#xd;
+    &quot;officialAddress&quot;: {&#xd;
+      &quot;zipCode&quot;: &quot;&lt;svg&gt;&lt;script&gt;0&lt;1&gt;alert(&apos;XSS&apos;)&lt;/script&gt;&quot;,&#xd;
+      &quot;town&quot;: {&#xd;
+        &quot;x&quot;: 52430.46,&#xd;
+        &quot;y&quot;: 1010,&#xd;
+        &quot;z&quot;: 311&#xd;
+      }&#xd;
+    },&#xd;
+    &quot;annualTurnover&quot;: 576551.7,&#xd;
+    &quot;employeesCount&quot;: 979,&#xd;
+    &quot;fullName&quot;: null,&#xd;
+    &quot;type&quot;: &quot;TRUST&quot;,&#xd;
+    &quot;postalAddress&quot;: {&#xd;
+      &quot;zipCode&quot;: &quot;ヽ༼ຈل͜ຈ༽ﾉ ヽ༼ຈل͜ຈ༽ﾉ &quot;,&#xd;
+      &quot;town&quot;: null&#xd;
+    }&#xd;
+  },&#xd;
+  &quot;salary&quot;: 411531.29,&#xd;
+  &quot;rating&quot;: 153888.41,&#xd;
+  &quot;position&quot;: &quot;DIRECTOR&quot;,&#xd;
+  &quot;status&quot;: &quot;FIRED&quot;,&#xd;
+  &quot;person&quot;: {&#xd;
+    &quot;eyeColor&quot;: &quot;ORANGE&quot;,&#xd;
+    &quot;hairColor&quot;: &quot;GREEN&quot;,&#xd;
+    &quot;location&quot;: {&#xd;
+      &quot;x&quot;: 24611.79,&#xd;
+      &quot;y&quot;: 71683,&#xd;
+      &quot;z&quot;: 85732&#xd;
+    },&#xd;
+    &quot;birthday&quot;: &quot;2022-12-28&quot;,&#xd;
+    &quot;weight&quot;: 1842.13,&#xd;
+    &quot;nationality&quot;: &quot;FRANCE&quot;&#xd;
+  }&#xd;
+}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create Worker #3">
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">21861</stringProp>
+          <stringProp name="HTTPSampler.path">/api/workers</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{&#xd;
+  &quot;name&quot;: &quot;Dermot&quot;,&#xd;
+  &quot;coordinates&quot;: {&#xd;
+    &quot;x&quot;: 12.301,&#xd;
+    &quot;y&quot;: 24&#xd;
+  },&#xd;
+  &quot;organization&quot;: {&#xd;
+    &quot;officialAddress&quot;: {&#xd;
+      &quot;zipCode&quot;: &quot;1/2&quot;,&#xd;
+      &quot;town&quot;: {&#xd;
+        &quot;x&quot;: 44633.98,&#xd;
+        &quot;y&quot;: 1015,&#xd;
+        &quot;z&quot;: 706&#xd;
+      }&#xd;
+    },&#xd;
+    &quot;annualTurnover&quot;: 935548.29,&#xd;
+    &quot;employeesCount&quot;: 166,&#xd;
+    &quot;fullName&quot;: &quot;Huron Consulting Group Inc.&quot;,&#xd;
+    &quot;type&quot;: &quot;GOVERNMENT&quot;,&#xd;
+    &quot;postalAddress&quot;: {&#xd;
+      &quot;zipCode&quot;: &quot;00˙Ɩ$-&quot;,&#xd;
+      &quot;town&quot;: {&#xd;
+        &quot;x&quot;: 184.7,&#xd;
+        &quot;y&quot;: 5929,&#xd;
+        &quot;z&quot;: 179&#xd;
+      }&#xd;
+    }&#xd;
+  },&#xd;
+  &quot;salary&quot;: 419817.39,&#xd;
+  &quot;rating&quot;: 598643.19,&#xd;
+  &quot;position&quot;: &quot;DIRECTOR&quot;,&#xd;
+  &quot;status&quot;: &quot;FIRED&quot;,&#xd;
+  &quot;person&quot;: {&#xd;
+    &quot;eyeColor&quot;: &quot;BLUE&quot;,&#xd;
+    &quot;hairColor&quot;: &quot;ORANGE&quot;,&#xd;
+    &quot;location&quot;: {&#xd;
+      &quot;x&quot;: 28441.98,&#xd;
+      &quot;y&quot;: 58953,&#xd;
+      &quot;z&quot;: 67273&#xd;
+    },&#xd;
+    &quot;birthday&quot;: &quot;2022-10-12&quot;,&#xd;
+    &quot;weight&quot;: 1015,&#xd;
+    &quot;nationality&quot;: &quot;UNITED_KINGDOM&quot;&#xd;
+  }&#xd;
+}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create Worker #4">
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">21861</stringProp>
+          <stringProp name="HTTPSampler.path">/api/workers</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{&#xd;
+  &quot;name&quot;: &quot;Igor&quot;,&#xd;
+  &quot;coordinates&quot;: {&#xd;
+    &quot;x&quot;: 613.398,&#xd;
+    &quot;y&quot;: 11&#xd;
+  },&#xd;
+  &quot;organization&quot;: {&#xd;
+    &quot;officialAddress&quot;: {&#xd;
+      &quot;zipCode&quot;: &quot;&apos;&quot;,&#xd;
+      &quot;town&quot;: null&#xd;
+    },&#xd;
+    &quot;annualTurnover&quot;: 203418.38,&#xd;
+    &quot;employeesCount&quot;: 975,&#xd;
+    &quot;fullName&quot;: null,&#xd;
+    &quot;type&quot;: &quot;GOVERNMENT&quot;,&#xd;
+    &quot;postalAddress&quot;: {&#xd;
+      &quot;zipCode&quot;: &quot;,./;&apos;[]\\-=&quot;,&#xd;
+      &quot;town&quot;: null&#xd;
+    }&#xd;
+  },&#xd;
+  &quot;salary&quot;: null,&#xd;
+  &quot;rating&quot;: 838426.5,&#xd;
+  &quot;position&quot;: &quot;BAKER&quot;,&#xd;
+  &quot;status&quot;: &quot;RECOMMENDED_FOR_PROMOTION&quot;,&#xd;
+  &quot;person&quot;: {&#xd;
+    &quot;eyeColor&quot;: &quot;ORANGE&quot;,&#xd;
+    &quot;hairColor&quot;: &quot;BLACK&quot;,&#xd;
+    &quot;location&quot;: {&#xd;
+      &quot;x&quot;: 28537.3,&#xd;
+      &quot;y&quot;: 49570,&#xd;
+      &quot;z&quot;: 6966&#xd;
+    },&#xd;
+    &quot;birthday&quot;: null,&#xd;
+    &quot;weight&quot;: 10566,&#xd;
+    &quot;nationality&quot;: &quot;UNITED_KINGDOM&quot;&#xd;
+  }&#xd;
+}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Create Worker #5">
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">21861</stringProp>
+          <stringProp name="HTTPSampler.path">/api/workers</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{&#xd;
+  &quot;name&quot;: &quot;Violette&quot;,&#xd;
+  &quot;coordinates&quot;: {&#xd;
+    &quot;x&quot;: 320.661,&#xd;
+    &quot;y&quot;: 16&#xd;
+  },&#xd;
+  &quot;organization&quot;: null,&#xd;
+  &quot;salary&quot;: 225237.28,&#xd;
+  &quot;rating&quot;: 925304.92,&#xd;
+  &quot;position&quot;: &quot;LABORER&quot;,&#xd;
+  &quot;status&quot;: null,&#xd;
+  &quot;person&quot;: {&#xd;
+    &quot;eyeColor&quot;: &quot;BLACK&quot;,&#xd;
+    &quot;hairColor&quot;: &quot;BLUE&quot;,&#xd;
+    &quot;location&quot;: {&#xd;
+      &quot;x&quot;: 39456.32,&#xd;
+      &quot;y&quot;: 93379,&#xd;
+      &quot;z&quot;: 56202&#xd;
+    },&#xd;
+    &quot;birthday&quot;: &quot;2020-01-30&quot;,&#xd;
+    &quot;weight&quot;: 151,&#xd;
+    &quot;nationality&quot;: &quot;FRANCE&quot;&#xd;
+  }&#xd;
+}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Update and Delete Workers" enabled="false">
+        <intProp name="ThreadGroup.num_threads">3</intProp>
+        <intProp name="ThreadGroup.ramp_time">3</intProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
+          <stringProp name="LoopController.loops">2</stringProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Update Worker #1">
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">21861</stringProp>
+          <stringProp name="HTTPSampler.path">/api/workers/1</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">PUT</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{&#xd;
+  &quot;name&quot;: &quot;Ring&quot;,&#xd;
+  &quot;coordinates&quot;: {&#xd;
+    &quot;x&quot;: 697.727,&#xd;
+    &quot;y&quot;: 17&#xd;
+  },&#xd;
+  &quot;organization&quot;: {&#xd;
+    &quot;officialAddress&quot;: {&#xd;
+      &quot;zipCode&quot;: &quot;something normal&quot;,&#xd;
+      &quot;town&quot;: null&#xd;
+    },&#xd;
+    &quot;annualTurnover&quot;: 417947.65,&#xd;
+    &quot;employeesCount&quot;: 646,&#xd;
+    &quot;fullName&quot;: &quot;Aetna Inc.&quot;,&#xd;
+    &quot;type&quot;: null,&#xd;
+    &quot;postalAddress&quot;: {&#xd;
+      &quot;zipCode&quot;: &quot;𠜎𠜱𠝹𠱓𠱸𠲖𠳏&quot;,&#xd;
+      &quot;town&quot;: {&#xd;
+        &quot;x&quot;: 583.99,&#xd;
+        &quot;y&quot;: 615,&#xd;
+        &quot;z&quot;: 428&#xd;
+      }&#xd;
+    }&#xd;
+  },&#xd;
+  &quot;salary&quot;: null,&#xd;
+  &quot;rating&quot;: 471659.59,&#xd;
+  &quot;position&quot;: &quot;DIRECTOR&quot;,&#xd;
+  &quot;status&quot;: &quot;HIRED&quot;,&#xd;
+  &quot;person&quot;: {&#xd;
+    &quot;eyeColor&quot;: &quot;ORANGE&quot;,&#xd;
+    &quot;hairColor&quot;: null,&#xd;
+    &quot;location&quot;: {&#xd;
+      &quot;x&quot;: 15273.29,&#xd;
+      &quot;y&quot;: 92410,&#xd;
+      &quot;z&quot;: 84971&#xd;
+    },&#xd;
+    &quot;birthday&quot;: &quot;2020-08-01&quot;,&#xd;
+    &quot;weight&quot;: 2054.37,&#xd;
+    &quot;nationality&quot;: &quot;UNITED_KINGDOM&quot;&#xd;
+  }&#xd;
+}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Update Worker #2">
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">21861</stringProp>
+          <stringProp name="HTTPSampler.path">/api/workers/2</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">PUT</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{&#xd;
+  &quot;name&quot;: &quot;Igor&quot;,&#xd;
+  &quot;coordinates&quot;: {&#xd;
+    &quot;x&quot;: 613.398,&#xd;
+    &quot;y&quot;: 11&#xd;
+  },&#xd;
+  &quot;organization&quot;: {&#xd;
+    &quot;officialAddress&quot;: {&#xd;
+      &quot;zipCode&quot;: &quot;&apos;&quot;,&#xd;
+      &quot;town&quot;: null&#xd;
+    },&#xd;
+    &quot;annualTurnover&quot;: 203418.38,&#xd;
+    &quot;employeesCount&quot;: 975,&#xd;
+    &quot;fullName&quot;: null,&#xd;
+    &quot;type&quot;: &quot;GOVERNMENT&quot;,&#xd;
+    &quot;postalAddress&quot;: {&#xd;
+      &quot;zipCode&quot;: &quot;,./;&apos;[]\\-=&quot;,&#xd;
+      &quot;town&quot;: null&#xd;
+    }&#xd;
+  },&#xd;
+  &quot;salary&quot;: null,&#xd;
+  &quot;rating&quot;: 838426.5,&#xd;
+  &quot;position&quot;: &quot;BAKER&quot;,&#xd;
+  &quot;status&quot;: &quot;RECOMMENDED_FOR_PROMOTION&quot;,&#xd;
+  &quot;person&quot;: {&#xd;
+    &quot;eyeColor&quot;: &quot;ORANGE&quot;,&#xd;
+    &quot;hairColor&quot;: &quot;BLACK&quot;,&#xd;
+    &quot;location&quot;: {&#xd;
+      &quot;x&quot;: 28537.3,&#xd;
+      &quot;y&quot;: 49570,&#xd;
+      &quot;z&quot;: 6966&#xd;
+    },&#xd;
+    &quot;birthday&quot;: null,&#xd;
+    &quot;weight&quot;: 10566,&#xd;
+    &quot;nationality&quot;: &quot;UNITED_KINGDOM&quot;&#xd;
+  }&#xd;
+}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Update Worker #3">
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">21861</stringProp>
+          <stringProp name="HTTPSampler.path">/api/workers/3</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">PUT</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">true</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments">
+            <collectionProp name="Arguments.arguments">
+              <elementProp name="" elementType="HTTPArgument">
+                <boolProp name="HTTPArgument.always_encode">false</boolProp>
+                <stringProp name="Argument.value">{&#xd;
+  &quot;name&quot;: &quot;Dermot&quot;,&#xd;
+  &quot;coordinates&quot;: {&#xd;
+    &quot;x&quot;: 12.301,&#xd;
+    &quot;y&quot;: 24&#xd;
+  },&#xd;
+  &quot;organization&quot;: {&#xd;
+    &quot;officialAddress&quot;: {&#xd;
+      &quot;zipCode&quot;: &quot;1/2&quot;,&#xd;
+      &quot;town&quot;: {&#xd;
+        &quot;x&quot;: 44633.98,&#xd;
+        &quot;y&quot;: 1015,&#xd;
+        &quot;z&quot;: 706&#xd;
+      }&#xd;
+    },&#xd;
+    &quot;annualTurnover&quot;: 935548.29,&#xd;
+    &quot;employeesCount&quot;: 166,&#xd;
+    &quot;fullName&quot;: &quot;Huron Consulting Group Inc.&quot;,&#xd;
+    &quot;type&quot;: &quot;GOVERNMENT&quot;,&#xd;
+    &quot;postalAddress&quot;: {&#xd;
+      &quot;zipCode&quot;: &quot;00˙Ɩ$-&quot;,&#xd;
+      &quot;town&quot;: {&#xd;
+        &quot;x&quot;: 184.7,&#xd;
+        &quot;y&quot;: 5929,&#xd;
+        &quot;z&quot;: 179&#xd;
+      }&#xd;
+    }&#xd;
+  },&#xd;
+  &quot;salary&quot;: 419817.39,&#xd;
+  &quot;rating&quot;: 598643.19,&#xd;
+  &quot;position&quot;: &quot;DIRECTOR&quot;,&#xd;
+  &quot;status&quot;: &quot;FIRED&quot;,&#xd;
+  &quot;person&quot;: {&#xd;
+    &quot;eyeColor&quot;: &quot;BLUE&quot;,&#xd;
+    &quot;hairColor&quot;: &quot;ORANGE&quot;,&#xd;
+    &quot;location&quot;: {&#xd;
+      &quot;x&quot;: 28441.98,&#xd;
+      &quot;y&quot;: 58953,&#xd;
+      &quot;z&quot;: 67273&#xd;
+    },&#xd;
+    &quot;birthday&quot;: &quot;2022-10-12&quot;,&#xd;
+    &quot;weight&quot;: 1015,&#xd;
+    &quot;nationality&quot;: &quot;UNITED_KINGDOM&quot;&#xd;
+  }&#xd;
+}</stringProp>
+                <stringProp name="Argument.metadata">=</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Delete Worker #1">
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">21861</stringProp>
+          <stringProp name="HTTPSampler.path">/api/workers/1</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">DELETE</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Delete Worker #2">
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">21861</stringProp>
+          <stringProp name="HTTPSampler.path">/api/workers/2</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">DELETE</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Delete Worker #3">
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">21861</stringProp>
+          <stringProp name="HTTPSampler.path">/api/workers/3</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">DELETE</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+      <ThreadGroup guiclass="ThreadGroupGui" testclass="ThreadGroup" testname="Import">
+        <intProp name="ThreadGroup.num_threads">2</intProp>
+        <intProp name="ThreadGroup.ramp_time">2</intProp>
+        <boolProp name="ThreadGroup.same_user_on_next_iteration">true</boolProp>
+        <stringProp name="ThreadGroup.on_sample_error">continue</stringProp>
+        <elementProp name="ThreadGroup.main_controller" elementType="LoopController" guiclass="LoopControlPanel" testclass="LoopController" testname="Loop Controller">
+          <stringProp name="LoopController.loops">1</stringProp>
+          <boolProp name="LoopController.continue_forever">false</boolProp>
+        </elementProp>
+      </ThreadGroup>
+      <hashTree>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Import #1">
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">21861</stringProp>
+          <stringProp name="HTTPSampler.path">/api/import</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <elementProp name="HTTPsampler.Files" elementType="HTTPFileArgs">
+            <collectionProp name="HTTPFileArgs.files">
+              <elementProp name="D:\ITMO\Software Engineering\Information Systems\Labs\Operarii\Backend\src\test\JMeter\Data\test_data_1.json" elementType="HTTPFileArg">
+                <stringProp name="File.mimetype">application/json</stringProp>
+                <stringProp name="File.path">D:\ITMO\Software Engineering\Information Systems\Labs\Operarii\Backend\src\test\JMeter\Data\test_data_1.json</stringProp>
+                <stringProp name="File.paramname">file</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <HTTPSamplerProxy guiclass="HttpTestSampleGui" testclass="HTTPSamplerProxy" testname="Import #2">
+          <stringProp name="HTTPSampler.domain">localhost</stringProp>
+          <stringProp name="HTTPSampler.port">21861</stringProp>
+          <stringProp name="HTTPSampler.path">/api/import</stringProp>
+          <boolProp name="HTTPSampler.follow_redirects">true</boolProp>
+          <stringProp name="HTTPSampler.method">POST</stringProp>
+          <boolProp name="HTTPSampler.use_keepalive">true</boolProp>
+          <elementProp name="HTTPsampler.Files" elementType="HTTPFileArgs">
+            <collectionProp name="HTTPFileArgs.files">
+              <elementProp name="D:\ITMO\Software Engineering\Information Systems\Labs\Operarii\Backend\src\test\JMeter\Data\test_data_2.json" elementType="HTTPFileArg">
+                <stringProp name="File.mimetype">application/json</stringProp>
+                <stringProp name="File.path">D:\ITMO\Software Engineering\Information Systems\Labs\Operarii\Backend\src\test\JMeter\Data\test_data_2.json</stringProp>
+                <stringProp name="File.paramname">file</stringProp>
+              </elementProp>
+            </collectionProp>
+          </elementProp>
+          <boolProp name="HTTPSampler.postBodyRaw">false</boolProp>
+          <elementProp name="HTTPsampler.Arguments" elementType="Arguments" guiclass="HTTPArgumentsPanel" testclass="Arguments" testname="User Defined Variables">
+            <collectionProp name="Arguments.arguments"/>
+          </elementProp>
+        </HTTPSamplerProxy>
+        <hashTree/>
+        <ResultCollector guiclass="ViewResultsFullVisualizer" testclass="ResultCollector" testname="View Results Tree">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+        <ResultCollector guiclass="SummaryReport" testclass="ResultCollector" testname="Summary Report">
+          <boolProp name="ResultCollector.error_logging">false</boolProp>
+          <objProp>
+            <name>saveConfig</name>
+            <value class="SampleSaveConfiguration">
+              <time>true</time>
+              <latency>true</latency>
+              <timestamp>true</timestamp>
+              <success>true</success>
+              <label>true</label>
+              <code>true</code>
+              <message>true</message>
+              <threadName>true</threadName>
+              <dataType>true</dataType>
+              <encoding>false</encoding>
+              <assertions>true</assertions>
+              <subresults>true</subresults>
+              <responseData>false</responseData>
+              <samplerData>false</samplerData>
+              <xml>false</xml>
+              <fieldNames>true</fieldNames>
+              <responseHeaders>false</responseHeaders>
+              <requestHeaders>false</requestHeaders>
+              <responseDataOnError>false</responseDataOnError>
+              <saveAssertionResultsFailureMessage>true</saveAssertionResultsFailureMessage>
+              <assertionsResultsToSave>0</assertionsResultsToSave>
+              <bytes>true</bytes>
+              <sentBytes>true</sentBytes>
+              <url>true</url>
+              <threadCounts>true</threadCounts>
+              <idleTime>true</idleTime>
+              <connectTime>true</connectTime>
+            </value>
+          </objProp>
+          <stringProp name="filename"></stringProp>
+        </ResultCollector>
+        <hashTree/>
+      </hashTree>
+      <HeaderManager guiclass="HeaderPanel" testclass="HeaderManager" testname="HTTP Header Manager">
+        <collectionProp name="HeaderManager.headers">
+          <elementProp name="" elementType="Header">
+            <stringProp name="Header.name">Content-Type</stringProp>
+            <stringProp name="Header.value">application/json</stringProp>
+          </elementProp>
+          <elementProp name="" elementType="Header">
+            <stringProp name="Header.name">Authorization</stringProp>
+            <stringProp name="Header.value">Bearer eyJhbGciOiJIUzI1NiJ9.eyJyb2xlIjoiVVNFUiIsInVzZXJJZCI6MSwic3ViIjoiRWR3YXJkVGVsbGVyIiwiaWF0IjoxNzM0ODg0NDIxLCJleHAiOjE3MzQ4ODgwMjF9.6hF5tqLyOdXTq_8Z9rxgTfWeaEUbsHmpC8_00Tr8Baw</stringProp>
+          </elementProp>
+        </collectionProp>
+      </HeaderManager>
+      <hashTree/>
+    </hashTree>
+  </hashTree>
+</jmeterTestPlan>
