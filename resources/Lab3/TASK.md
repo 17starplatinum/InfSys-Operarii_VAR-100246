@@ -4,9 +4,9 @@
     <img src="https://media1.tenor.com/m/Jk5eCnw0ekYAAAAC/novosphere-novo.gif" alt="businessmen"/>
 </p>
 
-### Вариант `?` (В 2024 всем было пофиг)
+### Вариант `10059` (В 2024 всем было пофиг)
 
-## Результат: ${\color{white}?}\%$
+## Результат: ${\color{green}100\%}$
 ___
 
 **Доработать ИС из ЛР2 следующим образом:**
