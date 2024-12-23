@@ -32,8 +32,14 @@ export const LayoutPage = ({ setPage, user, content, setUser }) => {
               <button
                 className="btn btn-primary mx-1"
                 onClick={() => setPage("special")}
-                >
+              >
                 <i className="fa fa-toolbox"></i>&nbsp; Спецы
+              </button>
+              <button
+                className="btn btn-primary mx-1"
+                onClick={() => setPage("import")}
+              >
+                <i className="fa fa-file"></i>&nbsp; Импорт
               </button>
               <button
                 className="btn btn-primary mx-1"

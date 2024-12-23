@@ -256,16 +256,17 @@ public class EntityMapper {
         importOperationDTO.setStatus(importHistory.getStatus());
         importOperationDTO.setTimestamp(importHistory.getTimestamp());
         importOperationDTO.setAddedObjectsCount(importHistory.getAddedObjectsCount());
-        importOperationDTO.setAddedObjectsCount(importHistory.getAddedObjectsCount());
+        importOperationDTO.setUsername(importHistory.getUser().getUsername());
         return importOperationDTO;
     }
 
-    public ImportHistory toImportHistoryEntity(User user, ImportStatus status, int addedObjects) {
+    public ImportHistory toImportHistoryEntity(User user, ImportStatus status, int addedObjects, String fileName) {
         ImportHistory importHistory = new ImportHistory();
         importHistory.setStatus(status);
         importHistory.setUser(user);
         importHistory.setTimestamp(LocalDateTime.now());
         importHistory.setAddedObjectsCount(addedObjects);
+        importHistory.setFileName(fileName);
         return importHistory;
     }
 }

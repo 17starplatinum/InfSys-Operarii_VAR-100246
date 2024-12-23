@@ -1,8 +1,8 @@
 import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {V1APIURL} from "./src/shared/constants";
+import {V1APIURL} from "./shared/constants";
 import axios from "axios";
-import {getAxios} from "./src/shared/utils";
+import {getAxios} from "./shared/utils";
 
 export const UserContext = createContext();
 

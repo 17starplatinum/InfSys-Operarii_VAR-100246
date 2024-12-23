@@ -1,4 +1,4 @@
-package ru.ifmo.se.service.info;
+package ru.ifmo.se.service.storage;
 
 public interface TwoPCResource {
     void prepare() throws Exception;

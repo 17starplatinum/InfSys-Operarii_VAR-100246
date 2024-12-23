@@ -4,7 +4,7 @@
     <img src="https://media1.tenor.com/m/Jk5eCnw0ekYAAAAC/novosphere-novo.gif" alt="businessmen"/>
 </p>
 
-### Вариант `?` (В 2024 всем было пох)
+### Вариант `?` (В 2024 всем было пофиг)
 
 ## Результат: ${\color{white}?}\%$
 ___

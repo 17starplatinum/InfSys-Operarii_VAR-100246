@@ -1,16 +1,19 @@
-DATA_DIR="./minio_data"
-if [ ! -d "$DATA_DIR" ]; then
-  mkdir -p "$DATA_DIR"
-  echo "Создана директория для данных: $DATA_DIR"
-fi
+$DATA_DIR="./minio_data"
+if ( !(test-path -PathType container $DATA_DIR) )
+{
+    New-Item -ItemType Directory -Path $DATA_DIR
+    Write-Host "Создана директория для данных: $DATA_DIR"
+}
 
-echo "Запуск MinIO на порту 9000 и консоль на порту 9001..."
-.\minio server "$DATA_DIR" --console-address ":9001" &
+Write-Host "Запуск MinIO на порту 9000 и консоль на порту 9001..."
+.\minio.exe server "$DATA_DIR" --console-address ":9001"
 
-sleep 2
-if pgrep -f "minio server" > /dev/null; then
-    echo "MinIO успешно запущен!"
-    echo "Консоль доступна по адресу: http://localhost:9001"
-else
-    echo "Ошибка при запуске MinIO"
-fi
+$process = Get-Process | Where-Object { $_.ProcessName -like "*minio*" }
+
+if ($process)
+{
+    Write-Host "MinIO успешно запущен!"
+    Write-Host "Консоль доступна по адресу: http://localhost:9001"
+} else {
+    Write-Host "Ошибка при запуске MinIO"
+}

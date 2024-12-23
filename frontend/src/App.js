@@ -11,6 +11,7 @@ import { CoordinatesComponent } from "./components/Coordinates";
 import { LocationsComponent } from "./components/Locations";
 import { AddressesComponent } from "./components/Addresses";
 import { AccessManagement, RequestAdminAccess } from "./components/AccessManagement";
+import {ImportHistoryComponent} from "./components/Import";
 
 function App() {
   const [user, setUser] = useState();
@@ -107,6 +108,15 @@ function App() {
                 content={user.role === "ADMIN" ? <AccessManagement setPage={setPage}/> : <RequestAdminAccess setPage={setPage}/>}
               />
           );
+    case "import":
+      return (
+        <LayoutPage
+          setPage={setPage}
+          user={user}
+          setUser={setUser}
+          content={user.role === "ADMIN" ? <ImportHistoryComponent setPage={setPage()} admin={true}/> : <ImportHistoryComponent setPage={setPage} admin={false}/>}
+          />
+      );
     default:
       return (
         <LayoutPage

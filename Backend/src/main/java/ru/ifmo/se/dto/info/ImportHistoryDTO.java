@@ -4,7 +4,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import ru.ifmo.se.entity.info.ImportStatus;
-import ru.ifmo.se.entity.user.User;
 
 import java.time.LocalDateTime;
 

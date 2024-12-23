@@ -43,6 +43,11 @@ export const DashboardComponent = ({ setPage }) => {
             title: "Специальные операции",
             icon: "fa-solid fa-toolbox",
           },
+          {
+            page: "import",
+            title: "Импорт объектов",
+            icon: "fa-solid fa-file",
+          },
         ].map((item, index) => (
           <div className="col-lg-4 col-md-6 mb-3" key={index}>
             <div className="card border border-1" onClick={() => setPage(item.page)}>
